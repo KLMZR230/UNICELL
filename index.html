@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNICELL Servicio Técnico | Reparación de Celulares y Consolas</title>
+    
+    <!-- Carga de Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carga de Lucide Icons (Iconos modernos y ligeros) --><script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Carga del cliente de Supabase --><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        /* Configuraciones de tema y fuente */
+        :root {
+            --color-primary: #FF4545; /* Rojo/Naranja de acento */
+            --color-secondary: #E91E63; /* Rosa/Magenta de circuito */
+            --color-dark: #1F2937; /* Gris oscuro para fondo */
+            --color-darker: #111827; /* Negro profundo */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-darker);
+            color: #E5E7EB; /* Texto gris claro */
+            background-image: radial-gradient(at top left, rgba(255, 69, 69, 0.1), transparent 50%),
+                              radial-gradient(at bottom right, rgba(233, 30, 99, 0.1), transparent 50%);
+            min-height: 100vh;
+        }
+        .accent-text {
+            color: var(--color-primary);
+        }
+        .service-card {
+            /* Asegura que el contenedor de la imagen de fondo funcione */
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 69, 69, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(233, 30, 99, 0.2);
+        }
+        .input-dark {
+            background-color: #2D3748; /* Darker input background */
+            border-color: rgba(255, 69, 69, 0.3);
+            color: white;
+        }
+        /* Estilo para la imagen de fondo con overlay */
+        .service-image-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15; /* Sutil */
+            transition: opacity 0.5s;
+        }
+        .service-content {
+            position: relative; /* Asegura que el contenido quede encima del fondo */
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <!-- Contenedor principal centrado y responsivo --><div class="max-w-4xl mx-auto py-8">
+
+        <!-- SECCIÓN 1: ENCABEZADO Y HERO --><header class="mb-16 pt-4 relative flex justify-between items-start sm:items-center">
+            
+            <!-- Logo y Nombre (Superior Izquierda) --><div class="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-3 mb-4 sm:mb-0">
+                <div id="logo-container" class="flex items-center space-x-2 relative group">
+                    <!-- Logo (Placeholder o Imagen Subida) --><div id="current-logo">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 accent-text" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 20a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" opacity=".2"/>
+                            <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" fill="var(--color-primary)"/>
+                            <path d="M16 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM10 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                            <path d="M12 14v-2" stroke-width="3"/>
+                        </svg>
+                    </div>
+                    
+                    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+                        UNICELL
+                    </h1>
+                </div>
+                <p class="text-lg sm:text-xl font-light accent-text border-b-2 border-pink-500 inline-block pb-1 pl-1 sm:pl-0">
+                    SERVICIO TÉCNICO
+                </p>
+            </div>
+
+            <!-- Botones de Acciones (Inventario y Ventas) --><div class="flex space-x-2 mt-2 sm:mt-0">
+                <button id="open-inventory-modal" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-3 sm:px-4 rounded-full transition duration-300 shadow-md flex items-center text-sm sm:text-base">
+                    <i data-lucide="package" class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2"></i>
+                    Inventario
+                </button>
+                <button id="open-sales-modal" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-3 sm:px-4 rounded-full transition duration-300 shadow-md flex items-center text-sm sm:text-base">
+                    <i data-lucide="receipt-text" class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2"></i>
+                    Ventas
+                </button>
+            </div>
+        </header>
+
+        <!-- SECCIÓN DE DESCRIPCIÓN CENTRAL --><section class="text-center mb-16 -mt-8"> <!-- Ajuste de margen superior para compensar el encabezado más compacto --><p class="mt-4 text-gray-400 max-w-md mx-auto">
+                Especialistas en la reparación de dispositivos móviles y mantenimiento de consolas.
+            </p>
+        </section>
+
+        <!-- SECCIÓN 2: SERVICIOS CON GESTIÓN DE IMAGENES --><section id="servicios" class="mb-16">
+            <h2 class="text-3xl font-bold text-center mb-8 text-white">Nuestros Servicios Expertos</h2>
+            <div id="service-cards-container" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <!-- Las tarjetas de servicio se renderizarán aquí dinámicamente -->
+                <div class="text-center text-gray-400 p-8">Cargando servicios...</div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: CONTACTO --><section id="contacto" class="mb-12 text-center p-6 bg-gray-800 rounded-xl shadow-2xl">
+            <h2 class="text-3xl font-bold mb-6 text-white">Contáctanos Hoy Mismo</h2>
+            <p class="text-gray-300 mb-8">¡Agenda tu reparación o consulta sin compromiso!</p>
+
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-6">
+                
+                <!-- WhatsApp / Teléfono --><a href="https://wa.me/52177191068" target="_blank" class="flex items-center space-x-3 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transition duration-300 shadow-md shadow-green-700/50">
+                    <i data-lucide="phone" class="w-5 h-5"></i>
+                    <span>77191068 (WhatsApp)</span>
+                </a>
+
+                <!-- Redes Sociales --><div class="flex space-x-4">
+                    <!-- Facebook --><a href="#" target="_blank" class="p-3 rounded-full bg-gray-700 hover:bg-gray-600 transition duration-300 group" aria-label="Facebook">
+                        <i data-lucide="facebook" class="w-6 h-6 text-white group-hover:accent-text"></i>
+                    </a>
+                    <!-- TikTok --><a href="https://www.tiktok.com/@unicell.75" target="_blank" class="p-3 rounded-full bg-gray-700 hover:bg-gray-600 transition duration-300 group" aria-label="TikTok">
+                        <!-- Icono SVG de TikTok para asegurar el color correcto --><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-white group-hover:accent-text"><path d="M21 8v.715h-4.63l-.444 1.777c.484.07.962.247 1.41.442v3.085c-.448.195-.926.372-1.41.442l.444 1.777H21V16h-4.57c-2.32 0-3.834-1.748-3.834-4.23 0-2.472 1.514-4.22 3.834-4.22H21zM9 16c2.32 0 3.834-1.748 3.834-4.23 0-2.472-1.514-4.22-3.834-4.22H3V16h6z" fill="currentColor"/></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 5: PIE DE PÁGINA Y ADMIN CONTROL --><footer class="text-center mt-10 text-gray-500 border-t border-gray-700 pt-6">
+            <p>&copy; 2024 UNICELL Servicio Técnico. Todos los derechos reservados.</p>
+            
+            <!-- ADMIN DEMO CONTROL --><div id="admin-control-panel" class="mt-4 p-4 bg-gray-800 rounded-lg max-w-sm mx-auto">
+                <p class="text-sm font-bold text-pink-400 mb-2">MODO ADMINISTRADOR (Demo)</p>
+                
+                <!-- Logo Upload for Admin --><div id="logo-admin-control" class="mb-4 hidden">
+                    <h4 class="text-sm font-semibold text-gray-200 mb-2">Control de Logo</h4>
+                    <input type="file" id="logo-file-input" accept="image/*" class="w-full text-xs p-1 rounded-md input-dark border-none" />
+                    <button id="upload-logo-btn" class="w-full bg-red-500 hover:bg-red-400 text-white font-bold py-1 mt-2 rounded-lg transition duration-300 text-xs">
+                        Subir/Actualizar Logo
+                    </button>
+                    <p id="logo-status-message" class="text-xs text-center mt-1"></p>
+                </div>
+                
+                <input id="admin-id-input" type="text" placeholder="Ingresa Admin ID: admin-123456" class="w-full p-2 rounded-lg input-dark text-sm mb-2" value="admin-123456"/>
+                <button id="set-admin-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg transition duration-300 text-sm">
+                    Habilitar Modo Admin
+                </button>
+                <p id="admin-status" class="mt-2 text-sm text-yellow-400 hidden">Estado: Admin Activado.</p>
+            </div>
+            
+        </footer>
+
+    </div>
+    
+    <!-- MODAL 1: REGISTRO DE VENTAS --><div id="sales-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4">
+        <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-pink-500/50 max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300 scale-100 opacity-100">
+            
+            <!-- Botón de Cerrar Modal --><button id="close-sales-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
+                <i data-lucide="x" class="w-7 h-7"></i>
+            </button>
+            
+            <h2 class="text-3xl font-bold text-center mb-6 text-white flex items-center justify-center">
+                <i data-lucide="receipt-text" class="w-7 h-7 accent-text mr-3"></i>
+                Registro de Ventas
+            </h2>
+            
+            <div id="sales-loading-indicator" class="text-center p-4 text-gray-400">Cargando datos de usuario...</div>
+            
+            <!-- Contenedor de Autenticación --><div id="auth-container" class="p-6 bg-gray-800 rounded-lg shadow-xl mb-6">
+                <h3 id="auth-title" class="text-xl font-semibold mb-4 text-white text-center">Acceder al Registro de Ventas</h3>
+                <p id="auth-message" class="text-center text-sm mb-4 text-gray-400">Por favor, inicia sesión con tu correo y contraseña.</p>
+                <input id="email-input" type="email" placeholder="Correo Electrónico" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500 mb-3" />
+                <input id="password-input" type="password" placeholder="Contraseña" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500 mb-4" />
+                <button id="login-btn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 mb-2 disabled:opacity-50">
+                    Iniciar Sesión
+                </button>
+                <button id="signup-btn" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition duration-300 mb-4 disabled:opacity-50 text-sm">
+                    Crear Cuenta (Registrarse)
+                </button>
+                <button id="logout-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg transition duration-300 text-sm hidden">
+                    Cerrar Sesión
+                </button>
+            </div>
+            
+            <div id="app-content" class="hidden">
+                <!-- CAMPO DE DESTINATARIO --><div class="mb-4 p-4 bg-gray-800 rounded-lg shadow-inner">
+                    <h3 class="text-xl font-semibold mb-2 text-gray-200">Destinatario de la Venta</h3>
+                    <input id="client-name-input" type="text" placeholder="Nombre del Cliente (Ej: Juan Pérez)" 
+                           class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500" />
+                </div>
+
+                <!-- Formulario para agregar producto --><div class="mb-8 p-4 bg-gray-800 rounded-lg shadow-inner">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir Nuevo Artículo</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <input id="product-name" type="text" placeholder="Nombre del Producto/Servicio" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500" />
+                        <input id="product-price" type="number" placeholder="Precio (Ej: 150.00)" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500" step="0.01" />
+                        <button id="add-btn" class="col-span-1 bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center disabled:opacity-50">
+                            <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir a Venta
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lista de Productos y Total --><div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-700 rounded-lg">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-1/4">Destinatario</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-2/5">Producto</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-1/6">Precio</th>
+                                <th class="px-3 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider w-1/6">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sales-list" class="bg-gray-800 divide-y divide-gray-700">
+                            <!-- Items se insertarán aquí por JavaScript --></tbody>
+                    </table>
+                </div>
+
+                <!-- Fila del Total --><div class="mt-4 p-4 bg-gray-700 rounded-lg flex justify-between items-center font-bold text-white text-xl">
+                    <span>TOTAL VENTA:</span>
+                    <span id="sales-total" class="accent-text text-2xl">$0.00</span>
+                </div>
+                
+                <!-- ID de Usuario (Mandatorio para apps colaborativas/persistentes) --><p class="text-xs text-gray-500 mt-4 text-right">
+                    Tu ID de Sesión: <span id="user-id-display" class="font-mono text-gray-400">Cargando...</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: INVENTARIO --><div id="inventory-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4">
+        <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-pink-500/50 max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300 scale-100 opacity-100">
+            
+            <!-- Botón de Cerrar Modal --><button id="close-inventory-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
+                <i data-lucide="x" class="w-7 h-7"></i>
+            </button>
+            
+            <h2 class="text-3xl font-bold text-center mb-6 text-white flex items-center justify-center">
+                <i data-lucide="package" class="w-7 h-7 accent-text mr-3"></i>
+                Gestión de Inventario
+            </h2>
+            
+            <div id="inventory-loading-indicator" class="text-center p-4 text-gray-400">Cargando inventario...</div>
+            
+            <div id="inventory-content" class="hidden">
+                <!-- Formulario para agregar producto al inventario (Solo Admin) --><div id="add-inventory-form" class="mb-8 p-4 bg-gray-800 rounded-lg shadow-inner border border-gray-700 hidden">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir/Editar Producto</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-center">
+                        <input id="inventory-name" type="text" placeholder="Nombre del Producto" class="col-span-2 p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500" />
+                        <input id="inventory-price" type="number" placeholder="Precio (Ej: 20.00)" class="p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500" step="0.01" />
+                        <input type="file" id="inventory-file-input" accept="image/*" class="text-sm p-2 rounded-lg input-dark border-none" />
+                        <div class="col-span-4 flex justify-between items-center space-x-2 mt-2">
+                            <button id="add-inventory-btn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center disabled:opacity-50">
+                                <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir a Inventario
+                            </button>
+                            <button id="cancel-edit-inventory-btn" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition duration-300 hidden">
+                                Cancelar Edición
+                            </button>
+                        </div>
+                        <p id="inventory-status-message" class="col-span-4 text-sm text-center mt-2"></p>
+                    </div>
+                </div>
+
+                <!-- Lista de Inventario --><div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-700 rounded-lg">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-1/12">Foto</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-4/12">Nombre</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-3/12">Precio</th>
+                                <th class="px-3 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider w-4/12">Acciones (Solo Admin)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-list" class="bg-gray-800 divide-y divide-gray-700">
+                            <!-- Items se insertarán aquí por JavaScript --></tbody>
+                    </table>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+
+    <!-- Inicializar iconos de Lucide --><script>
+        lucide.createIcons();
+    </script>
+    
+    <!-- Lógica de Supabase y la Aplicación --><script type="module">
+        // --- CREDENCIALES REALES DE SUPABASE ---
+        const SUPABASE_URL = 'https://pavonviwyyjmdwwhxrzm.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhdm9udml3eXlqbWR3d2h4cnptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2MTA2MzcsImV4cCI6MjA3NzE4NjYzN30.dWGKn3MWuVHvOivh608-ZIdfVGsekdpfLu7quc42HBk';
+        const BUCKET_NAME = 'public_assets'; // Nombre del Bucket de Supabase Storage
+
+        // --- Datos Estáticos y Variables Globales ---
+        const ADMIN_ID_DEMO = "admin-123456";
+        
+        const SERVICE_DATA = [
+            { id: 'microsoldadura', title: 'Microsoldadura', icon: 'microscope', description: 'Reparación a nivel de placa base, fallas complejas y de componentes internos.' },
+            { id: 'pantallas', title: 'Pantallas, Baterías y Repuestos', icon: 'display', description: 'Cambio de pantallas, reemplazo de baterías y venta de repuestos originales.' },
+            { id: 'liberaciones', title: 'Liberaciones y Desbloqueo', icon: 'unlock', description: 'Servicio de liberación de operadoras y desbloqueo de dispositivos.' },
+            { id: 'consolas', title: 'Mantenimiento de Consolas y Conectores', icon: 'gamepad', description: 'Servicio completo para consolas (PS, Xbox) y reparación de conectores de carga.' }
+        ];
+
+        let supabase = null;
+        let userId = null;
+        let isAdmin = false;
+        let serviceImageMap = {}; 
+        let currentInventoryId = null; // Para edición
+
+        // UI elements (Comunes)
+        const logoContainer = document.getElementById('logo-container');
+        const currentLogo = document.getElementById('current-logo');
+        const salesModal = document.getElementById('sales-modal');
+        const inventoryModal = document.getElementById('inventory-modal');
+        const salesLoadingIndicator = document.getElementById('sales-loading-indicator');
+        const inventoryLoadingIndicator = document.getElementById('inventory-loading-indicator');
+        
+        // UI elements (Autenticación)
+        const authContainer = document.getElementById('auth-container');
+        const emailInput = document.getElementById('email-input');
+        const passwordInput = document.getElementById('password-input');
+        const loginBtn = document.getElementById('login-btn');
+        const signupBtn = document.getElementById('signup-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const authMessage = document.getElementById('auth-message');
+        
+        // UI elements (Ventas)
+        const appContent = document.getElementById('app-content'); 
+        const userIdDisplay = document.getElementById('user-id-display');
+        const salesList = document.getElementById('sales-list');
+        const salesTotal = document.getElementById('sales-total');
+        const clientNameInput = document.getElementById('client-name-input');
+        const productNameInput = document.getElementById('product-name');
+        const productPriceInput = document.getElementById('product-price');
+        const addBtn = document.getElementById('add-btn');
+        
+        // UI elements (Servicios/Admin)
+        const serviceCardsContainer = document.getElementById('service-cards-container');
+        const adminIdInput = document.getElementById('admin-id-input');
+        const setAdminBtn = document.getElementById('set-admin-btn');
+        const adminStatus = document.getElementById('admin-status');
+        const logoAdminControl = document.getElementById('logo-admin-control');
+        const logoFileInput = document.getElementById('logo-file-input');
+        const uploadLogoBtn = document.getElementById('upload-logo-btn');
+        const logoStatusMessage = document.getElementById('logo-status-message');
+
+        // UI elements (Inventario)
+        const inventoryContent = document.getElementById('inventory-content');
+        const inventoryList = document.getElementById('inventory-list');
+        const addInventoryForm = document.getElementById('add-inventory-form');
+        const inventoryNameInput = document.getElementById('inventory-name');
+        const inventoryPriceInput = document.getElementById('inventory-price');
+        const inventoryFileInput = document.getElementById('inventory-file-input');
+        const addInventoryBtn = document.getElementById('add-inventory-btn');
+        const cancelEditInventoryBtn = document.getElementById('cancel-edit-inventory-btn');
+        const inventoryStatusMessage = document.getElementById('inventory-status-message');
+
+
+        // --- Lógica de Supabase: Storage y CRUD ---
+
+        /** Maneja la subida de un archivo a Supabase Storage y devuelve la ruta completa. */
+        async function uploadFile(file, folderName, fileName) {
+            if (!file) return { data: null, error: new Error("No se seleccionó ningún archivo.") };
+
+            const filePath = `${folderName}/${fileName}`;
+            
+            const { data, error } = await supabase.storage
+                .from(BUCKET_NAME)
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: true
+                });
+
+            if (error) {
+                console.error("Error al subir archivo:", error);
+                return { data: null, error };
+            }
+
+            // Retorna la URL pública de la imagen
+            const publicUrl = supabase.storage.from(BUCKET_NAME).getPublicUrl(filePath).data.publicUrl;
+            return { data: publicUrl, error: null, path: filePath };
+        }
+
+        /** Elimina un archivo de Supabase Storage. */
+        async function deleteFile(filePath) {
+            // El filePath debe ser la ruta dentro del bucket (ej: 'inventory/imagen.jpg')
+            const { error } = await supabase.storage.from(BUCKET_NAME).remove([filePath]);
+            if (error) {
+                console.error("Error al eliminar archivo:", error);
+                return false;
+            }
+            return true;
+        }
+
+        // --- Lógica de Inicialización ---
+        function initSupabase() {
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                // Listener de autenticación
+                supabase.auth.onAuthStateChange((event, session) => {
+                    handleAuthChange(session);
+                });
+
+                // Cargar datos del sitio (logo e imágenes de servicios)
+                loadSiteData();
+                
+            } catch (e) {
+                console.error("Error al inicializar Supabase:", e.message);
+                salesLoadingIndicator.textContent = 'ERROR: No se pudo inicializar Supabase.';
+            }
+        }
+
+        async function loadSiteData() {
+            await loadLogo();
+            await loadServiceImages();
+        }
+        
+        // --- Lógica de Admin/Servicios ---
+
+        function checkAdminStatus() {
+            const adminIdToCheck = adminIdInput.value.trim();
+
+            // Lógica de Admin: El ID del usuario debe coincidir con el ID de Admin ingresado.
+            if (userId && userId === adminIdToCheck && adminIdToCheck.length > 0) {
+                isAdmin = true;
+                adminStatus.classList.remove('hidden');
+                adminStatus.textContent = `Estado: Admin Activado. ID: ${userId}`;
+                setAdminBtn.textContent = 'Desactivar Modo Admin';
+                setAdminBtn.classList.remove('bg-red-600');
+                setAdminBtn.classList.add('bg-green-600');
+                logoAdminControl.classList.remove('hidden'); // Mostrar control de logo
+            } else {
+                isAdmin = false;
+                adminStatus.classList.add('hidden');
+                setAdminBtn.textContent = 'Habilitar Modo Admin';
+                setAdminBtn.classList.remove('bg-green-600');
+                setAdminBtn.classList.add('bg-red-600');
+                logoAdminControl.classList.add('hidden'); // Ocultar control de logo
+            }
+            renderServiceCards(SERVICE_DATA);
+            // Mostrar/ocultar formulario de inventario
+            addInventoryForm.classList.toggle('hidden', !isAdmin);
+        }
+        
+        async function loadLogo() {
+            // Buscamos la columna 'image_url' (snake_case)
+            const { data, error } = await supabase.from('services').select('image_url').eq('id', 'logo').single();
+            
+            if (!error && data && data.image_url) {
+                currentLogo.innerHTML = `<img src="${data.image_url}" alt="Logo UNICELL" class="w-10 h-10 rounded-lg object-contain bg-white p-1" onerror="this.src='https://placehold.co/40x40/FF4545/FFFFFF?text=LOGO'">`;
+            } else {
+                console.warn("No se encontró logo personalizado o la columna 'image_url' no existe. Usando SVG predeterminado.");
+                currentLogo.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 accent-text" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" opacity=".2"/>
+                        <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" fill="var(--color-primary)"/>
+                        <path d="M16 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM10 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                        <path d="M12 14v-2" stroke-width="3"/>
+                    </svg>
+                `;
+            }
+            lucide.createIcons();
+        }
+
+        async function uploadLogo() {
+            if (!isAdmin) return;
+            const file = logoFileInput.files[0];
+            if (!file) {
+                logoStatusMessage.textContent = 'Selecciona un archivo primero.';
+                logoStatusMessage.className = 'text-xs text-center mt-1 text-yellow-400';
+                return;
+            }
+
+            uploadLogoBtn.disabled = true;
+            logoStatusMessage.textContent = 'Subiendo logo...';
+            logoStatusMessage.className = 'text-xs text-center mt-1 text-yellow-400';
+
+            // Subir archivo a Storage
+            const { data: publicUrl, error: uploadError, path: imagePath } = await uploadFile(file, 'site_assets', 'logo');
+
+            if (uploadError) {
+                logoStatusMessage.textContent = `Error al subir: ${uploadError.message}`;
+                logoStatusMessage.className = 'text-xs text-center mt-1 text-red-500';
+                uploadLogoBtn.disabled = false;
+                return;
+            }
+
+            // Guardar URL en la tabla 'services' usando 'image_url'
+            const { error: dbError } = await supabase
+                .from('services')
+                .upsert({ id: 'logo', image_url: publicUrl }, { onConflict: 'id' });
+
+            if (dbError) {
+                logoStatusMessage.textContent = `Error al guardar URL: ${dbError.message}`;
+                logoStatusMessage.className = 'text-xs text-center mt-1 text-red-500';
+            } else {
+                logoStatusMessage.textContent = 'Logo actualizado con éxito.';
+                logoStatusMessage.className = 'text-xs text-center mt-1 text-green-500';
+                await loadLogo();
+            }
+            uploadLogoBtn.disabled = false;
+        }
+
+        async function loadServiceImages() {
+            // Buscamos la columna 'image_url'
+            const { data, error } = await supabase
+                .from('services') 
+                .select('id, image_url'); 
+
+            if (error) {
+                if (error.code === '42P01') { 
+                    console.warn("ADVERTENCIA: La tabla 'services' no existe. Las imágenes no se cargarán.");
+                } else {
+                    console.error("Error al cargar imágenes de Supabase:", error.message);
+                }
+                return;
+            }
+
+            serviceImageMap = {};
+            data.forEach(item => {
+                // Usamos item.image_url
+                serviceImageMap[item.id] = item.image_url || '';
+            });
+            renderServiceCards(SERVICE_DATA);
+        }
+        
+        async function updateServiceImage(serviceId, file) {
+            if (!isAdmin || !file) return;
+
+            // 1. Subir la imagen al storage
+            const { data: publicUrl, error: uploadError } = await uploadFile(file, 'service_images', `${serviceId}_${Date.now()}`);
+
+            if (uploadError) {
+                console.error("Error al subir imagen de servicio:", uploadError.message);
+                return;
+            }
+
+            // 2. Guardar URL en la tabla 'services' usando 'image_url'
+            const { error: dbError } = await supabase
+                .from('services')
+                .upsert({ id: serviceId, image_url: publicUrl }, { onConflict: 'id' });
+
+            if (dbError) {
+                console.error("Error al guardar URL de servicio:", dbError.message);
+            } else {
+                await loadServiceImages();
+            }
+        }
+
+        async function deleteServiceImage(serviceId) {
+            if (!isAdmin) return;
+            if (!confirm(`¿Seguro que quieres eliminar la imagen de ${serviceId}?`)) return;
+
+            // 1. Eliminar referencia en DB
+            const { error: dbError } = await supabase
+                .from('services')
+                .update({ image_url: '' }) // Actualizamos a 'image_url'
+                .eq('id', serviceId);
+
+            if (dbError) {
+                console.error("Error al eliminar la referencia de imagen en DB:", dbError.message);
+                return;
+            }
+            
+            await loadServiceImages();
+        }
+        
+        function renderServiceCards(services) {
+            serviceCardsContainer.innerHTML = '';
+            
+            services.forEach(service => {
+                const imageUrl = serviceImageMap[service.id] || '';
+                
+                const card = document.createElement('div');
+                card.className = 'service-card bg-gray-800 p-6 rounded-xl shadow-lg';
+                card.setAttribute('data-service-id', service.id);
+                
+                let adminControls = '';
+                if (isAdmin) {
+                    adminControls = `
+                        <div class="service-admin-controls mt-4 p-3 bg-gray-700 rounded-lg border border-pink-500/50">
+                            <h4 class="text-sm font-semibold text-pink-400 mb-2">Control Admin</h4>
+                            <input type="file" id="file-input-${service.id}" accept="image/*" class="w-full text-xs p-1 rounded-md input-dark border-none mb-2" />
+                            <div class="flex space-x-2">
+                                <button onclick="window.updateServiceImageHandler('${service.id}')" 
+                                    class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg transition duration-300 text-xs disabled:opacity-50">
+                                    <i data-lucide="upload" class="w-4 h-4 inline mr-1"></i> ${imageUrl ? 'Actualizar Foto' : 'Subir Foto'}
+                                </button>
+                                <button onclick="window.deleteServiceImageHandler('${service.id}')" 
+                                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 rounded-lg transition duration-300 text-xs ${!imageUrl && 'hidden'}">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div id="service-image-bg-${service.id}" class="service-image-bg" 
+                        style="${imageUrl ? `background-image: url('${imageUrl}');` : ''}">
+                    </div>
+                    <div class="service-content">
+                        <i data-lucide="${service.icon}" class="w-8 h-8 accent-text mb-3"></i>
+                        <h3 class="text-xl font-semibold mb-2">${service.title}</h3>
+                        <p class="text-gray-400">${service.description}</p>
+                        ${adminControls}
+                    </div>
+                `;
+
+                serviceCardsContainer.appendChild(card);
+            });
+            lucide.createIcons();
+            
+            // Exponer handlers globales para botones dinámicos
+            window.updateServiceImageHandler = (id) => {
+                const fileInput = document.getElementById(`file-input-${id}`);
+                const file = fileInput.files[0];
+                if (file) {
+                    updateServiceImage(id, file);
+                } else {
+                    console.error("Selecciona un archivo para subir.");
+                }
+            };
+            window.deleteServiceImageHandler = deleteServiceImage;
+        }
+
+        // --- Lógica de Autenticación (Supabase Auth) ---
+
+        function handleAuthChange(session) {
+            salesLoadingIndicator.classList.add('hidden');
+            inventoryLoadingIndicator.classList.add('hidden');
+            
+            if (session && session.user) {
+                userId = session.user.id;
+                userIdDisplay.textContent = userId;
+                
+                authContainer.classList.add('hidden');
+                logoutBtn.classList.remove('hidden');
+                
+                // Cargar datos de la app
+                checkAdminStatus(); 
+                
+                console.log("Sesión activa. UID:", userId);
+            } else {
+                userId = null;
+                userIdDisplay.textContent = 'No autenticado';
+                
+                authContainer.classList.remove('hidden');
+                logoutBtn.classList.add('hidden');
+                
+                // Ocultar contenido y desactivar admin
+                appContent.classList.add('hidden');
+                inventoryContent.classList.add('hidden');
+                isAdmin = false;
+                checkAdminStatus(); 
+                
+                console.log("Sesión cerrada. Mostrando formulario de inicio de sesión.");
+            }
+            // Recargar datos de ventas/inventario (si la modal está abierta)
+            if (!salesModal.classList.contains('hidden') && userId) { loadSalesData(); appContent.classList.remove('hidden'); }
+            if (!inventoryModal.classList.contains('hidden')) { loadInventoryData(); }
+        }
+
+        async function handleLogin() {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            if (!email || !password) { authMessage.textContent = 'Ingresa correo y contraseña.'; return; }
+            
+            loginBtn.disabled = signupBtn.disabled = true;
+            authMessage.textContent = 'Iniciando sesión...';
+
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+            loginBtn.disabled = signupBtn.disabled = false;
+            if (error) {
+                authMessage.textContent = `Error: ${error.message}`;
+            } else {
+                authMessage.textContent = '¡Sesión iniciada con éxito! Abrir de nuevo la ventana.';
+                closeSalesModal(); // Cerrar para que el usuario la reabra con el contenido
+            }
+        }
+
+        async function handleSignUp() {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            if (!email || !password) { authMessage.textContent = 'Ingresa correo y contraseña.'; return; }
+
+            loginBtn.disabled = signupBtn.disabled = true;
+            authMessage.textContent = 'Creando cuenta...';
+
+            const { error } = await supabase.auth.signUp({ email, password });
+
+            loginBtn.disabled = signupBtn.disabled = false;
+            if (error) {
+                authMessage.textContent = `Error: ${error.message}`;
+            } else {
+                authMessage.textContent = 'Cuenta creada. Revisa tu correo para verificarla.';
+            }
+        }
+
+        async function handleLogout() {
+            const { error } = await supabase.auth.signOut();
+            if (error) { console.error("Logout Error:", error); }
+        }
+        
+        // --- Lógica del Registro de Ventas (CRUD) ---
+
+        async function loadSalesData() {
+            if (!userId) { return; }
+            
+            const { data, error } = await supabase.from('sales').select('*').eq('user_id', userId); 
+
+            if (error) {
+                 if (error.code === '42P01') { 
+                    salesList.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-400 italic font-bold">Error: La tabla "sales" no ha sido creada.</td></tr>';
+                } else {
+                    console.error("Error al cargar ventas de Supabase:", error.message);
+                }
+                return;
+            }
+
+            const salesItems = data.map(item => ({
+                id: item.id, clientName: item.client_name || 'N/A', name: item.name, price: item.price
+            }));
+            
+            salesItems.sort((a, b) => a.name.localeCompare(b.name));
+            renderSales(salesItems);
+        }
+
+        async function addSaleItem() {
+            if (!userId) { authMessage.textContent = 'Debes iniciar sesión para agregar ventas.'; return; }
+
+            const clientName = clientNameInput.value.trim();
+            const name = productNameInput.value.trim();
+            const price = parseFloat(productPriceInput.value.trim());
+
+            if (!name || isNaN(price) || price <= 0 || !clientName) { 
+                console.error("Datos de venta inválidos."); return; 
+            }
+            
+            addBtn.disabled = true;
+
+            const { error } = await supabase
+                .from('sales')
+                .insert([{ client_name: clientName, name: name, price: price, user_id: userId }]); 
+            
+            if (error) {
+                console.error("Error al agregar venta en Supabase:", error.message);
+            } else {
+                await loadSalesData();
+            }
+
+            productNameInput.value = '';
+            productPriceInput.value = '';
+            addBtn.disabled = false;
+        }
+
+        async function updateSaleItem(id, newClientName, newName, newPrice) {
+            if (!userId) return;
+
+            const { error } = await supabase
+                .from('sales')
+                .update({ client_name: newClientName, name: newName, price: newPrice })
+                .eq('id', id).eq('user_id', userId);
+            
+            if (error) { console.error("Error al actualizar venta en Supabase:", error.message); } else { await loadSalesData(); }
+        }
+
+        async function deleteSaleItem(id) {
+            if (!userId) return;
+            if (!confirm("¿Estás seguro de que quieres eliminar este artículo de la venta?")) { return; }
+            
+            const { error } = await supabase.from('sales').delete().eq('id', id).eq('user_id', userId); 
+            if (error) { console.error("Error al eliminar venta en Supabase:", error.message); } else { await loadSalesData(); }
+        }
+
+        function renderSales(items) {
+            salesList.innerHTML = '';
+            let total = 0;
+            if (items.length === 0) { salesList.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500 italic">No hay artículos en el registro de ventas.</td></tr>'; }
+
+            items.forEach(item => {
+                total += item.price;
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-700 transition duration-150';
+                
+                const clientNameCell = document.createElement('td');
+                clientNameCell.className = 'px-3 py-3 font-medium text-pink-400';
+                clientNameCell.innerHTML = `<span id="client-name-${item.id}">${item.clientName}</span>`;
+                
+                const nameCell = document.createElement('td');
+                nameCell.className = 'px-3 py-3 font-medium text-white';
+                nameCell.innerHTML = `<span id="name-${item.id}">${item.name}</span>`;
+
+                const priceCell = document.createElement('td');
+                priceCell.className = 'px-3 py-3 text-white';
+                priceCell.innerHTML = `<span id="price-${item.id}">$${item.price.toFixed(2)}</span>`;
+
+                const actionsCell = document.createElement('td');
+                actionsCell.className = 'px-3 py-3 text-right space-x-2';
+
+                const editBtn = document.createElement('button');
+                editBtn.innerHTML = '<i data-lucide="pencil" class="w-4 h-4"></i>';
+                editBtn.className = 'edit-btn text-yellow-400 hover:text-yellow-300 p-2 rounded-full transition duration-150';
+                editBtn.setAttribute('data-id', item.id);
+                editBtn.setAttribute('data-editing', 'false');
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4"></i>';
+                deleteBtn.className = 'text-red-500 hover:text-red-400 p-2 rounded-full transition duration-150';
+                deleteBtn.onclick = () => deleteSaleItem(item.id);
+
+                actionsCell.appendChild(editBtn);
+                actionsCell.appendChild(deleteBtn);
+
+                tr.appendChild(clientNameCell);
+                tr.appendChild(nameCell);
+                tr.appendChild(priceCell);
+                tr.appendChild(actionsCell);
+                salesList.appendChild(tr);
+                editBtn.onclick = (e) => toggleEditSales(e, item.id, item.clientName, item.name, item.price);
+            });
+
+            salesTotal.textContent = `$${total.toFixed(2)}`;
+            lucide.createIcons();
+        }
+
+        function toggleEditSales(event, id, currentClientName, currentName, currentPrice) {
+            // Lógica de edición de ventas 
+            const button = event.currentTarget;
+            const isEditing = button.getAttribute('data-editing') === 'true';
+            
+            const clientNameSpan = document.getElementById(`client-name-${id}`);
+            const nameSpan = document.getElementById(`name-${id}`);
+            const priceSpan = document.getElementById(`price-${id}`);
+
+            if (!isEditing) {
+                // Modo Edición: Cambiar SPANs a INPUTs
+                const clientNameInput = `<input type="text" id="input-client-name-${id}" value="${currentClientName}" class="w-full bg-gray-600 rounded-md p-1 input-dark text-pink-400" />`;
+                const nameInput = `<input type="text" id="input-name-${id}" value="${currentName}" class="w-full bg-gray-600 rounded-md p-1 input-dark" />`;
+                const priceInput = `<input type="number" id="input-price-${id}" value="${currentPrice.toFixed(2)}" class="w-full bg-gray-600 rounded-md p-1 input-dark" step="0.01" />`;
+
+                clientNameSpan.innerHTML = clientNameInput;
+                nameSpan.innerHTML = nameInput;
+                priceSpan.innerHTML = priceInput;
+
+                button.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i>';
+                button.classList.remove('text-yellow-400');
+                button.classList.add('text-green-500');
+                button.setAttribute('data-editing', 'true');
+                lucide.createIcons();
+
+            } else {
+                // Modo Guardar: Leer INPUTs y guardar en Supabase
+                const newClientName = document.getElementById(`input-client-name-${id}`).value.trim();
+                const newName = document.getElementById(`input-name-${id}`).value.trim();
+                const newPrice = parseFloat(document.getElementById(`input-price-${id}`).value.trim());
+
+                if (!newName || !newClientName || isNaN(newPrice) || newPrice <= 0) {
+                    console.error("El Destinatario, nombre y precio deben ser válidos para guardar.");
+                    return;
+                }
+
+                updateSaleItem(id, newClientName, newName, newPrice); 
+
+                button.innerHTML = '<i data-lucide="pencil" class="w-4 h-4"></i>';
+                button.classList.remove('text-green-500');
+                button.classList.add('text-yellow-400');
+                button.setAttribute('data-editing', 'false');
+                lucide.createIcons();
+            }
+        }
+
+        // --- Lógica del Inventario (CRUD) ---
+        
+        async function loadInventoryData() {
+            inventoryLoadingIndicator.classList.add('hidden');
+            inventoryContent.classList.remove('hidden');
+
+            const { data, error } = await supabase.from('inventory').select('*'); 
+
+            if (error) {
+                if (error.code === '42P01') { 
+                    inventoryList.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-400 italic font-bold">Error: La tabla "inventory" no ha sido creada.</td></tr>';
+                } else {
+                    console.error("Error al cargar inventario de Supabase:", error.message);
+                }
+                return;
+            }
+
+            renderInventory(data);
+        }
+
+        function renderInventory(items) {
+            inventoryList.innerHTML = '';
+            addInventoryForm.classList.toggle('hidden', !isAdmin);
+
+            if (items.length === 0) { inventoryList.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500 italic">No hay productos en el inventario.</td></tr>'; }
+
+            items.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-700 transition duration-150';
+                
+                // Foto
+                const photoCell = document.createElement('td');
+                photoCell.className = 'px-3 py-2';
+                // Usamos item.image_url
+                photoCell.innerHTML = `<img src="${item.image_url || 'https://placehold.co/40x40/525252/FFFFFF?text=No+Foto'}" alt="Foto producto" class="w-10 h-10 object-cover rounded-md" onerror="this.src='https://placehold.co/40x40/525252/FFFFFF?text=No+Foto'">`;
+
+                // Nombre
+                const nameCell = document.createElement('td');
+                nameCell.className = 'px-3 py-3 font-medium text-white';
+                nameCell.textContent = item.name;
+
+                // Precio
+                const priceCell = document.createElement('td');
+                priceCell.className = 'px-3 py-3 text-pink-400';
+                priceCell.textContent = `$${item.price.toFixed(2)}`;
+
+                // Acciones
+                const actionsCell = document.createElement('td');
+                actionsCell.className = 'px-3 py-3 text-right space-x-2';
+                
+                if (isAdmin) {
+                    const editBtn = document.createElement('button');
+                    editBtn.innerHTML = '<i data-lucide="pencil" class="w-4 h-4"></i> Editar';
+                    editBtn.className = 'text-yellow-400 hover:text-yellow-300 p-2 rounded-md transition duration-150 flex items-center justify-end ml-auto';
+                    editBtn.onclick = () => editInventoryStart(item);
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar';
+                    // Usamos item.image_path
+                    deleteBtn.className = 'text-red-500 hover:text-red-400 p-2 rounded-md transition duration-150 flex items-center justify-end ml-auto mt-1';
+                    deleteBtn.onclick = () => deleteInventoryItem(item.id, item.image_path);
+                    
+                    actionsCell.appendChild(editBtn);
+                    actionsCell.appendChild(deleteBtn);
+                    actionsCell.classList.add('flex', 'flex-col');
+                } else {
+                    actionsCell.textContent = 'Solo Admin';
+                }
+
+
+                tr.appendChild(photoCell);
+                tr.appendChild(nameCell);
+                tr.appendChild(priceCell);
+                tr.appendChild(actionsCell);
+                inventoryList.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function editInventoryStart(item) {
+            if (!isAdmin) return;
+            currentInventoryId = item.id;
+            inventoryNameInput.value = item.name;
+            inventoryPriceInput.value = item.price;
+            addInventoryBtn.innerHTML = '<i data-lucide="save" class="w-5 h-5 mr-2"></i> Guardar Cambios';
+            cancelEditInventoryBtn.classList.remove('hidden');
+            inventoryStatusMessage.textContent = `Editando: ${item.name}. (La imagen se actualiza si subes un nuevo archivo.)`;
+            lucide.createIcons();
+        }
+
+        function editInventoryCancel() {
+            currentInventoryId = null;
+            inventoryNameInput.value = '';
+            inventoryPriceInput.value = '';
+            inventoryFileInput.value = ''; // Limpiar archivo
+            addInventoryBtn.innerHTML = '<i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir a Inventario';
+            cancelEditInventoryBtn.classList.add('hidden');
+            inventoryStatusMessage.textContent = '';
+            lucide.createIcons();
+        }
+
+        async function addOrUpdateInventoryItem() {
+            if (!isAdmin) { inventoryStatusMessage.textContent = 'ERROR: Debes ser administrador.'; return; }
+            
+            const name = inventoryNameInput.value.trim();
+            const price = parseFloat(inventoryPriceInput.value.trim());
+            const file = inventoryFileInput.files[0];
+
+            if (!name || isNaN(price) || price <= 0) { 
+                inventoryStatusMessage.textContent = 'Ingresa nombre y precio válido.'; return; 
+            }
+
+            addInventoryBtn.disabled = true;
+            inventoryStatusMessage.textContent = 'Procesando...';
+
+            let image_url = null; // Usamos image_url
+            let image_path = null; // Usamos image_path
+            
+            // Si hay un archivo para subir, lo procesamos
+            if (file) {
+                inventoryStatusMessage.textContent = 'Subiendo imagen...';
+                const fileExtension = file.name.split('.').pop();
+                const fileName = `${name.replace(/\s/g, '_')}_${Date.now()}.${fileExtension}`;
+                
+                const { data, error, path } = await uploadFile(file, 'inventory_photos', fileName);
+
+                if (error) {
+                    inventoryStatusMessage.textContent = `Error al subir imagen: ${error.message}`;
+                    addInventoryBtn.disabled = false; return;
+                }
+                image_url = data;
+                image_path = path;
+            }
+
+            // Crear o Actualizar registro en la DB
+            const itemData = { name, price };
+            if (image_url) {
+                itemData.image_url = image_url;
+                itemData.image_path = image_path;
+            }
+
+            if (currentInventoryId) {
+                // UPDATE
+                const { error } = await supabase.from('inventory').update(itemData).eq('id', currentInventoryId);
+                if (error) { console.error("Error update inventario:", error); inventoryStatusMessage.textContent = `Error al guardar: ${error.message}`; }
+            } else {
+                // INSERT
+                const { error } = await supabase.from('inventory').insert([itemData]);
+                if (error) { console.error("Error insert inventario:", error); inventoryStatusMessage.textContent = `Error al añadir: ${error.message}`; }
+            }
+
+            inventoryStatusMessage.textContent = 'Inventario actualizado con éxito.';
+            editInventoryCancel();
+            await loadInventoryData();
+            addInventoryBtn.disabled = false;
+        }
+
+        async function deleteInventoryItem(id, image_path) {
+            if (!isAdmin) return;
+            if (!confirm("¿Seguro que quieres eliminar este producto y su imagen?")) { return; }
+
+            // 1. Eliminar la imagen del Storage (si existe)
+            if (image_path) {
+                const success = await deleteFile(image_path);
+                if (!success) { console.warn("Advertencia: No se pudo eliminar el archivo del Storage, pero se eliminará el registro de DB."); }
+            }
+
+            // 2. Eliminar el registro de la base de datos
+            const { error } = await supabase.from('inventory').delete().eq('id', id);
+
+            if (error) { console.error("Error al eliminar inventario:", error); } 
+            
+            await loadInventoryData();
+        }
+
+        // --- Lógica de la Modal ---
+        function openSalesModal() {
+            salesModal.classList.remove('hidden');
+            salesModal.classList.add('flex');
+            // Al abrir la modal, si hay sesión activa, cargar datos de ventas
+            if (userId) { loadSalesData(); appContent.classList.remove('hidden'); }
+        }
+
+        function closeSalesModal() {
+            salesModal.classList.add('hidden');
+            salesModal.classList.remove('flex');
+        }
+        
+        function openInventoryModal() {
+            inventoryModal.classList.remove('hidden');
+            inventoryModal.classList.add('flex');
+            // Al abrir la modal, si el usuario está autenticado, cargamos el inventario
+            if (userId) { 
+                loadInventoryData(); 
+            } else { 
+                authMessage.textContent = 'Inicia sesión para ver el Inventario.'; 
+                openSalesModal(); // Abrir la modal de ventas que tiene el login
+                closeInventoryModal();
+            }
+        }
+
+        function closeInventoryModal() {
+            inventoryModal.classList.add('hidden');
+            inventoryModal.classList.remove('flex');
+            editInventoryCancel(); // Limpiar formulario al cerrar
+        }
+
+
+        // --- Event Listeners y Arranque ---
+        window.onload = function() {
+            initSupabase(); 
+
+            // Eventos de Autenticación
+            loginBtn.onclick = handleLogin;
+            signupBtn.onclick = handleSignUp;
+            logoutBtn.onclick = handleLogout;
+            emailInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { handleLogin(); } });
+            passwordInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { handleLogin(); } });
+
+            // Eventos de Venta
+            addBtn.onclick = addSaleItem;
+            // Eventos de Modals
+            document.getElementById('open-sales-modal').onclick = openSalesModal;
+            document.getElementById('close-sales-modal').onclick = closeSalesModal;
+            document.getElementById('open-inventory-modal').onclick = openInventoryModal;
+            document.getElementById('close-inventory-modal').onclick = closeInventoryModal;
+            
+            salesModal.addEventListener('click', (e) => { if (e.target === salesModal) { closeSalesModal(); } });
+            inventoryModal.addEventListener('click', (e) => { if (e.target === inventoryModal) { closeInventoryModal(); } });
+
+            // Eventos de Admin
+            setAdminBtn.onclick = () => { 
+                if (isAdmin) { 
+                    adminIdInput.value = ''; // Limpia el ID para desactivar
+                } 
+                checkAdminStatus(); 
+            };
+            uploadLogoBtn.onclick = uploadLogo;
+
+            // Eventos de Inventario
+            addInventoryBtn.onclick = addOrUpdateInventoryItem;
+            cancelEditInventoryBtn.onclick = editInventoryCancel;
+
+            renderServiceCards(SERVICE_DATA);
+            adminIdInput.value = ADMIN_ID_DEMO; 
+        };
+    </script>
+</body>
+</html>
