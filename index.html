@@ -51,13 +51,10 @@
         body { background-color: var(--bg-primary); color: var(--text-primary); font-family: var(--font-main); }
         h1, h2, h3, h4, h5, h6 { font-family: var(--font-headings); }
         header.sticky { background-color: var(--bg-header); border-bottom: 1px solid var(--border-color); backdrop-filter: blur(10px); }
-        .bg-gray-800 { background-color: var(--bg-secondary) !important; } 
-        .bg-gray-900 { background-color: var(--bg-primary) !important; }
+        .bg-gray-800 { background-color: var(--bg-secondary) !important; } .bg-gray-900 { background-color: var(--bg-primary) !important; }
         .text-gray-300 { color: var(--text-secondary); } .text-gray-400 { color: var(--text-muted); }
-        .bg-gray-600 { background-color: var(--bg-secondary) !important; }
-        .bg-gray-700 { background-color: color-mix(in srgb, var(--bg-secondary) 70%, var(--bg-primary)) !important; }
-        .border-gray-500, .border-gray-600, .border-gray-700 { border-color: var(--border-color); }
-        .divide-gray-700 > :not([hidden]) ~ :not([hidden]) { border-color: var(--border-color); }
+        .bg-gray-600 { background-color: var(--bg-secondary) !important; } .bg-gray-700 { background-color: color-mix(in srgb, var(--bg-secondary) 70%, var(--bg-primary)) !important; }
+        .border-gray-500, .border-gray-600, .border-gray-700 { border-color: var(--border-color); } .divide-gray-700 > :not([hidden]) ~ :not([hidden]) { border-color: var(--border-color); }
         .text-indigo-400, .text-indigo-300 { color: var(--accent-color); } .border-indigo-500 { border-color: var(--accent-color); }
         .bg-indigo-500 { background-color: var(--accent-color-dark); color: var(--text-primary); } .hover\:bg-indigo-600:hover { background-color: var(--accent-color); }
         .focus\:ring-indigo-500:focus { --tw-ring-color: var(--accent-color); }
@@ -116,62 +113,94 @@
 
         // --- REFERENCIAS DOM ---
         const adminStatusDisplay=document.getElementById('admin-status'), appErrorDisplay=document.getElementById('app-error-display'), logoContainer=document.getElementById('logo-container'), authModal=document.getElementById('auth-modal'), authContainer=document.getElementById('auth-container'), logoutContainer=document.getElementById('logout-container'), authTitle=document.getElementById('auth-title'), authButtonText=document.getElementById('auth-button-text'), authSubmitBtn=document.getElementById('auth-submit-btn'), toggleAuthModeBtn=document.getElementById('toggle-auth-mode'), loginForm=document.getElementById('login-form'), authEmailInput=document.getElementById('auth-email'), authPasswordInput=document.getElementById('auth-password'), authMessage=document.getElementById('auth-message'), currentUserUidDisplay=document.getElementById('current-user-uid'), logoutBtn=document.getElementById('logout-btn'), openSalesModalBtn=document.getElementById('open-sales-modal-btn'), salesModal=document.getElementById('sales-modal'), salesContent=document.getElementById('sales-content'), salesAuthMessage=document.getElementById('sales-auth-message'), salesAddFormAdmin=document.getElementById('sales-add-form-admin'), salesList=document.getElementById('sales-list'), salesTotal=document.getElementById('sales-total'), clientNameInput=document.getElementById('client-name'), productNameInput=document.getElementById('product-name'), productPriceInput=document.getElementById('product-price'), saleCategorySelect=document.getElementById('sale-category'), addSaleBtn=document.getElementById('add-btn'), salesHeaderActions=document.getElementById('sales-header-actions'), inventoryModal=document.getElementById('inventory-modal'), inventoryContentAdmin=document.getElementById('inventory-content-admin'), inventoryGridContainer = document.getElementById('inventory-grid'), inventoryLoadingMsg = document.getElementById('inventory-loading-msg'), inventoryEmptyMsg = document.getElementById('inventory-empty-msg'), inventoryNameInput=document.getElementById('inventory-name'), inventoryPriceInput=document.getElementById('inventory-price'), inventoryCategorySelect=document.getElementById('inventory-category'), inventoryImageFile=document.getElementById('inventory-image-file'), inventoryAddBtn=document.getElementById('inventory-add-btn'), inventoryMessage=document.getElementById('inventory-message'), 
-        // CORRECCIÓN: Se elimina la referencia a inventoryHeaderActions
+        // Eliminada referencia a inventoryHeaderActions
         themeBtnDark=document.getElementById('theme-btn-dark'), themeBtnInfernal=document.getElementById('theme-btn-infernal'), themeBtnGold=document.getElementById('theme-btn-gold'), openThemeDropdownBtn=document.getElementById('open-theme-dropdown-btn'), themeDropdownMenu=document.getElementById('theme-dropdown-menu'), themeDropdownWrapper=document.getElementById('theme-dropdown-wrapper');
 
         // --- UTILIDADES ---
-        function initLogoTemplates(){const a=document.getElementById("logo-upload-overlay"),b=document.getElementById("default-logo-svg");a&&(logoUploadOverlayHTML=a.outerHTML,a.parentNode&&a.remove()),b&&(defaultSvgHtml=b.outerHTML);const c=document.getElementById("current-logo");c&&!c.querySelector("img")&&defaultSvgHtml&&(c.innerHTML=defaultSvgHtml+(logoUploadOverlayHTML||""),logoUploadOverlayHTML&&lucide.createIcons())}
+        // Función para adjuntar el listener al input del logo de forma segura
+        function attachLogoInputListener() {
+            const logoInput = document.getElementById('logo-file-input');
+            if (logoInput) {
+                logoInput.onchange = handleLogoUpload;
+                console.log("Listener attached to logo input."); // Log para depuración
+            } else {
+                 console.log("Logo input not found for attaching listener."); // Log para depuración
+            }
+        }
+        function initLogoTemplates(){const a=document.getElementById("logo-upload-overlay"),b=document.getElementById("default-logo-svg");a&&(logoUploadOverlayHTML=a.outerHTML,a.parentNode&&a.remove()),b&&(defaultSvgHtml=b.outerHTML);const c=document.getElementById("current-logo");c&&!c.querySelector("img")&&defaultSvgHtml&&(c.innerHTML=defaultSvgHtml+(logoUploadOverlayHTML||""),logoUploadOverlayHTML&&(lucide.createIcons(), attachLogoInputListener()))} // Adjuntar listener aquí
         function handleGlobalError(a){appErrorDisplay.textContent=`Error crítico: ${a}`,appErrorDisplay.classList.remove("hidden")}
         function displayMessage(a,b,c="error"){b.textContent=a,b.className="success"===c?"text-center text-sm text-green-400":"text-center text-sm text-red-400",setTimeout(()=>{b.textContent=""},5e3)}
         function closeThemeDropdown(){themeDropdownMenu&&themeDropdownMenu.classList.add("hidden")}
-        // ==================================================
-        // CORRECCIÓN AQUÍ: Se eliminan las referencias a inventoryHeaderActions
-        // ==================================================
-        function updateUIBasedOnAuth(){
-            if (isAdmin){
-                adminStatusDisplay.classList.remove("hidden");
-                logoContainer.classList.add("admin-active"); 
-                inventoryContentAdmin.classList.remove("hidden"); 
-                // inventoryHeaderActions ya no existe -> LÍNEA ELIMINADA
-                salesAddFormAdmin.classList.remove("hidden"); 
-                salesHeaderActions.classList.remove("hidden"); // Este sí existe (para ventas)
-                openSalesModalBtn.classList.remove("hidden"); 
-                openSalesModalBtn.classList.remove("bg-transparent","text-gray-300");
-                openSalesModalBtn.classList.add("bg-indigo-500","text-white");
-            } else {
-                adminStatusDisplay.classList.add("hidden");
-                logoContainer.classList.remove("admin-active"); 
-                inventoryContentAdmin.classList.add("hidden"); 
-                // inventoryHeaderActions ya no existe -> LÍNEA ELIMINADA
-                salesAddFormAdmin.classList.add("hidden"); 
-                salesHeaderActions.classList.add("hidden");
-                if (userId){
-                    openSalesModalBtn.classList.remove("hidden");
-                    openSalesModalBtn.classList.remove("bg-indigo-500","text-white");
-                    openSalesModalBtn.classList.add("bg-transparent","text-gray-300");
-                } else { 
-                    openSalesModalBtn.classList.add("hidden"); 
-                }
-            }
-            loadInventoryData(); // Carga inventario (ahora en grid)
-            if (userId) loadSalesData(); // Carga ventas (sigue en tabla)
-        }
+        function updateUIBasedOnAuth(){if(isAdmin){adminStatusDisplay.classList.remove("hidden"),logoContainer.classList.add("admin-active"),inventoryContentAdmin.classList.remove("hidden"),salesAddFormAdmin.classList.remove("hidden"),salesHeaderActions.classList.remove("hidden"),openSalesModalBtn.classList.remove("hidden"),openSalesModalBtn.classList.remove("bg-transparent","text-gray-300"),openSalesModalBtn.classList.add("bg-indigo-500","text-white")}else{adminStatusDisplay.classList.add("hidden"),logoContainer.classList.remove("admin-active"),inventoryContentAdmin.classList.add("hidden"),salesAddFormAdmin.classList.add("hidden"),salesHeaderActions.classList.add("hidden"),userId?(openSalesModalBtn.classList.remove("hidden"),openSalesModalBtn.classList.remove("bg-indigo-500","text-white"),openSalesModalBtn.classList.add("bg-transparent","text-gray-300")):openSalesModalBtn.classList.add("hidden")}loadInventoryData(),userId&&loadSalesData()}
 
-        // --- AUTENTICACIÓN --- (Sin cambios)
+        // --- AUTENTICACIÓN ---
         function handleAuthChange(a){console.log("HandleAuthChange Fired. Session:",a),a&&a.user?(userId=a.user.id,userEmail=a.user.email,isAdmin=userEmail===ADMIN_EMAIL_REAL,currentUserUidDisplay.textContent=userEmail,authContainer.classList.add("hidden"),logoutContainer.classList.remove("hidden"),salesAuthMessage.classList.add("hidden"),salesContent.classList.remove("hidden")):(userId=null,userEmail=null,isAdmin=!1,authContainer.classList.remove("hidden"),logoutContainer.classList.add("hidden"),salesAuthMessage.classList.remove("hidden"),salesContent.classList.add("hidden"),renderSales([])),updateUIBasedOnAuth(),loadLogo()}
         async function handleAuthSubmit(a){a.preventDefault();const b=authEmailInput.value,c=authPasswordInput.value,d="Registrarse"===authTitle.textContent;authSubmitBtn.disabled=!0,authMessage.textContent="Procesando...";let e;try{e=d?await supabase.auth.signUp({email:b,password:c}):await supabase.auth.signInWithPassword({email:b,password:c}),e.error?displayMessage(e.error.message,authMessage,"error"):(displayMessage("Éxito. Cerrando modal...",authMessage,"success"),setTimeout(()=>closeModal(authModal),1e3))}catch(f){displayMessage("Error de conexión.",authMessage,"error"),console.error(f)}finally{authSubmitBtn.disabled=!1}}
         async function handleLogout(){const{error:a}=await supabase.auth.signOut();a&&console.error("Error al cerrar sesión:",a.message),closeModal(authModal)}
 
-        // --- TEMAS --- (Sin cambios)
+        // --- TEMAS ---
         function applyTheme(a){document.body.classList.remove("theme-dark","theme-infernal","theme-gold");const b={dark:themeBtnDark,infernal:themeBtnInfernal,gold:themeBtnGold};Object.values(b).forEach(c=>c&&c.classList.remove("active")),"infernal"===a?(document.body.classList.add("theme-infernal"),themeBtnInfernal&&themeBtnInfernal.classList.add("active")):"gold"===a?(document.body.classList.add("theme-gold"),themeBtnGold&&themeBtnGold.classList.add("active")):(document.body.classList.add("theme-dark"),themeBtnDark&&themeBtnDark.classList.add("active")),localStorage.setItem("unicell-theme",a)}
         function loadSavedTheme(){const a=localStorage.getItem("unicell-theme")||"dark";applyTheme(a),themeBtnDark&&(themeBtnDark.onclick=()=>{applyTheme("dark"),closeThemeDropdown()}),themeBtnInfernal&&(themeBtnInfernal.onclick=()=>{applyTheme("infernal"),closeThemeDropdown()}),themeBtnGold&&(themeBtnGold.onclick=()=>{applyTheme("gold"),closeThemeDropdown()})}
 
-        // --- STORAGE --- (Sin cambios)
+        // --- STORAGE ---
         async function uploadFile(a,b){const{data:c,error:d}=await supabase.storage.from(ASSETS_BUCKET).upload(b,a,{cacheControl:"3600",upsert:!0});if(d)throw console.error("Error al subir archivo a Storage:",d),Error(`Error al subir archivo: ${d.message}`);return c.path}
         function getPublicUrl(a){const{data:b}=supabase.storage.from(ASSETS_BUCKET).getPublicUrl(a);return`${b.publicUrl}?v=${Date.now()}`}
         async function deleteFile(a){if(!a||"null"===a)return;const{error:b}=await supabase.storage.from(ASSETS_BUCKET).remove([a]);b&&console.error("Error al eliminar archivo de Storage:",b)}
-        async function handleLogoUpload(a){if(!isAdmin)return;const b=a.target.files[0];if(!b)return;const c=document.getElementById("current-logo"),d=new FileReader;d.onload=b=>{let d=c.querySelector("img");d||(c.innerHTML="",d=document.createElement("img"),d.className="w-full h-full object-cover rounded-full",c.appendChild(d)),d.src=b.target.result,logoUploadOverlayHTML&&!c.querySelector("#logo-upload-overlay")&&(c.insertAdjacentHTML("beforeend",logoUploadOverlayHTML),(()=>{const a=document.getElementById("logo-file-input");a&&(a.onchange=handleLogoUpload),lucide.createIcons()})())},d.readAsDataURL(b),c.insertAdjacentHTML("beforeend",'<div class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full"><div class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div></div>');try{if(!userId)throw Error("Admin debe iniciar sesión.");const f=await uploadFile(b,`logo/${userId}/${Date.now()}_${b.name}`),g=getPublicUrl(f),{error:h}=await supabase.from("services").upsert({id:"logo",image_url:g,image_path:f,user_id:userId},{onConflict:"id"});if(h)throw h;displayMessage("Logo actualizado.",authMessage,"success")}catch(i){console.error("Error al subir logo:",i),displayMessage(`Error al subir logo: ${i.message}`,authMessage,"error"),loadLogo()}finally{const j=c.querySelector(".animate-spin");j&&j.parentElement.remove(),logoUploadOverlayHTML&&!c.querySelector("#logo-upload-overlay")&&(c.insertAdjacentHTML("beforeend",logoUploadOverlayHTML),(()=>{const a=document.getElementById("logo-file-input");a&&(a.onchange=handleLogoUpload),lucide.createIcons()})()),a.target.value=null}}
-        async function loadLogo(){if(!supabase)return;try{const{data:a,error:b}=await supabase.from("services").select("image_url").eq("id","logo").maybeSingle();if(b&&"PGRST116"!==b.code)throw b;const c=document.getElementById("current-logo");c.innerHTML="",a&&a.image_url?c.innerHTML=`<img src="${a.image_url}" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null; this.parentElement.innerHTML = '${defaultSvgHtml.replace(/'/g,"\\'")}' + '${logoUploadOverlayHTML.replace(/'/g,"\\'")}'; lucide.createIcons();">${logoUploadOverlayHTML}`:c.innerHTML=defaultSvgHtml+logoUploadOverlayHTML;const d=document.getElementById("logo-file-input");d&&(d.onchange=handleLogoUpload),isAdmin?logoContainer.classList.add("admin-active"):logoContainer.classList.remove("admin-active"),lucide.createIcons()}catch(e){console.error("Error al cargar logo:",e);const f=document.getElementById("current-logo");f&&(f.innerHTML=defaultSvgHtml+logoUploadOverlayHTML,(()=>{const a=document.getElementById("logo-file-input");a&&(a.onchange=handleLogoUpload),lucide.createIcons()})())}}
+        
+        // ==================================================
+        // CORRECCIÓN handleLogoUpload: Asegurar re-adjuntar listener
+        // ==================================================
+        async function handleLogoUpload(a) {
+            if (!isAdmin) return;
+            const b = a.target.files[0]; if (!b) return;
+            const c = document.getElementById("current-logo");
+            const d = new FileReader;
+            d.onload = b => {
+                let d = c.querySelector("img");
+                d || (c.innerHTML = "", d = document.createElement("img"), d.className = "w-full h-full object-cover rounded-full", c.appendChild(d)), d.src = b.target.result, 
+                // Insertar overlay DESPUÉS de establecer la imagen
+                logoUploadOverlayHTML && !c.querySelector("#logo-upload-overlay") && (c.insertAdjacentHTML("beforeend", logoUploadOverlayHTML), lucide.createIcons(), attachLogoInputListener()) // <-- Re-adjuntar listener
+            }, d.readAsDataURL(b);
+            
+            c.insertAdjacentHTML("beforeend", '<div class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full"><div class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div></div>');
+            try {
+                if (!userId) throw Error("Admin debe iniciar sesión.");
+                const f = await uploadFile(b, `logo/${userId}/${Date.now()}_${b.name}`), g = getPublicUrl(f), { error: h } = await supabase.from("services").upsert({ id: "logo", image_url: g, image_path: f, user_id: userId }, { onConflict: "id" }); if (h) throw h;
+                displayMessage("Logo actualizado.", authMessage, "success")
+            } catch (i) { console.error("Error al subir logo:", i), displayMessage(`Error al subir logo: ${i.message}`, authMessage, "error"), loadLogo() } // Recargar si falla
+            finally {
+                const j = c.querySelector(".animate-spin"); j && j.parentElement.remove();
+                // Asegurar que el overlay exista y tenga listener al final
+                if (logoUploadOverlayHTML && !c.querySelector('#logo-upload-overlay')) {
+                     c.insertAdjacentHTML('beforeend', logoUploadOverlayHTML);
+                      lucide.createIcons();
+                      attachLogoInputListener(); // <-- Re-adjuntar listener
+                 }
+                a.target.value = null // Limpiar input para permitir subir el mismo archivo de nuevo
+            }
+        }
+        
+        // ==================================================
+        // CORRECCIÓN loadLogo: Asegurar re-adjuntar listener
+        // ==================================================
+        async function loadLogo() {
+            if (!supabase) return;
+            try {
+                const { data: a, error: b } = await supabase.from("services").select("image_url").eq("id", "logo").maybeSingle(); if (b && "PGRST116" !== b.code) throw b;
+                const c = document.getElementById("current-logo"); c.innerHTML = ""; // Limpiar siempre
+                a && a.image_url 
+                    ? c.innerHTML = `<img src="${a.image_url}" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null; this.parentElement.innerHTML = '${defaultSvgHtml.replace(/'/g, "\\'")}' + '${logoUploadOverlayHTML.replace(/'/g, "\\'")}'; lucide.createIcons(); attachLogoInputListener();">${logoUploadOverlayHTML}` // <-- Adjuntar listener en onerror
+                    : c.innerHTML = defaultSvgHtml + logoUploadOverlayHTML;
+                
+                attachLogoInputListener(); // <-- Re-adjuntar listener después de cambiar innerHTML
+                isAdmin ? logoContainer.classList.add("admin-active") : logoContainer.classList.remove("admin-active");
+                lucide.createIcons() // Asegurar iconos
+            } catch (e) { 
+                console.error("Error al cargar logo:", e); 
+                const f = document.getElementById("current-logo"); 
+                f && (f.innerHTML = defaultSvgHtml + logoUploadOverlayHTML, attachLogoInputListener(), lucide.createIcons()) // <-- Adjuntar listener en fallback
+            }
+        }
 
         // --- INVENTARIO (Lógica adaptada a grid) ---
         function loadInventoryData(){if(!supabase)return;inventoryGridContainer.innerHTML="",inventoryLoadingMsg.classList.remove("hidden"),inventoryEmptyMsg.classList.add("hidden"),supabase.from("inventory").select("*").order("name",{ascending:!0}).then(({data:a,error:b})=>{inventoryLoadingMsg.classList.add("hidden"),(()=>{if(b)throw b})(),renderInventory(a||[])}).catch(c=>{inventoryLoadingMsg.classList.add("hidden"),console.error("Error al cargar inventario:",c),inventoryGridContainer.innerHTML='<p class="text-center text-red-400 italic sm:col-span-2 lg:col-span-3 xl:col-span-4 py-4">Error al cargar inventario.</p>',c.message.includes('column "category" does not exist')?handleGlobalError("La columna 'category' no existe en la tabla 'inventory'. Revise las instrucciones."):c.message.includes("does not exist")?handleGlobalError("La tabla 'inventory' no existe en Supabase."):c.message.includes("permission denied")&&handleGlobalError("Permisos incorrectos para leer 'inventory'. Revisa las Políticas RLS.")})}
@@ -189,7 +218,7 @@
         async function updateSaleItem(a,b,c,d,e){if(!isAdmin)return;const{error:f}=await supabase.from("sales").update({clientName:b,name:c,price:d,category:e}).eq("id",a);f&&(console.error("Error al actualizar venta:",f),displayMessage("Error al actualizar.",salesAuthMessage)),loadSalesData()}
         window.deleteSaleItem=async function(a){if(!isAdmin||!confirm("¿Eliminar esta venta del registro?"))return;const{error:b}=await supabase.from("sales").delete().eq("id",a);b?(console.error("Error al eliminar venta:",b),displayMessage(`Error: ${b.message}`,salesAuthMessage)):loadSalesData()}
 
-        // --- MODALES Y EVENT LISTENERS --- (Sin cambios)
+        // --- MODALES Y EVENT LISTENERS ---
         function openModal(a){a.classList.remove("hidden"),a.classList.add("flex")} function closeModal(a){a.classList.add("hidden"),a.classList.remove("flex")} document.querySelectorAll(".fixed.inset-0").forEach(a=>{a.addEventListener("click",b=>{b.target===a&&closeModal(a)})}),document.getElementById("open-auth-modal-btn").onclick=()=>openModal(authModal),document.getElementById("close-auth-modal").onclick=()=>closeModal(authModal),logoutBtn.onclick=handleLogout,toggleAuthModeBtn.onclick=()=>{const a="Iniciar Sesión"===authTitle.textContent;authTitle.textContent=a?"Registrarse":"Iniciar Sesión",authButtonText.textContent=a?"Registrarse":"Iniciar Sesión",toggleAuthModeBtn.textContent=a?"¿Ya tienes cuenta? Inicia Sesión":"¿No tienes cuenta? Regístrate"},loginForm.onsubmit=handleAuthSubmit,document.getElementById("open-inventory-modal-btn").onclick=()=>openModal(inventoryModal),document.getElementById("close-inventory-modal").onclick=()=>closeModal(inventoryModal),inventoryAddBtn.onclick=addInventoryItem,openSalesModalBtn.onclick=()=>{userId?(salesAuthMessage.classList.add("hidden"),salesContent.classList.remove("hidden"),openModal(salesModal)):(salesAuthMessage.textContent="Debes iniciar sesión para acceder a las ventas.",salesAuthMessage.classList.remove("hidden"),salesContent.classList.add("hidden"),openModal(salesModal))},document.getElementById("close-sales-modal").onclick=()=>closeModal(salesModal),addSaleBtn.onclick=addSaleItem,openThemeDropdownBtn&&openThemeDropdownBtn.onclick,openThemeDropdownBtn.onclick=a=>{a.stopPropagation(),themeDropdownMenu.classList.toggle("hidden")},window.addEventListener("click",a=>{themeDropdownWrapper&&!themeDropdownWrapper.contains(a.target)&&closeThemeDropdown()});
 
         // --- INICIALIZACIÓN ---
