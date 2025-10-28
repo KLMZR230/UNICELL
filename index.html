@@ -32,9 +32,6 @@
 
         #logo-upload-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.7); opacity: 0; transition: opacity 0.3s; cursor: pointer; border-radius: 0.5rem; }
         
-        /* * CAMBIO: El overlay ya no se muestra permanentemente.
-         * Ahora solo aparece cuando (1) eres admin Y (2) pasas el ratón (hover) por encima.
-         */
         #logo-container.admin-active:hover #logo-upload-overlay { 
             display: flex; 
             opacity: 1; 
@@ -61,7 +58,8 @@
 
         <header class="mb-16 pt-4 relative flex justify-between items-start sm:items-center">
 
-            <div class="flex items-center space-x-3 mb-4 sm:mb-0 relative" id="logo-container"> <div class="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center rounded-lg" id="current-logo">
+            <div class="flex items-center space-x-3 mb-4 sm:mb-0 relative" id="logo-container">
+                <div class="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center rounded-lg" id="current-logo">
                     <svg id="default-logo-svg" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 sm:w-12 sm:h-12 accent-text" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 20a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" opacity=".2"/>
                         <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" fill="var(--color-primary)"/>
@@ -284,7 +282,6 @@
         const adminStatusDisplay = document.getElementById('admin-status');
         const appErrorDisplay = document.getElementById('app-error-display');
         const logoContainer = document.getElementById('logo-container');
-        //const logoUploadOverlay = document.getElementById('logo-upload-overlay'); // Ya no es necesaria una referencia global
         const authModal = document.getElementById('auth-modal');
         const authContainer = document.getElementById('auth-container');
         const logoutContainer = document.getElementById('logout-container');
@@ -329,11 +326,19 @@
         function initLogoTemplates() {
             const overlay = document.getElementById('logo-upload-overlay');
             const svg = document.getElementById('default-logo-svg');
-            if (overlay) { logoUploadOverlayHTML = overlay.outerHTML; }
-            if (svg) { defaultSvgHtml = svg.outerHTML; }
-            if (document.getElementById('current-logo') && !document.getElementById('current-logo').querySelector('img')) {
+            if (overlay) { 
+                logoUploadOverlayHTML = overlay.outerHTML; 
+                overlay.remove(); // Quitamos el original para evitar duplicados
+            }
+            if (svg) { 
+                defaultSvgHtml = svg.outerHTML; 
+                // No quitamos el SVG, se reemplazará
+            }
+            
+            const currentLogoDiv = document.getElementById('current-logo');
+            if (currentLogoDiv && !currentLogoDiv.querySelector('img')) {
                 // Rellena con el SVG y el overlay (que está oculto por CSS por defecto)
-                document.getElementById('current-logo').innerHTML = defaultSvgHtml + logoUploadOverlayHTML;
+                currentLogoDiv.innerHTML = defaultSvgHtml + logoUploadOverlayHTML;
             }
         }
         function handleGlobalError(msg) { appErrorDisplay.textContent = `Error crítico: ${msg}`; appErrorDisplay.classList.remove('hidden'); }
@@ -343,7 +348,6 @@
             if (isAdmin) {
                 adminStatusDisplay.classList.remove('hidden');
                 logoContainer.classList.add('admin-active'); // Activa hover para subir logo
-                // CAMBIO: Ya no tocamos el 'logoUploadOverlay' aquí. El CSS lo maneja.
                 inventoryContentAdmin.classList.remove('hidden'); 
                 inventoryHeaderActions.classList.remove('hidden'); 
                 salesAddFormAdmin.classList.remove('hidden'); 
@@ -351,8 +355,7 @@
                 openSalesModalBtn.classList.remove('hidden'); 
             } else {
                 adminStatusDisplay.classList.add('hidden');
-                logoContainer.classList.remove('admin-active');
-                // CAMBIO: Ya no tocamos el 'logoUploadOverlay' aquí.
+                logoContainer.classList.remove('admin-active'); // Desactiva hover
                 inventoryContentAdmin.classList.add('hidden');
                 inventoryHeaderActions.classList.add('hidden');
                 salesAddFormAdmin.classList.add('hidden');
@@ -428,7 +431,7 @@
         // --------------------------------------------------------------------------------
         function applyTheme(themeName) {
             document.body.classList.remove('theme-feminine', 'theme-masculine');
-            const buttons = { 'default': themeBtnDefault, 'feminINE': themeBtnFeminine, 'masculine': themeBtnMasculine };
+            const buttons = { 'default': themeBtnDefault, 'feminine': themeBtnFeminine, 'masculine': themeBtnMasculine };
             Object.values(buttons).forEach(btn => btn.classList.remove('active'));
             if (themeName === 'feminine') { document.body.classList.add('theme-feminine'); themeBtnFeminine.classList.add('active'); }
             else if (themeName === 'masculine') { document.body.classList.add('theme-masculine'); themeBtnMasculine.classList.add('active'); }
@@ -484,19 +487,16 @@
                 if (error && error.code !== 'PGRST116') throw error;
                 const logoDiv = document.getElementById('current-logo');
                 
-                // Construye el HTML: la imagen (o SVG) + el overlay (que CSS oculta/muestra)
                 if (data && data.image_url) {
                     logoDiv.innerHTML = `<img src="${data.image_url}" class="w-full h-full object-contain rounded-lg" onerror="this.onerror=null; this.src='${defaultSvgHtml}';">${logoUploadOverlayHTML}`;
                 } else {
                     logoDiv.innerHTML = defaultSvgHtml + logoUploadOverlayHTML;
                 }
                 
-                // Reasigna el listener de subida al nuevo input
                 const logoInput = document.getElementById('logo-file-input');
                 if (logoInput) logoInput.onchange = handleLogoUpload;
                 
-                // CAMBIO: Solo gestionamos la clase 'admin-active' en el *contenedor*.
-                // El CSS se encargará de mostrar/ocultar el overlay en 'hover'.
+                // CAMBIO: Solo gestionamos la clase 'admin-active'. CSS hace el resto.
                 if(isAdmin) {
                     logoContainer.classList.add('admin-active');
                 } else {
