@@ -328,16 +328,14 @@
             const svg = document.getElementById('default-logo-svg');
             if (overlay) { 
                 logoUploadOverlayHTML = overlay.outerHTML; 
-                overlay.remove(); // Quitamos el original para evitar duplicados
+                overlay.remove(); 
             }
             if (svg) { 
                 defaultSvgHtml = svg.outerHTML; 
-                // No quitamos el SVG, se reemplazará
             }
             
             const currentLogoDiv = document.getElementById('current-logo');
             if (currentLogoDiv && !currentLogoDiv.querySelector('img')) {
-                // Rellena con el SVG y el overlay (que está oculto por CSS por defecto)
                 currentLogoDiv.innerHTML = defaultSvgHtml + logoUploadOverlayHTML;
             }
         }
@@ -347,7 +345,7 @@
         function updateUIBasedOnAuth() {
             if (isAdmin) {
                 adminStatusDisplay.classList.remove('hidden');
-                logoContainer.classList.add('admin-active'); // Activa hover para subir logo
+                logoContainer.classList.add('admin-active'); 
                 inventoryContentAdmin.classList.remove('hidden'); 
                 inventoryHeaderActions.classList.remove('hidden'); 
                 salesAddFormAdmin.classList.remove('hidden'); 
@@ -355,7 +353,7 @@
                 openSalesModalBtn.classList.remove('hidden'); 
             } else {
                 adminStatusDisplay.classList.add('hidden');
-                logoContainer.classList.remove('admin-active'); // Desactiva hover
+                logoContainer.classList.remove('admin-active'); 
                 inventoryContentAdmin.classList.add('hidden');
                 inventoryHeaderActions.classList.add('hidden');
                 salesAddFormAdmin.classList.add('hidden');
@@ -496,7 +494,6 @@
                 const logoInput = document.getElementById('logo-file-input');
                 if (logoInput) logoInput.onchange = handleLogoUpload;
                 
-                // CAMBIO: Solo gestionamos la clase 'admin-active'. CSS hace el resto.
                 if(isAdmin) {
                     logoContainer.classList.add('admin-active');
                 } else {
