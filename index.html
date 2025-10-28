@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         /* ================================================================== */
-        /* TEMAS Y ESTILOS GLOBALES (Sin cambios) */
+        /* TEMAS Y ESTILOS GLOBALES */
         /* ================================================================== */
         :root { --color-primary: #FF4545; --color-secondary: #E91E63; --color-dark: #1F2937; --color-darker: #111827; --color-text: #E5E7EB; --admin-border: #00FF00; --color-primary-gradient: rgba(255, 69, 69, 0.1); --color-secondary-gradient: rgba(233, 30, 99, 0.1); }
         body.theme-feminine { --color-primary: #F472B6; --color-secondary: #EC4899; --color-dark: #374151; --color-darker: #1F2937; --color-text: #F3F4F6; --admin-border: #A7F3D0; --color-primary-gradient: rgba(244, 114, 182, 0.1); --color-secondary-gradient: rgba(236, 72, 153, 0.1); }
@@ -21,9 +21,18 @@
         .accent-text { color: var(--color-primary); }
         .input-dark { background-color: var(--color-dark); border: 1px solid rgba(var(--color-secondary), 0.3); color: var(--color-text); }
         #logo-upload-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.7); opacity: 0; transition: opacity 0.3s; cursor: pointer; border-radius: 0.5rem; }
-        #logo-container.admin-active #logo-upload-overlay { display: flex; opacity: 1; } /* Modificado para mostrar solo con admin-active */
+        #logo-container.admin-active #logo-upload-overlay { display: flex; opacity: 1; }
         #logo-container:not(.admin-active) #logo-upload-overlay { display: none; }
-        .inventory-image-preview { width: 100%; height: 120px; object-fit: cover; border-radius: 0.5rem; margin-bottom: 0.5rem; }
+        
+        /* CAMBIO: Aumentada la altura de la imagen de 120px a 160px */
+        .inventory-image-preview {
+            width: 100%;
+            height: 160px; /* Más grande */
+            object-fit: cover;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
         .theme-btn { width: 2rem; height: 2rem; border-radius: 9999px; border: 3px solid #4B5563; cursor: pointer; transition: border-color 0.2s; }
         .theme-btn.active, .theme-btn:hover { border-color: var(--color-primary); }
         #theme-btn-default { background-color: #FF4545; } #theme-btn-feminine { background-color: #F472B6; } #theme-btn-masculine { background-color: #3B82F6; }
@@ -32,207 +41,28 @@
 <body class="p-4">
 
     <div class="max-w-4xl mx-auto py-8">
-
-        <header class="mb-16 pt-4 relative flex justify-between items-start sm:items-center">
-
-            <div class="flex items-center space-x-3 mb-4 sm:mb-0 relative" id="logo-container"> <div class="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center rounded-lg" id="current-logo">
-                    <svg id="default-logo-svg" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 sm:w-12 sm:h-12 accent-text" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 20a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" opacity=".2"/>
-                        <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" fill="var(--color-primary)"/>
-                        <path d="M16 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM10 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-                        <path d="M12 14v-2" stroke-width="3"/>
-                    </svg>
-                    <div id="logo-upload-overlay" class="hidden"> <i data-lucide="upload" class="w-6 h-6 text-white mr-2"></i>
-                        <span class="text-white text-sm">Subir Logo</span>
-                        <input type="file" id="logo-file-input" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
+        <div id="inventory-modal" class="fixed inset-0 z-40 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4">
+            <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-pink-500/50 max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300">
+                <div id="inventory-content-public">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-700 rounded-lg">
+                            <thead class="bg-gray-700">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-40">Foto</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Nombre</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Precio</th>
+                                    <th id="inventory-header-actions" class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider w-40 hidden">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-list" class="bg-gray-800 divide-y divide-gray-700">
+                                <tr><td colspan="4" class="text-center py-4 text-gray-500 italic">Cargando inventario...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-
-                <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
-                    UNICELL
-                    <span class="block text-lg sm:text-xl font-light accent-text border-b-2 border-pink-500 inline-block pb-1 pl-1 sm:pl-0">
-                        SERVICIO TÉCNICO
-                    </span>
-                </h1>
-            </div>
-
-            <div class="flex space-x-3 items-center mt-2 sm:mt-0">
-                <button id="open-inventory-modal-btn" onclick="openModal(document.getElementById('inventory-modal'))" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-3 rounded-full transition duration-300 shadow-md flex items-center text-sm sm:text-base">
-                    <i data-lucide="package" class="w-4 h-4 sm:w-5 sm:h-5"></i>
-                    <span class="ml-1 sm:ml-2">Inventario</span>
-                </button>
-                <button id="open-sales-modal-btn" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-full transition duration-300 shadow-md flex items-center text-sm sm:text-base hidden"> <i data-lucide="receipt-text" class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2"></i>
-                    Ventas
-                </button>
-
-                <div id="theme-selector-container" class="flex space-x-2 items-center">
-                    <button id="theme-btn-default" class="theme-btn" title="Tema Original"></button>
-                    <button id="theme-btn-feminine" class="theme-btn" title="Tema Femenino"></button>
-                    <button id="theme-btn-masculine" class="theme-btn" title="Tema Masculino"></button>
-                </div>
-
-                <button id="open-auth-modal-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 shadow-md flex items-center">
-                    <i data-lucide="user" class="w-5 h-5"></i>
-                </button>
-            </div>
-        </header>
-
-        <section class="text-center mb-16 -mt-8">
-            <p id="app-error-display" class="mt-4 text-red-500 font-bold hidden"></p>
-            <p class="mt-4 text-gray-400 max-w-md mx-auto">
-                Especialistas en la reparación de dispositivos móviles y mantenimiento de consolas.
-            </p>
-        </section>
-
-        <section id="contacto" class="mb-12 text-center p-6 bg-gray-800 rounded-xl shadow-2xl">
-            <h2 class="text-3xl font-bold mb-6 text-white">Contáctanos Hoy Mismo</h2>
-            <p class="text-gray-300 mb-8">¡Agenda tu reparación o consulta sin compromiso!</p>
-            <div class="flex flex-col sm:flex-row justify-center items-center gap-6">
-                <a href="https://wa.me/52177191068" target="_blank" class="flex items-center space-x-3 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transition duration-300 shadow-md shadow-green-700/50">
-                    <i data-lucide="phone" class="w-5 h-5"></i>
-                    <span>77191068 (WhatsApp)</span>
-                </a>
-            </div>
-        </section>
-
-        <footer class="text-center mt-10 text-gray-500 border-t border-gray-700 pt-6">
-            <p>&copy; 2024 UNICELL Servicio Técnico. Todos los derechos reservados.</p>
-            <p id="admin-status" class="text-xs mt-2 italic hidden">
-                <span class="text-green-500">MODO ADMINISTRADOR ACTIVO.</span>
-            </p>
-        </footer>
-    </div>
-
-    <div id="auth-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4">
-        <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-gray-700 max-w-sm w-full p-6 relative">
-            <button id="close-auth-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
-                <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
-            <div id="auth-container">
-                <h2 class="text-2xl font-bold text-center mb-6 text-white" id="auth-title">Iniciar Sesión</h2>
-                <form id="login-form" class="space-y-4">
-                    <input id="auth-email" type="email" placeholder="Correo Electrónico" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500" required />
-                    <input id="auth-password" type="password" placeholder="Contraseña" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500" required />
-                    <button type="submit" id="auth-submit-btn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center">
-                        <i data-lucide="log-in" class="w-5 h-5 mr-2"></i>
-                        <span id="auth-button-text">Iniciar Sesión</span>
-                    </button>
-                    <p id="auth-message" class="text-center text-sm text-red-400"></p>
-                </form>
-                <button id="toggle-auth-mode" class="w-full mt-4 text-center text-sm text-gray-400 hover:text-white transition">
-                    ¿No tienes cuenta? Regístrate
-                </button>
-            </div>
-            <div id="logout-container" class="hidden text-center">
-                <p class="text-lg text-white mb-4">Sesión Iniciada.</p>
-                <p id="current-user-uid" class="text-xs text-gray-500 mb-6 font-mono break-all"></p>
-                <button id="logout-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center">
-                    <i data-lucide="log-out" class="w-5 h-5 mr-2"></i> Cerrar Sesión
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="inventory-modal" class="fixed inset-0 z-40 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4">
-        <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-pink-500/50 max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300">
-            <button id="close-inventory-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
-                <i data-lucide="x" class="w-7 h-7"></i>
-            </button>
-            <h2 class="text-3xl font-bold text-center mb-6 text-white flex items-center justify-center">
-                <i data-lucide="package" class="w-7 h-7 accent-text mr-3"></i>
-                Inventario de Productos
-            </h2>
-
-            <div id="inventory-content-admin" class="hidden mb-8 p-4 bg-gray-800 rounded-lg shadow-inner">
-                <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir/Editar Producto</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
-                    <div class="sm:col-span-1">
-                        <label class="text-gray-400 text-sm">Nombre</label>
-                        <input id="inventory-name" type="text" placeholder="Nombre del Producto" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500" />
-                    </div>
-                    <div class="sm:col-span-1">
-                        <label class="text-gray-400 text-sm">Precio</label>
-                        <input id="inventory-price" type="number" placeholder="Precio (Ej: 150.00)" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500" step="0.01" />
-                    </div>
-                    <div class="sm:col-span-1">
-                        <label class="text-gray-400 text-sm">Foto (Opcional)</label>
-                        <input type="file" id="inventory-image-file" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100" accept="image/*" />
-                    </div>
-                    <button id="inventory-add-btn" class="sm:col-span-1 bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center disabled:opacity-50">
-                        <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir Producto
-                    </button>
-                </div>
-                <p id="inventory-message" class="text-center text-sm mt-3 text-red-400"></p>
-            </div>
-
-            <div id="inventory-content-public">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-700 rounded-lg">
-                        <thead class="bg-gray-700">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-20">Foto</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Nombre</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Precio</th>
-                                <th id="inventory-header-actions" class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider w-40 hidden">Acciones</th> </tr>
-                        </thead>
-                        <tbody id="inventory-list" class="bg-gray-800 divide-y divide-gray-700">
-                            <tr><td colspan="4" class="text-center py-4 text-gray-500 italic">Cargando inventario...</td></tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div id="sales-modal" class="fixed inset-0 z-40 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4">
-        <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-pink-500/50 max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300">
-            <button id="close-sales-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
-                <i data-lucide="x" class="w-7 h-7"></i>
-            </button>
-            <h2 class="text-3xl font-bold text-center mb-6 text-white flex items-center justify-center">
-                <i data-lucide="receipt-text" class="w-7 h-7 accent-text mr-3"></i>
-                Registro de Ventas
-            </h2>
-             <p id="sales-auth-message" class="text-center p-4 text-red-400 hidden">Debes iniciar sesión para ver o registrar ventas.</p>
-
-            <div id="sales-content"> <div id="sales-add-form-admin" class="hidden mb-8 p-4 bg-gray-800 rounded-lg shadow-inner">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir Nuevo Artículo</h3>
-                    <label class="text-gray-400 text-sm mb-1 block">Destinatario/Cliente</label>
-                    <input id="client-name" type="text" placeholder="Nombre del Destinatario" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500 mb-4" />
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <input id="product-name" type="text" placeholder="Nombre del Producto/Servicio" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500" />
-                        <input id="product-price" type="number" placeholder="Precio (Ej: 150.00)" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500" step="0.01" />
-                        <button id="add-btn" class="col-span-1 bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center disabled:opacity-50">
-                            <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir a Venta
-                        </button>
-                    </div>
-                 </div>
-
-                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-700 rounded-lg">
-                        <thead class="bg-gray-700">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Destinatario</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Producto</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Precio</th>
-                                <th id="sales-header-actions" class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider w-40 hidden">Acciones</th> </tr>
-                        </thead>
-                        <tbody id="sales-list" class="bg-gray-800 divide-y divide-gray-700">
-                            <tr><td colspan="4" class="text-center py-4 text-gray-500 italic">Cargando ventas...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="mt-4 p-4 bg-gray-700 rounded-lg flex justify-between items-center font-bold text-white text-xl">
-                    <span>TOTAL VENTA:</span>
-                    <span id="sales-total" class="accent-text text-2xl">$0.00</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <script>
+    </div> <script>
         // Inicializar Lucide Icons
         lucide.createIcons();
     </script>
@@ -244,23 +74,21 @@
         const SUPABASE_URL = 'https://pavonviwyyjmdwwhxrzm.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhdm9udml3eXlqbWR3d2h4cnptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2MTA2MzcsImV4cCI6MjA3NzE4NjYzN30.dWGKn3MWuVHvOivh608-ZIdfVGsekdpfLu7quc42HBk';
         const ADMIN_EMAIL_REAL = 'unicell2025@gmail.com';
-        const ASSETS_BUCKET = 'public_assets'; // Asegúrate que este bucket sea PÚBLICO en Supabase Storage
+        const ASSETS_BUCKET = 'public_assets';
 
         let supabase = null;
         let userId = null;
-        let userEmail = null; // Guardaremos el email
+        let userEmail = null; 
         let isAdmin = false;
 
         let logoUploadOverlayHTML = '';
         let defaultSvgHtml = '';
 
-        // Referencias del DOM (Simplificadas y relevantes)
+        // Referencias del DOM
         const adminStatusDisplay = document.getElementById('admin-status');
         const appErrorDisplay = document.getElementById('app-error-display');
         const logoContainer = document.getElementById('logo-container');
         const logoUploadOverlay = document.getElementById('logo-upload-overlay');
-
-        // Auth Modal
         const authModal = document.getElementById('auth-modal');
         const authContainer = document.getElementById('auth-container');
         const logoutContainer = document.getElementById('logout-container');
@@ -274,36 +102,28 @@
         const authMessage = document.getElementById('auth-message');
         const currentUserUidDisplay = document.getElementById('current-user-uid');
         const logoutBtn = document.getElementById('logout-btn');
-
-        // Modales y Botones Principales
         const openSalesModalBtn = document.getElementById('open-sales-modal-btn');
-        const openInventoryModalBtn = document.getElementById('open-inventory-modal-btn'); // Aunque siempre visible, necesitamos la ref
-
-        // Sales Modal Content
+        const openInventoryModalBtn = document.getElementById('open-inventory-modal-btn');
         const salesModal = document.getElementById('sales-modal');
         const salesContent = document.getElementById('sales-content');
         const salesAuthMessage = document.getElementById('sales-auth-message');
-        const salesAddFormAdmin = document.getElementById('sales-add-form-admin'); // Formulario admin
+        const salesAddFormAdmin = document.getElementById('sales-add-form-admin');
         const salesList = document.getElementById('sales-list');
         const salesTotal = document.getElementById('sales-total');
         const clientNameInput = document.getElementById('client-name');
         const productNameInput = document.getElementById('product-name');
         const productPriceInput = document.getElementById('product-price');
         const addSaleBtn = document.getElementById('add-btn');
-        const salesHeaderActions = document.getElementById('sales-header-actions'); // Cabecera acciones admin
-
-        // Inventory Modal Content
+        const salesHeaderActions = document.getElementById('sales-header-actions');
         const inventoryModal = document.getElementById('inventory-modal');
-        const inventoryContentAdmin = document.getElementById('inventory-content-admin'); // Formulario admin
+        const inventoryContentAdmin = document.getElementById('inventory-content-admin');
         const inventoryList = document.getElementById('inventory-list');
         const inventoryNameInput = document.getElementById('inventory-name');
         const inventoryPriceInput = document.getElementById('inventory-price');
         const inventoryImageFile = document.getElementById('inventory-image-file');
         const inventoryAddBtn = document.getElementById('inventory-add-btn');
         const inventoryMessage = document.getElementById('inventory-message');
-        const inventoryHeaderActions = document.getElementById('inventory-header-actions'); // Cabecera acciones admin
-
-        // Temas
+        const inventoryHeaderActions = document.getElementById('inventory-header-actions');
         const themeBtnDefault = document.getElementById('theme-btn-default');
         const themeBtnFeminine = document.getElementById('theme-btn-feminine');
         const themeBtnMasculine = document.getElementById('theme-btn-masculine');
@@ -311,10 +131,10 @@
         // --------------------------------------------------------------------------------
         // 2. UTILIDADES
         // --------------------------------------------------------------------------------
-        function initLogoTemplates() { /* ... (sin cambios) ... */
+        function initLogoTemplates() {
             const overlay = document.getElementById('logo-upload-overlay');
             const svg = document.getElementById('default-logo-svg');
-            if (overlay) { logoUploadOverlayHTML = overlay.outerHTML; /* No lo removemos */ }
+            if (overlay) { logoUploadOverlayHTML = overlay.outerHTML; }
             if (svg) { defaultSvgHtml = svg.outerHTML; }
             if (document.getElementById('current-logo') && !document.getElementById('current-logo').querySelector('img')) {
                 document.getElementById('current-logo').innerHTML = defaultSvgHtml;
@@ -323,39 +143,36 @@
         function handleGlobalError(msg) { appErrorDisplay.textContent = `Error crítico: ${msg}`; appErrorDisplay.classList.remove('hidden'); }
         function displayMessage(msg, element, type = 'error') { element.textContent = msg; element.className = type === 'success' ? 'text-center text-sm text-green-400' : 'text-center text-sm text-red-400'; setTimeout(() => { element.textContent = ''; }, 5000); }
 
-        // Función CENTRALIZADA para actualizar UI basada en si es Admin o está Logueado
         function updateUIBasedOnAuth() {
             if (isAdmin) {
                 adminStatusDisplay.classList.remove('hidden');
-                logoContainer.classList.add('admin-active'); // Activa hover para subir logo
-                logoUploadOverlay.classList.remove('hidden'); // Muestra overlay de subida
-                inventoryContentAdmin.classList.remove('hidden'); // Muestra form añadir inventario
-                inventoryHeaderActions.classList.remove('hidden'); // Muestra cabecera acciones inventario
-                salesAddFormAdmin.classList.remove('hidden'); // Muestra form añadir venta
-                salesHeaderActions.classList.remove('hidden'); // Muestra cabecera acciones venta
-                openSalesModalBtn.classList.remove('hidden'); // Asegura que el botón Ventas sea visible
+                logoContainer.classList.add('admin-active'); 
+                logoUploadOverlay.classList.remove('hidden'); 
+                inventoryContentAdmin.classList.remove('hidden'); 
+                inventoryHeaderActions.classList.remove('hidden'); 
+                salesAddFormAdmin.classList.remove('hidden'); 
+                salesHeaderActions.classList.remove('hidden'); 
+                openSalesModalBtn.classList.remove('hidden'); 
             } else {
                 adminStatusDisplay.classList.add('hidden');
                 logoContainer.classList.remove('admin-active');
-                logoUploadOverlay.classList.add('hidden'); // Oculta overlay de subida
+                logoUploadOverlay.classList.add('hidden'); 
                 inventoryContentAdmin.classList.add('hidden');
                 inventoryHeaderActions.classList.add('hidden');
                 salesAddFormAdmin.classList.add('hidden');
                 salesHeaderActions.classList.add('hidden');
-                // Botón Ventas: Visible si está logueado (no admin), oculto si no
                 if (userId) {
                     openSalesModalBtn.classList.remove('hidden');
                 } else {
                     openSalesModalBtn.classList.add('hidden');
                 }
             }
-            // Actualizar renderizados para mostrar/ocultar botones inline
-            loadInventoryData(); // Recarga inventario para mostrar/ocultar botones de fila
-            if (userId) loadSalesData(); // Recarga ventas si está logueado
+            loadInventoryData(); 
+            if (userId) loadSalesData(); 
         }
 
         // --------------------------------------------------------------------------------
-        // 3. LÓGICA DE AUTENTICACIÓN (Enfocada en mostrar/ocultar)
+        // 3. LÓGICA DE AUTENTICACIÓN
         // --------------------------------------------------------------------------------
         function initSupabase() {
             if (!SUPABASE_URL || !SUPABASE_ANON_KEY) { handleGlobalError('¡ERROR: Faltan la URL o la Clave de Supabase!'); return; }
@@ -368,22 +185,25 @@
         }
 
         function handleAuthChange(session) {
+            // CAMBIO: Añadido console.log para depuración. 
+            // Revisa la consola (F12) al recargar la página.
+            // Si dice "Session: null", el navegador no está recuperando tu sesión.
+            console.log('Auth state change detected. Session:', session);
+
             if (session && session.user) {
                 userId = session.user.id;
-                userEmail = session.user.email; // Guardamos el email
-                isAdmin = (userEmail === ADMIN_EMAIL_REAL); // Verificamos si es admin
+                userEmail = session.user.email;
+                isAdmin = (userEmail === ADMIN_EMAIL_REAL);
                 currentUserUidDisplay.textContent = userEmail;
 
                 authContainer.classList.add('hidden');
                 logoutContainer.classList.remove('hidden');
 
-                // Carga datos privados (ventas)
-                salesAuthMessage.classList.add('hidden'); // Oculta mensaje de login para ventas
-                salesContent.classList.remove('hidden'); // Muestra contenedor de ventas
-                loadSalesData(); // Carga TODAS las ventas
+                salesAuthMessage.classList.add('hidden');
+                salesContent.classList.remove('hidden');
+                loadSalesData();
 
             } else {
-                // No hay sesión
                 userId = null;
                 userEmail = null;
                 isAdmin = false;
@@ -391,19 +211,17 @@
                 authContainer.classList.remove('hidden');
                 logoutContainer.classList.add('hidden');
 
-                // Oculta contenido privado (ventas)
-                salesAuthMessage.classList.remove('hidden'); // Muestra mensaje de login para ventas
-                salesContent.classList.add('hidden'); // Oculta contenedor de ventas
-                renderSales([]); // Limpia la tabla de ventas
+                salesAuthMessage.classList.remove('hidden');
+                salesContent.classList.add('hidden');
+                renderSales([]);
             }
 
-            // --- ESTO SE EJECUTA SIEMPRE ---
-            updateUIBasedOnAuth(); // Actualiza toda la UI (botones admin, etc.)
-            loadLogo();            // Carga el logo (público)
-            loadInventoryData();   // Carga el inventario (público)
+            updateUIBasedOnAuth();
+            loadLogo();
+            loadInventoryData();
         }
 
-        async function handleAuthSubmit(e) { /* ... (sin cambios) ... */
+        async function handleAuthSubmit(e) {
             e.preventDefault();
             const email = authEmailInput.value; const password = authPasswordInput.value;
             const isSigningUp = authTitle.textContent === 'Registrarse';
@@ -417,16 +235,16 @@
             } catch (err) { displayMessage('Error de conexión.', authMessage, 'error'); console.error(err); }
             finally { authSubmitBtn.disabled = false; }
         }
-        async function handleLogout() { /* ... (sin cambios) ... */
+        async function handleLogout() {
              const { error } = await supabase.auth.signOut();
              if (error) console.error("Error al cerrar sesión:", error.message);
-             closeModal(authModal); // onAuthStateChange hará el resto
+             closeModal(authModal);
         }
 
         // --------------------------------------------------------------------------------
-        // 4. GESTIÓN DE TEMAS (Sin cambios)
+        // 4. GESTIÓN DE TEMAS
         // --------------------------------------------------------------------------------
-        function applyTheme(themeName) { /* ... (sin cambios) ... */
+        function applyTheme(themeName) {
             document.body.classList.remove('theme-feminine', 'theme-masculine');
             const buttons = { 'default': themeBtnDefault, 'feminine': themeBtnFeminine, 'masculine': themeBtnMasculine };
             Object.values(buttons).forEach(btn => btn.classList.remove('active'));
@@ -435,7 +253,7 @@
             else { themeBtnDefault.classList.add('active'); }
             localStorage.setItem('unicell-theme', themeName);
         }
-        function loadSavedTheme() { /* ... (sin cambios) ... */
+        function loadSavedTheme() {
              const savedTheme = localStorage.getItem('unicell-theme') || 'default';
              applyTheme(savedTheme);
              themeBtnDefault.onclick = () => applyTheme('default');
@@ -444,61 +262,60 @@
         }
 
         // --------------------------------------------------------------------------------
-        // 5. GESTIÓN DE STORAGE (LOGO E INVENTARIO) (Subida solo Admin)
+        // 5. GESTIÓN DE STORAGE (LOGO E INVENTARIO)
         // --------------------------------------------------------------------------------
-        async function uploadFile(file, path) { /* ... (sin cambios) ... */
+        async function uploadFile(file, path) {
             const { data, error } = await supabase.storage.from(ASSETS_BUCKET).upload(path, file, { cacheControl: '3600', upsert: true });
             if (error) { console.error("Error al subir archivo a Storage:", error); throw new Error(`Error al subir archivo: ${error.message}`); }
             return data.path;
         }
-        function getPublicUrl(path) { /* ... (sin cambios) ... */
+        function getPublicUrl(path) {
              const { data } = supabase.storage.from(ASSETS_BUCKET).getPublicUrl(path); return `${data.publicUrl}?v=${Date.now()}`;
         }
-        async function deleteFile(path) { /* ... (sin cambios) ... */
-            if (!path || path === 'null') return; // Evitar error si no hay path
+        async function deleteFile(path) {
+            if (!path || path === 'null') return;
             const { error } = await supabase.storage.from(ASSETS_BUCKET).remove([path]);
             if (error) console.error("Error al eliminar archivo de Storage:", error);
         }
 
         async function handleLogoUpload(e) {
-            if (!isAdmin) return; // Solo admin sube
+            if (!isAdmin) return;
             const file = e.target.files[0]; if (!file) return;
             const logoDiv = document.getElementById('current-logo');
             logoDiv.innerHTML = '<div class="w-full h-full flex items-center justify-center text-pink-500 font-bold text-xs animate-pulse">Cargando...</div>';
             try {
-                if (!userId) throw new Error("Admin debe iniciar sesión."); // Necesario para asociar user_id
+                if (!userId) throw new Error("Admin debe iniciar sesión.");
                 const path = await uploadFile(file, `logo/${userId}/${Date.now()}_${file.name}`);
                 const url = getPublicUrl(path);
                 const { error: dbError } = await supabase.from('services').upsert({ id: 'logo', image_url: url, image_path: path, user_id: userId }, { onConflict: 'id' });
                 if (dbError) throw dbError;
-                loadLogo(); // Recarga para mostrar la nueva imagen
+                loadLogo();
                 displayMessage('Logo actualizado.', authMessage, 'success');
-            } catch (error) { console.error("Error al subir logo:", error); displayMessage(`Error al subir logo: ${error.message}`, authMessage, 'error'); loadLogo(); // Recarga para restaurar
+            } catch (error) { console.error("Error al subir logo:", error); displayMessage(`Error al subir logo: ${error.message}`, authMessage, 'error'); loadLogo();
             } finally { e.target.value = null; }
         }
 
-        async function loadLogo() { // Carga pública
+        async function loadLogo() {
             if (!supabase) return;
             try {
-                const { data, error } = await supabase.from('services').select('image_url').eq('id', 'logo').maybeSingle(); // maybeSingle es más eficiente
-                if (error && error.code !== 'PGRST116') throw error; // Ignora 'not found'
+                const { data, error } = await supabase.from('services').select('image_url').eq('id', 'logo').maybeSingle();
+                if (error && error.code !== 'PGRST116') throw error;
                 const logoDiv = document.getElementById('current-logo');
                 if (data && data.image_url) {
                     logoDiv.innerHTML = `<img src="${data.image_url}" class="w-full h-full object-contain rounded-lg" onerror="this.onerror=null; this.src='${defaultSvgHtml}';"><div id="logo-upload-overlay">${logoUploadOverlayHTML}</div>`;
                 } else {
-                    logoDiv.innerHTML = defaultSvgHtml + `<div id="logo-upload-overlay">${logoUploadOverlayHTML}</div>`; // Asegura que el overlay esté
+                    logoDiv.innerHTML = defaultSvgHtml + `<div id="logo-upload-overlay">${logoUploadOverlayHTML}</div>`;
                 }
-                // Reasignar handler y actualizar UI admin
                 const logoInput = document.getElementById('logo-file-input');
                 if (logoInput) logoInput.onchange = handleLogoUpload;
-                updateUIBasedOnAuth(); // Asegura que el overlay se muestre/oculte correctamente
+                updateUIBasedOnAuth();
             } catch (error) { console.error("Error al cargar logo:", error); const logoDiv = document.getElementById('current-logo'); if(logoDiv) logoDiv.innerHTML = defaultSvgHtml; }
         }
 
         // --------------------------------------------------------------------------------
-        // 6. GESTIÓN DE INVENTARIO (Lectura pública, Escritura Admin)
+        // 6. GESTIÓN DE INVENTARIO
         // --------------------------------------------------------------------------------
-        function loadInventoryData() { // Carga pública
+        function loadInventoryData() {
             if (!supabase) return;
             supabase.from('inventory').select('*').order('name', { ascending: true })
                 .then(({ data, error }) => {
@@ -529,19 +346,21 @@
                     <button onclick="deleteInventoryItem('${item.id}', '${item.image_path}')" class="text-red-500 hover:text-red-400 p-2 rounded-full transition duration-150">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>` : '';
+                
+                // CAMBIO: Añadido align-top a todos los <td> y ajustado el div "Sin Foto"
                 tr.innerHTML = `
-                    <td class="p-2">
-                        ${item.image_url ? `<img src="${item.image_url}" alt="${item.name}" class="inventory-image-preview">` : `<div class="h-12 w-12 bg-gray-600 rounded-lg flex items-center justify-center text-xs text-gray-400">Sin Foto</div>`}
+                    <td class="p-2 align-top">
+                        ${item.image_url ? `<img src="${item.image_url}" alt="${item.name}" class="inventory-image-preview">` : `<div class="w-full h-[160px] bg-gray-600 rounded-lg flex items-center justify-center text-xs text-gray-400">Sin Foto</div>`}
                     </td>
-                    <td class="px-4 py-3 font-medium text-white"><span id="inv-name-${item.id}">${item.name}</span></td>
-                    <td class="px-4 py-3 text-white"><span id="inv-price-${item.id}">$${Number(item.price || 0).toFixed(2)}</span></td>
-                    <td class="px-4 py-3 text-right space-x-2">${adminButtons}</td>`;
+                    <td class="px-4 py-3 align-top font-medium text-white"><span id="inv-name-${item.id}">${item.name}</span></td>
+                    <td class="px-4 py-3 align-top text-white"><span id="inv-price-${item.id}">$${Number(item.price || 0).toFixed(2)}</span></td>
+                    <td class="px-4 py-3 align-top text-right space-x-2">${adminButtons}</td>`;
                 inventoryList.appendChild(tr);
             });
             lucide.createIcons();
         }
 
-        async function addInventoryItem() { // Solo Admin
+        async function addInventoryItem() {
             if (!isAdmin || !userId) { displayMessage("Acción no permitida.", inventoryMessage); return; }
             const name = inventoryNameInput.value.trim();
             const price = parseFloat(inventoryPriceInput.value.trim());
@@ -564,7 +383,7 @@
             } finally { inventoryAddBtn.innerHTML = '<i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir Producto'; inventoryAddBtn.disabled = false; lucide.createIcons(); }
         }
 
-        window.toggleInventoryEdit = function(event, id, currentName, currentPrice) { /* ... (sin cambios, ya verifica isAdmin implícitamente por visibilidad de botones) ... */
+        window.toggleInventoryEdit = function(event, id, currentName, currentPrice) {
             if (!isAdmin) return;
             const button = event.currentTarget; const isEditing = button.getAttribute('data-editing') === 'true';
             const nameSpan = document.getElementById(`inv-name-${id}`); const priceSpan = document.getElementById(`inv-price-${id}`);
@@ -577,19 +396,18 @@
                 const newPrice = parseFloat(document.getElementById(`input-inv-price-${id}`).value.trim());
                 if (!newName || isNaN(newPrice) || newPrice <= 0) { displayMessage("Nombre y precio válidos.", inventoryMessage); return; }
                 updateInventoryItem(id, newName, newPrice);
-                // No actualizamos UI aquí, loadInventoryData lo hará
             }
         }
-        async function updateInventoryItem(id, newName, newPrice) { // Solo Admin
+        async function updateInventoryItem(id, newName, newPrice) {
              if (!isAdmin) return;
              const { error } = await supabase.from('inventory').update({ name: newName, price: newPrice, user_id: userId }).eq('id', id);
              if (error) { console.error("Error al actualizar inventario:", error); displayMessage('Error al actualizar.', inventoryMessage); }
-             loadInventoryData(); // Recarga para reflejar cambios y quitar modo edición
+             loadInventoryData();
         }
-        window.deleteInventoryItem = async function(id, imagePath) { // Solo Admin
+        window.deleteInventoryItem = async function(id, imagePath) {
             if (!isAdmin || !confirm("¿Eliminar este producto del inventario?")) return;
             try {
-                await deleteFile(imagePath); // Intenta borrar imagen primero
+                await deleteFile(imagePath);
                 const { error } = await supabase.from('inventory').delete().eq('id', id);
                 if (error) throw error;
                 displayMessage('Producto eliminado.', inventoryMessage, 'success');
@@ -598,12 +416,10 @@
         }
 
         // --------------------------------------------------------------------------------
-        // 7. GESTIÓN DE VENTAS (Lectura Logueados, Escritura Admin)
+        // 7. GESTIÓN DE VENTAS
         // --------------------------------------------------------------------------------
-        function loadSalesData() { // Carga si está logueado
-            if (!supabase || !userId) { renderSales([]); return; } // Si no hay user, limpia y sale
-
-            // Quitado el filtro .eq('user_id', userId) para ver TODAS las ventas
+        function loadSalesData() {
+            if (!supabase || !userId) { renderSales([]); return; }
             supabase.from('sales').select('*').order('created_at', { ascending: false })
                 .then(({ data, error }) => {
                     if (error) throw error;
@@ -647,7 +463,7 @@
             lucide.createIcons();
         }
 
-        async function addSaleItem() { // Solo Admin
+        async function addSaleItem() {
             if (!isAdmin || !userId) { salesAuthMessage.textContent = 'Solo el admin puede registrar ventas.'; salesAuthMessage.classList.remove('hidden'); return; }
             const clientName = clientNameInput.value.trim() || 'Venta General';
             const name = productNameInput.value.trim();
@@ -656,16 +472,15 @@
 
             addSaleBtn.disabled = true;
             try {
-                // Asociamos la venta al ID del admin que la registra
                 const { error } = await supabase.from('sales').insert([{ clientName, name, price, user_id: userId, created_at: new Date().toISOString() }]);
                 if (error) throw error;
-                productNameInput.value = ''; productPriceInput.value = ''; clientNameInput.value = ''; // Limpiar todo
+                productNameInput.value = ''; productPriceInput.value = ''; clientNameInput.value = '';
                 loadSalesData();
             } catch (e) { console.error("Error al agregar venta:", e); displayMessage(`Error: ${e.message}`, salesAuthMessage);
             } finally { addSaleBtn.disabled = false; }
         }
 
-        window.toggleSaleEdit = function(event, id, currentClientName, currentName, currentPrice) { /* ... (sin cambios, ya verifica isAdmin implícitamente) ... */
+        window.toggleSaleEdit = function(event, id, currentClientName, currentName, currentPrice) {
             if (!isAdmin) return;
             const button = event.currentTarget; const isEditing = button.getAttribute('data-editing') === 'true';
             const clientSpan = document.getElementById(`client-name-${id}`); const nameSpan = document.getElementById(`sale-name-${id}`); const priceSpan = document.getElementById(`sale-price-${id}`);
@@ -680,16 +495,15 @@
                 const newPrice = parseFloat(document.getElementById(`input-sale-price-${id}`).value.trim());
                 if (!newName || isNaN(newPrice) || newPrice <= 0) { displayMessage("Nombre y precio válidos.", salesAuthMessage); return; }
                 updateSaleItem(id, newClientName, newName, newPrice);
-                // No actualizamos UI aquí, loadSalesData lo hará
             }
         }
-        async function updateSaleItem(id, newClientName, newName, newPrice) { // Solo Admin
+        async function updateSaleItem(id, newClientName, newName, newPrice) {
             if (!isAdmin) return;
             const { error } = await supabase.from('sales').update({ clientName: newClientName, name: newName, price: newPrice }).eq('id', id);
             if (error) { console.error("Error al actualizar venta:", error); displayMessage('Error al actualizar.', salesAuthMessage); }
-             loadSalesData(); // Recarga para reflejar cambios y quitar modo edición
+             loadSalesData();
         }
-        window.deleteSaleItem = async function(id) { // Solo Admin
+        window.deleteSaleItem = async function(id) {
             if (!isAdmin || !confirm("¿Eliminar esta venta del registro?")) return;
             const { error } = await supabase.from('sales').delete().eq('id', id);
             if (error) { console.error("Error al eliminar venta:", error); displayMessage(`Error: ${error.message}`, salesAuthMessage); }
@@ -703,11 +517,10 @@
         function closeModal(modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
         document.querySelectorAll('.fixed.inset-0').forEach(modal => { modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(modal); }); });
 
-        // Auth
         document.getElementById('open-auth-modal-btn').onclick = () => openModal(authModal);
         document.getElementById('close-auth-modal').onclick = () => closeModal(authModal);
         logoutBtn.onclick = handleLogout;
-        toggleAuthModeBtn.onclick = () => { /* ... (sin cambios) ... */
+        toggleAuthModeBtn.onclick = () => {
              const isLogin = authTitle.textContent === 'Iniciar Sesión';
              authTitle.textContent = isLogin ? 'Registrarse' : 'Iniciar Sesión';
              authButtonText.textContent = isLogin ? 'Registrarse' : 'Iniciar Sesión';
@@ -715,35 +528,37 @@
         };
         loginForm.onsubmit = handleAuthSubmit;
 
-        // Inventory (Botón siempre visible, modal siempre abre)
         document.getElementById('close-inventory-modal').onclick = () => closeModal(inventoryModal);
-        inventoryAddBtn.onclick = addInventoryItem; // Función interna ya verifica isAdmin
+        inventoryAddBtn.onclick = addInventoryItem;
 
-        // Sales (Botón y modal controlados por estado de login/admin)
         openSalesModalBtn.onclick = () => {
-             if (userId) { // Solo abre si está logueado
+             if (userId) {
                  salesAuthMessage.classList.add('hidden');
                  salesContent.classList.remove('hidden');
-                 // Los datos ya se cargan/actualizan en handleAuthChange
                  openModal(salesModal);
              } else {
-                 // Si por alguna razón el botón fuera visible sin login, muestra error
                  salesAuthMessage.textContent = 'Debes iniciar sesión para acceder a las ventas.';
                  salesAuthMessage.classList.remove('hidden');
                  salesContent.classList.add('hidden');
-                 openModal(salesModal); // Abre modal para mostrar el mensaje
+                 openModal(salesModal);
              }
          };
         document.getElementById('close-sales-modal').onclick = () => closeModal(salesModal);
-        addSaleBtn.onclick = addSaleItem; // Función interna ya verifica isAdmin
+        addSaleBtn.onclick = addSaleItem;
 
-        // Inicialización
-        window.onload = function() {
+        // --------------------------------------------------------------------------------
+        // 10. INICIALIZACIÓN
+        // --------------------------------------------------------------------------------
+        
+        // CAMBIO: Usar DOMContentLoaded es más rápido y robusto que window.onload
+        document.addEventListener('DOMContentLoaded', function() {
             initLogoTemplates();
             initSupabase();      // Inicia Supabase y el listener de auth
             loadSavedTheme();    // Carga el tema guardado
-            // handleAuthChange se llamará automáticamente y cargará todo lo demás
-        };
+            
+            // NOTA: handleAuthChange se llamará automáticamente desde initSupabase
+            // y se encargará de cargar logo, inventario y ventas según el estado de sesión.
+        });
     </script>
 </body>
 </html>
