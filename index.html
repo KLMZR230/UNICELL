@@ -89,12 +89,19 @@
                     Ventas
                 </button>
 
-                <div id="theme-selector-container" class="flex space-x-2 items-center">
-                    <button id="theme-btn-default" class="theme-btn" title="Tema Original"></button>
-                    <button id="theme-btn-feminine" class="theme-btn" title="Tema Femenino"></button>
-                    <button id="theme-btn-masculine" class="theme-btn" title="Tema Masculino"></button>
+                <div class="relative" id="theme-dropdown-wrapper">
+                    <button id="open-theme-dropdown-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 shadow-md flex items-center">
+                        <i data-lucide="palette" class="w-5 h-5"></i>
+                    </button>
+            
+                    <div id="theme-dropdown-menu" class="hidden absolute top-full right-0 mt-2 w-max bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-3 z-50">
+                        <div id="theme-selector-container" class="flex space-x-2 items-center">
+                            <button id="theme-btn-default" class="theme-btn" title="Tema Original"></button>
+                            <button id="theme-btn-feminine" class="theme-btn" title="Tema Femenino"></button>
+                            <button id="theme-btn-masculine" class="theme-btn" title="Tema Masculino"></button>
+                        </div>
+                    </div>
                 </div>
-
                 <button id="open-auth-modal-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 shadow-md flex items-center">
                     <i data-lucide="user" class="w-5 h-5"></i>
                 </button>
@@ -320,6 +327,14 @@
         const themeBtnFeminine = document.getElementById('theme-btn-feminine');
         const themeBtnMasculine = document.getElementById('theme-btn-masculine');
 
+        // ==================================================
+        // CAMBIO AQUÍ: Nuevas referencias para el desplegable de temas
+        // ==================================================
+        const openThemeDropdownBtn = document.getElementById('open-theme-dropdown-btn');
+        const themeDropdownMenu = document.getElementById('theme-dropdown-menu');
+        const themeDropdownWrapper = document.getElementById('theme-dropdown-wrapper');
+
+
         // --------------------------------------------------------------------------------
         // 2. UTILIDADES
         // --------------------------------------------------------------------------------
@@ -341,6 +356,13 @@
         }
         function handleGlobalError(msg) { appErrorDisplay.textContent = `Error crítico: ${msg}`; appErrorDisplay.classList.remove('hidden'); }
         function displayMessage(msg, element, type = 'error') { element.textContent = msg; element.className = type === 'success' ? 'text-center text-sm text-green-400' : 'text-center text-sm text-red-400'; setTimeout(() => { element.textContent = ''; }, 5000); }
+
+        // ==================================================
+        // CAMBIO AQUÍ: Nueva función para cerrar el desplegable
+        // ==================================================
+        function closeThemeDropdown() {
+             if (themeDropdownMenu) themeDropdownMenu.classList.add('hidden');
+        }
 
         function updateUIBasedOnAuth() {
             if (isAdmin) {
@@ -439,9 +461,13 @@
         function loadSavedTheme() {
              const savedTheme = localStorage.getItem('unicell-theme') || 'default';
              applyTheme(savedTheme);
-             themeBtnDefault.onclick = () => applyTheme('default');
-             themeBtnFeminine.onclick = () => applyTheme('feminine');
-             themeBtnMasculine.onclick = () => applyTheme('masculine');
+
+             // ==================================================
+             // CAMBIO AQUÍ: Añadir closeThemeDropdown() al seleccionar un tema
+             // ==================================================
+             themeBtnDefault.onclick = () => { applyTheme('default'); closeThemeDropdown(); };
+             themeBtnFeminine.onclick = () => { applyTheme('feminine'); closeThemeDropdown(); };
+             themeBtnMasculine.onclick = () => { applyTheme('masculine'); closeThemeDropdown(); };
         }
 
         // --------------------------------------------------------------------------------
@@ -644,9 +670,9 @@
                     </button>` : '';
                 
                 tr.innerHTML = `
-                    <td class="px-4 py-3 font-medium text-gray-300"><span id="client-name-${item.id}">${item.clientName || 'N/A'}</span></td>
-                    <td class="px-4 py-3 font-medium text-white"><span id="sale-name-${item.id}">${item.name}</span></td>
-                    <td class="px-4 py-3 text-white"><span id="sale-price-${item.id}">$${Number(item.price || 0).toFixed(2)}</span></td>
+                    <td class="px-4 py-3 font-medium text-gray-300"><span id="client-name-${id}">${item.clientName || 'N/A'}</span></td>
+                    <td class="px-4 py-3 font-medium text-white"><span id="sale-name-${id}">${item.name}</span></td>
+                    <td class="px-4 py-3 text-white"><span id="sale-price-${id}">$${Number(item.price || 0).toFixed(2)}</span></td>
                     <td class="px-4 py-3 text-right space-x-2">${adminButtons}</td>`;
                 salesList.appendChild(tr);
             });
@@ -740,6 +766,23 @@
          };
         document.getElementById('close-sales-modal').onclick = () => closeModal(salesModal);
         addSaleBtn.onclick = addSaleItem;
+
+        // ==================================================
+        // CAMBIO AQUÍ: Listeners para el nuevo desplegable de temas
+        // ==================================================
+        if(openThemeDropdownBtn) {
+            openThemeDropdownBtn.onclick = (e) => {
+                e.stopPropagation(); // Evita que el clic se propague al 'window'
+                themeDropdownMenu.classList.toggle('hidden');
+            };
+        }
+        
+        // Listener global para cerrar el desplegable si se hace clic fuera
+        window.addEventListener('click', (e) => {
+            if (themeDropdownWrapper && !themeDropdownWrapper.contains(e.target)) {
+                closeThemeDropdown();
+            }
+        });
 
 
         // --------------------------------------------------------------------------------
