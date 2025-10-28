@@ -5,38 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNICELL Servicio Técnico | App de Gestión</title>
     
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Supabase Client CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* Configuraciones de tema y fuente */
+        /* ================================================================== */
+        /* 1. CONFIGURACIÓN DE TEMAS
+        /* ================================================================== */
+        
+        /* Tema 1: Original (Predeterminado) */
         :root {
             --color-primary: #FF4545; /* Rojo/Naranja de acento */
             --color-secondary: #E91E63; /* Rosa/Magenta de circuito */
-            --color-dark: #1F2937; /* Gris oscuro para fondo */
+            --color-dark: #1F2937; /* Gris oscuro para fondo de inputs */
             --color-darker: #111827; /* Negro profundo */
+            --color-text: #E5E7EB; /* Texto gris claro */
             --admin-border: #00FF00; /* Borde verde para destacar elementos de administrador */
+            
+            /* Colores para el degradado de fondo */
+            --color-primary-gradient: rgba(255, 69, 69, 0.1);
+            --color-secondary-gradient: rgba(233, 30, 99, 0.1);
         }
+
+        /* Tema 2: Femenino */
+        body.theme-feminine {
+            --color-primary: #F472B6; /* pink-400 */
+            --color-secondary: #EC4899; /* pink-500 */
+            --color-dark: #374151; /* gray-700 */
+            --color-darker: #1F2937; /* gray-800 */
+            --color-text: #F3F4F6; /* gray-100 */
+            --admin-border: #A7F3D0; /* green-200 */
+            
+            --color-primary-gradient: rgba(244, 114, 182, 0.1);
+            --color-secondary-gradient: rgba(236, 72, 153, 0.1);
+        }
+        
+        /* Tema 3: Masculino */
+        body.theme-masculine {
+            --color-primary: #3B82F6; /* blue-500 */
+            --color-secondary: #2563EB; /* blue-600 */
+            --color-dark: #1F2937; /* gray-800 */
+            --color-darker: #111827; /* gray-900 */
+            --color-text: #F9FAFB; /* gray-50 */
+            --admin-border: #34D399; /* green-400 */
+            
+            --color-primary-gradient: rgba(59, 130, 246, 0.1);
+            --color-secondary-gradient: rgba(37, 99, 235, 0.1);
+        }
+        
+        /* ================================================================== */
+        /* 2. ESTILOS GLOBALES (Usando variables de tema)
+        /* ================================================================== */
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--color-darker);
-            color: #E5E7EB; /* Texto gris claro */
-            background-image: radial-gradient(at top left, rgba(255, 69, 69, 0.1), transparent 50%),
-                              radial-gradient(at bottom right, rgba(233, 30, 99, 0.1), transparent 50%);
+            color: var(--color-text); /* Aplicado color de texto global */
+            background-image: radial-gradient(at top left, var(--color-primary-gradient), transparent 50%),
+                              radial-gradient(at bottom right, var(--color-secondary-gradient), transparent 50%);
             min-height: 100vh;
         }
         .accent-text {
             color: var(--color-primary);
         }
         .input-dark {
-            background-color: #2D3748; /* Darker input background */
-            border-color: rgba(255, 69, 69, 0.3);
-            color: white;
+            background-color: var(--color-dark); 
+            border: 1px solid rgba(var(--color-secondary), 0.3); /* Borde usa color de tema */
+            color: var(--color-text);
         }
         /* Estilos para el overlay de subida de logo */
         #logo-upload-overlay {
@@ -57,28 +93,6 @@
         #logo-container.admin-active:hover #logo-upload-overlay {
             opacity: 1;
         }
-        .service-card {
-            background-size: cover;
-            background-position: center;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(255, 69, 69, 0.2);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .service-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(17, 24, 39, 0.85); /* Overlay oscuro para legibilidad */
-            z-index: 10;
-        }
-        .service-card > * {
-            position: relative;
-            z-index: 20;
-        }
         .inventory-image-preview {
             width: 100%;
             height: 120px;
@@ -86,18 +100,31 @@
             border-radius: 0.5rem;
             margin-bottom: 0.5rem;
         }
+        
+        /* Estilos del selector de tema */
+        .theme-btn {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px;
+            border: 3px solid #4B5563; /* Borde gris por defecto */
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .theme-btn.active, .theme-btn:hover {
+            border-color: var(--color-primary); /* Borde de acento al seleccionar/hover */
+        }
+        #theme-btn-default { background-color: #FF4545; }
+        #theme-btn-feminine { background-color: #F472B6; }
+        #theme-btn-masculine { background-color: #3B82F6; }
     </style>
 </head>
 <body class="p-4">
 
-    <!-- Contenedor Principal -->
     <div class="max-w-4xl mx-auto py-8">
 
-        <!-- Encabezado y Navegación de Acciones -->
         <header class="mb-16 pt-4 relative flex justify-between items-start sm:items-center">
             
             <div class="flex items-center space-x-3 mb-4 sm:mb-0 relative" id="logo-container">
-                <!-- Logo Principal (Contenedor para Subida) -->
                 <div class="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center rounded-lg" id="current-logo">
                     <svg id="default-logo-svg" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 sm:w-12 sm:h-12 accent-text" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 20a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" opacity=".2"/>
@@ -105,7 +132,6 @@
                         <path d="M16 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM10 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
                         <path d="M12 14v-2" stroke-width="3"/>
                     </svg>
-                    <!-- Overlay de Subida de Logo (Solo Admin) -->
                     <div id="logo-upload-overlay">
                         <i data-lucide="upload" class="w-6 h-6 text-white mr-2"></i>
                         <span class="text-white text-sm">Subir Logo</span>
@@ -121,25 +147,20 @@
                 </h1>
             </div>
 
-            <!-- Controles de Acciones (Inventario, Ventas, Usuario) -->
             <div class="flex space-x-3 items-center mt-2 sm:mt-0">
-                <!-- Botón de Inventario (Solo Admin) -->
                 <button id="open-inventory-modal-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-3 rounded-full transition duration-300 shadow-md flex items-center text-sm sm:text-base hidden">
                     <i data-lucide="package" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                 </button>
-                <!-- Botón de Ventas -->
                 <button id="open-sales-modal-btn" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-full transition duration-300 shadow-md flex items-center text-sm sm:text-base">
                     <i data-lucide="receipt-text" class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2"></i>
                     Ventas
                 </button>
-                <!-- Botón de Usuario (Login/Logout) -->
                 <button id="open-auth-modal-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 shadow-md flex items-center">
                     <i data-lucide="user" class="w-5 h-5"></i>
                 </button>
             </div>
         </header>
 
-        <!-- Sección de Descripción -->
         <section class="text-center mb-16 -mt-8"> 
             <p id="app-error-display" class="mt-4 text-red-500 font-bold hidden"></p>
             <p class="mt-4 text-gray-400 max-w-md mx-auto">
@@ -147,24 +168,12 @@
             </p>
         </section>
 
-        <!-- Sección de Servicios -->
-        <section id="servicios" class="mb-16">
-            <h2 class="text-3xl font-bold text-center mb-8 text-white">Nuestros Servicios Expertos</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="services-grid">
-
-                <!-- Las tarjetas de servicio se renderizan aquí por JavaScript -->
-
-            </div>
-        </section>
-
-        <!-- Sección de Contacto -->
         <section id="contacto" class="mb-12 text-center p-6 bg-gray-800 rounded-xl shadow-2xl">
             <h2 class="text-3xl font-bold mb-6 text-white">Contáctanos Hoy Mismo</h2>
             <p class="text-gray-300 mb-8">¡Agenda tu reparación o consulta sin compromiso!</p>
 
             <div class="flex flex-col sm:flex-row justify-center items-center gap-6">
                 
-                <!-- WhatsApp Link -->
                 <a href="https://wa.me/52177191068" target="_blank" class="flex items-center space-x-3 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transition duration-300 shadow-md shadow-green-700/50">
                     <i data-lucide="phone" class="w-5 h-5"></i>
                     <span>77191068 (WhatsApp)</span>
@@ -172,17 +181,24 @@
             </div>
         </section>
 
-        <!-- Pie de Página (Muestra estado de Admin) -->
         <footer class="text-center mt-10 text-gray-500 border-t border-gray-700 pt-6">
             <p>&copy; 2024 UNICELL Servicio Técnico. Todos los derechos reservados.</p>
             <p id="admin-status" class="text-xs mt-2 italic hidden">
                 <span class="text-green-500">MODO ADMINISTRADOR ACTIVO.</span>
             </p>
+            
+            <div class="mt-6">
+                <span class="text-sm text-gray-400 mb-2 block">Seleccionar Tema</span>
+                <div class="flex justify-center space-x-3">
+                    <button id="theme-btn-default" class="theme-btn" title="Tema Original"></button>
+                    <button id="theme-btn-feminine" class="theme-btn" title="Tema Femenino"></button>
+                    <button id="theme-btn-masculine" class="theme-btn" title="Tema Masculino"></button>
+                </div>
+            </div>
         </footer>
 
     </div>
     
-    <!-- Modal de Autenticación -->
     <div id="auth-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4">
         <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-gray-700 max-w-sm w-full p-6 relative">
             <button id="close-auth-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
@@ -216,7 +232,6 @@
         </div>
     </div>
 
-    <!-- Modal de Inventario -->
     <div id="inventory-modal" class="fixed inset-0 z-40 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4">
         <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-pink-500/50 max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300">
             <button id="close-inventory-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
@@ -229,7 +244,6 @@
             <p id="inventory-auth-message" class="text-center p-4 text-red-400 hidden">Necesitas iniciar sesión como administrador para gestionar el inventario.</p>
 
             <div id="inventory-content" class="hidden">
-                <!-- Formulario de Añadir/Editar Inventario -->
                 <div class="mb-8 p-4 bg-gray-800 rounded-lg shadow-inner">
                     <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir/Editar Producto</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
@@ -252,7 +266,6 @@
                     <p id="inventory-message" class="text-center text-sm mt-3 text-red-400"></p>
                 </div>
 
-                <!-- Tabla de Inventario -->
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-700 rounded-lg">
                         <thead class="bg-gray-700">
@@ -264,15 +277,13 @@
                             </tr>
                         </thead>
                         <tbody id="inventory-list" class="bg-gray-800 divide-y divide-gray-700">
-                            <!-- Items de inventario se renderizan aquí -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Ventas -->
     <div id="sales-modal" class="fixed inset-0 z-40 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4">
         <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-pink-500/50 max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300">
             <button id="close-sales-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
@@ -300,7 +311,6 @@
                     </div>
                 </div>
 
-                <!-- Tabla de Ventas -->
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-700 rounded-lg">
                         <thead class="bg-gray-700">
@@ -312,12 +322,10 @@
                             </tr>
                         </thead>
                         <tbody id="sales-list" class="bg-gray-800 divide-y divide-gray-700">
-                            <!-- Items de venta se renderizan aquí -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
 
-                <!-- Total de Ventas -->
                 <div class="mt-4 p-4 bg-gray-700 rounded-lg flex justify-between items-center font-bold text-white text-xl">
                     <span>TOTAL VENTA:</span>
                     <span id="sales-total" class="accent-text text-2xl">$0.00</span>
@@ -354,7 +362,6 @@
         let supabase = null;
         let userId = null;
         let isAdmin = false;
-        let currentEditingItemId = null; // Para Inventario
         
         // Variables globales para la plantilla del logo (para evitar el error de onchange)
         let logoUploadOverlayHTML = '';
@@ -362,7 +369,6 @@
 
         
         // Referencias del DOM
-        const servicesGrid = document.getElementById('services-grid');
         const adminStatusDisplay = document.getElementById('admin-status');
         const inventoryContent = document.getElementById('inventory-content');
         const inventoryAuthMessage = document.getElementById('inventory-auth-message');
@@ -376,6 +382,7 @@
         const logoutContainer = document.getElementById('logout-container');
         const authTitle = document.getElementById('auth-title');
         const authButtonText = document.getElementById('auth-button-text');
+        const authSubmitBtn = document.getElementById('auth-submit-btn'); // Añadida referencia
         const toggleAuthModeBtn = document.getElementById('toggle-auth-mode');
         const loginForm = document.getElementById('login-form');
         const authEmailInput = document.getElementById('auth-email');
@@ -405,8 +412,10 @@
         const inventoryAddBtn = document.getElementById('inventory-add-btn');
         const inventoryMessage = document.getElementById('inventory-message');
         
-        // Para gestionar el panel de edición de servicios
-        let currentServiceEditPanel = null;
+        // Elementos del selector de tema (NUEVO)
+        const themeBtnDefault = document.getElementById('theme-btn-default');
+        const themeBtnFeminine = document.getElementById('theme-btn-feminine');
+        const themeBtnMasculine = document.getElementById('theme-btn-masculine');
 
 
         // --------------------------------------------------------------------------------
@@ -478,24 +487,8 @@
             }, 5000);
         }
         
-        /**
-         * Alterna la visibilidad del panel de administración de un servicio.
-         * @param {string} serviceId ID del servicio.
-         */
-        window.toggleServiceAdminPanel = function(serviceId) {
-            const newPanel = document.getElementById(`admin-panel-${serviceId}`);
-            
-            // 1. Si hay un panel abierto y no es el que acabamos de tocar, lo cerramos.
-            if (currentServiceEditPanel && currentServiceEditPanel !== newPanel) {
-                currentServiceEditPanel.classList.add('hidden');
-            }
-
-            // 2. Abrimos/cerramos el panel actual.
-            if (newPanel) {
-                newPanel.classList.toggle('hidden');
-                currentServiceEditPanel = newPanel.classList.contains('hidden') ? null : newPanel;
-            }
-        };
+        // --- Funciones de Servicios Eliminadas ---
+        // window.toggleServiceAdminPanel ya no existe.
 
 
         // --------------------------------------------------------------------------------
@@ -506,7 +499,6 @@
          * Inicializa Supabase y configura el listener de autenticación.
          */
         function initSupabase() {
-            // Validación para claves placeholder (eliminada la verificación de "PEGA", pero aún útil)
             if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
                  handleGlobalError('¡ERROR: Faltan la URL o la Clave de Supabase!');
                 return;
@@ -553,7 +545,7 @@
                 checkAdminStatus(); 
 
                 // Carga los datos solo después de autenticación
-                loadServiceImages();
+                loadLogo(); // <- Modificado
                 loadSalesData();
                 loadInventoryData();
                 
@@ -574,8 +566,8 @@
                 renderSales([]); // Limpia la lista de ventas
                 renderInventory([]); // Limpia la lista de inventario
                 
-                // Carga solo las imágenes de servicio sin controles de admin
-                loadServiceImages();
+                // Carga solo el logo
+                loadLogo(); // <- Modificado
             }
         }
 
@@ -627,10 +619,61 @@
             // handleAuthChange manejará el resto
             closeModal(authModal);
         }
+        
+        // --------------------------------------------------------------------------------
+        // 4. GESTIÓN DE TEMAS (NUEVO)
+        // --------------------------------------------------------------------------------
+        
+        /**
+         * Aplica un tema a la aplicación y lo guarda en localStorage.
+         * @param {string} themeName 'default', 'feminine', 'masculine'
+         */
+        function applyTheme(themeName) {
+            // 1. Limpiar clases de tema anteriores
+            document.body.classList.remove('theme-feminine', 'theme-masculine');
+            
+            // 2. Definir botones para actualizar clase 'active'
+            const buttons = {
+                'default': themeBtnDefault,
+                'feminine': themeBtnFeminine,
+                'masculine': themeBtnMasculine
+            };
+
+            // 3. Quitar 'active' de todos
+            Object.values(buttons).forEach(btn => btn.classList.remove('active'));
+
+            // 4. Aplicar nueva clase de tema si no es el default
+            if (themeName === 'feminine') {
+                document.body.classList.add('theme-feminine');
+                themeBtnFeminine.classList.add('active');
+            } else if (themeName === 'masculine') {
+                document.body.classList.add('theme-masculine');
+                themeBtnMasculine.classList.add('active');
+            } else {
+                // Es 'default'
+                themeBtnDefault.classList.add('active');
+            }
+            
+            // 5. Guardar en localStorage
+            localStorage.setItem('unicell-theme', themeName);
+        }
+
+        /**
+         * Carga el tema guardado desde localStorage al iniciar la app.
+         */
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('unicell-theme') || 'default';
+            applyTheme(savedTheme);
+            
+            // Asignar eventos a los botones de tema
+            themeBtnDefault.onclick = () => applyTheme('default');
+            themeBtnFeminine.onclick = () => applyTheme('feminine');
+            themeBtnMasculine.onclick = () => applyTheme('masculine');
+        }
 
 
         // --------------------------------------------------------------------------------
-        // 4. GESTIÓN DE STORAGE (LOGO E IMÁGENES)
+        // 5. GESTIÓN DE STORAGE (LOGO E IMÁGENES DE INVENTARIO)
         // --------------------------------------------------------------------------------
 
         /**
@@ -699,6 +742,7 @@
                 const url = getPublicUrl(path);
 
                 // Actualizar la URL en la tabla 'services' con un ID fijo 'logo'
+                // Esta tabla 'services' se sigue usando, pero solo para el logo.
                 const { error: dbError } = await supabase
                     .from('services')
                     .upsert({ id: 'logo', image_url: url, image_path: path, user_id: userId }, { onConflict: 'id' });
@@ -719,212 +763,67 @@
             } finally {
                 // Restaurar el input para permitir otra subida
                 e.target.value = null;
-                // Si falló la subida, recargar el logo (loadServiceImages)
+                // Si falló la subida, recargar el logo
                 if (logoContainer.querySelector('div') && logoContainer.querySelector('div').textContent.includes('Cargando')) {
-                   loadServiceImages();
+                   loadLogo(); // <- Modificado
                 }
             }
         }
 
-
-        // --------------------------------------------------------------------------------
-        // 5. GESTIÓN DE SERVICIOS (READ & ADMIN)
-        // --------------------------------------------------------------------------------
-        
-        // Estructura de servicios por defecto (IDs deben coincidir con la base de datos)
-        const defaultServices = [
-            { id: 'microsoldadura', title: 'Microsoldadura', description: 'Reparación a nivel de placa base, fallas complejas y de componentes internos.', icon: 'microscope' },
-            { id: 'pantallas', title: 'Pantallas, Baterías y Repuestos', description: 'Cambio de pantallas, reemplazo de baterías y venta de repuestos originales.', icon: 'display' },
-            { id: 'liberaciones', title: 'Liberaciones y Desbloqueo', description: 'Servicio de liberación de operadoras y desbloqueo de dispositivos.', icon: 'unlock' },
-            { id: 'consolas', title: 'Mantenimiento de Consolas y Conectores', description: 'Servicio completo para consolas (PS, Xbox) y reparación de conectores de carga.', icon: 'gamepad' },
-        ];
-
-
         /**
-         * Carga las URLs de las imágenes de servicios y actualiza el renderizado.
+         * Carga la URL del logo (REFACTORIZADO)
          */
-        async function loadServiceImages() {
+        async function loadLogo() {
             if (!supabase) return;
             
             try {
-                // Cargar logo e imágenes de servicios
-                const { data: serviceData, error } = await supabase
+                // Cargar solo el logo
+                const { data, error } = await supabase
                     .from('services')
-                    .select('id, image_url, image_path');
+                    .select('id, image_url, image_path')
+                    .eq('id', 'logo'); // Solo trae el logo
 
                 if (error) {
-                    if (error.code === '42P01') { // Error de tabla no encontrada
-                        console.warn("Error al cargar servicios: La tabla 'services' no existe. Renderizando solo el contenido estático.");
-                        renderServices(defaultServices);
-                        return;
-                    }
-                    // Manejo del error 42703 (columna no existe)
-                    if (error.code === '42703') { 
-                        console.error("Error 42703: La columna 'image_path' o 'image_url' no existe. Renderizando estático.");
-                        renderServices(defaultServices); 
-                        return;
-                    }
-                    if (error.message && error.message.includes('Invalid API key')) {
-                        handleGlobalError('CLAVE API INVÁLIDA. Revisa tus credenciales en el código.');
-                        return;
-                    }
-                    throw error;
+                    // Si la tabla 'services' no existe, o hay otro error (ej. RLS),
+                    // simplemente mostramos el logo por defecto y continuamos.
+                    console.warn("Advertencia al cargar logo (puede ser normal si la tabla no existe o RLS está activo):", error.message);
                 }
 
-                // Mapear URLs a los servicios por defecto
-                const serviceMap = serviceData.reduce((acc, item) => {
-                    acc[item.id] = item;
-                    return acc;
-                }, {});
-
-                const servicesWithImages = defaultServices.map(service => {
-                    const dbItem = serviceMap[service.id];
-                    return {
-                        ...service,
-                        image_url: dbItem ? dbItem.image_url : null,
-                        image_path: dbItem ? dbItem.image_path : null
-                    };
-                });
-                
-                // Cargar y mostrar el logo si existe
-                const logoItem = serviceMap['logo'];
+                const logoItem = data && data.length > 0 ? data[0] : null;
                 const logoContainer = document.getElementById('current-logo');
                 
                 if (logoItem && logoItem.image_url) {
-                    // Si hay imagen, usa la imagen y añade el overlay para subir otra
                     logoContainer.innerHTML = `<img src="${logoItem.image_url}" class="w-full h-full object-contain rounded-lg" onerror="this.onerror=null; this.src='/placeholder.png';"/>${logoUploadOverlayHTML}`;
                 } else {
-                    // Si no hay imagen, usa el SVG por defecto y añade el overlay
                     logoContainer.innerHTML = `${defaultSvgHtml}${logoUploadOverlayHTML}`;
                 }
 
-                renderServices(servicesWithImages);
                 // FIX: Re-asigna el event handler aquí, garantizando que el input exista
-                document.getElementById('logo-file-input').onchange = handleLogoUpload;
-
-
-            } catch (error) {
-                console.error("Error al cargar imágenes de Supabase:", error);
-                // Si falla la carga, sigue mostrando los servicios por defecto
-                renderServices(defaultServices); 
-            }
-        }
-        
-        /**
-         * Dibuja las tarjetas de servicio.
-         * @param {Array<object>} services Lista de servicios con URLs de imagen.
-         */
-        function renderServices(services) {
-            servicesGrid.innerHTML = services.map(service => {
-                
-                const adminPanel = isAdmin ? `
-                    <button onclick="event.stopPropagation(); toggleServiceAdminPanel('${service.id}')" 
-                            class="absolute top-2 right-2 p-2 rounded-full bg-black/70 hover:bg-black/90 text-admin-border shadow-lg z-50 transition">
-                        <i data-lucide="wrench" class="w-5 h-5"></i>
-                    </button>
-
-                    <div id="admin-panel-${service.id}" class="absolute top-0 left-0 w-full h-full bg-gray-900/95 p-6 rounded-xl hidden z-40 flex flex-col justify-center items-center">
-                        <button onclick="toggleServiceAdminPanel('${service.id}')" 
-                                class="absolute top-3 right-3 text-white hover:text-red-400">
-                            <i data-lucide="x" class="w-6 h-6"></i>
-                        </button>
-                        
-                        <p class="text-lg font-semibold text-admin-border mb-4">Gestionar Imagen de ${service.title}</p>
-                        
-                        ${service.image_url ? 
-                            `<div class="text-center mb-4">
-                                <span class="text-sm text-gray-400 block mb-2">Imagen actual (Clica para eliminar)</span>
-                                <button onclick="deleteServiceImage('${service.id}', '${service.image_path}'); toggleServiceAdminPanel('${service.id}');" 
-                                        class="p-2 rounded-full bg-red-600 hover:bg-red-700 text-white shadow-md transition duration-150">
-                                    <i data-lucide="trash-2" class="w-5 h-5 mr-1"></i> Eliminar
-                                </button>
-                            </div>` : `<span class="text-sm text-gray-500 block mb-4">No hay imagen.</span>`}
-                        
-                        <input type="file" onchange="uploadServiceImage(event, '${service.id}'); toggleServiceAdminPanel('${service.id}');" 
-                                class="w-full max-w-xs text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100" accept="image/*" />
-                    </div>
-                ` : '';
-
-                return `
-                    <div class="service-card bg-gray-800 p-6 rounded-xl shadow-lg relative" 
-                        style="${service.image_url ? `background-image: url('${service.image_url}');` : ''}">
-                        
-                        ${adminPanel}
-
-                        <div class="relative z-20">
-                            <i data-lucide="${service.icon}" class="w-8 h-8 accent-text mb-3"></i>
-                            <h3 class="text-xl font-semibold mb-2">${service.title}</h3>
-                            <p class="text-gray-400">${service.description}</p>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            lucide.createIcons();
-        }
-        
-        /**
-         * Sube y actualiza la imagen de un servicio específico. (Global para ser accesible desde el HTML)
-         */
-        window.uploadServiceImage = async function(e, serviceId) {
-            if (!isAdmin) return;
-            const file = e.target.files[0];
-            if (!file) return;
-
-            try {
-                // 1. Subir a Storage
-                const path = await uploadFile(file, `services/${serviceId}/${file.name}`);
-                const url = getPublicUrl(path);
-
-                // 2. Actualizar en la base de datos (UPSERT)
-                const { error: dbError } = await supabase
-                    .from('services')
-                    .upsert({ id: serviceId, image_url: url, image_path: path, user_id: userId }, { onConflict: 'id' });
-
-                if (dbError) throw dbError;
-                
-                // 3. Recargar la interfaz (loadServiceImages)
-                loadServiceImages();
+                const logoInput = document.getElementById('logo-file-input');
+                if (logoInput) {
+                    logoInput.onchange = handleLogoUpload;
+                }
 
             } catch (error) {
-                console.error(`Error al subir imagen de servicio ${serviceId}:`, error);
-                displayMessage(`Error al subir imagen: ${error.message}`, authMessage, 'error');
-            } finally {
-                e.target.value = null; // Resetear el input
+                console.error("Error fatal al cargar logo de Supabase:", error);
+                // Si falla, al menos muestra el logo por defecto
+                const logoContainer = document.getElementById('current-logo');
+                if(logoContainer) {
+                    logoContainer.innerHTML = `${defaultSvgHtml}${logoUploadOverlayHTML}`;
+                    const logoInput = document.getElementById('logo-file-input');
+                    if (logoInput) logoInput.onchange = handleLogoUpload;
+                }
             }
         }
         
-        /**
-         * Elimina la imagen de un servicio específico. (Global para ser accesible desde el HTML)
-         */
-        window.deleteServiceImage = async function(serviceId, imagePath) {
-            if (!isAdmin) return;
-            
-            // 1. Eliminar de Storage
-            if (imagePath && imagePath !== 'null') {
-                await deleteFile(imagePath);
-            }
+        // --- Funciones de renderServices, uploadServiceImage, deleteServiceImage eliminadas ---
 
-            // 2. Actualizar en la base de datos
-            const { error: dbError } = await supabase
-                .from('services')
-                .update({ image_url: null, image_path: null })
-                .eq('id', serviceId);
-
-            if (dbError) {
-                console.error("Error al eliminar URL de servicio:", dbError);
-            }
-            
-            // 3. Recargar la interfaz
-            loadServiceImages();
-        }
 
         // --------------------------------------------------------------------------------
         // 6. GESTIÓN DE INVENTARIO (CRUD)
+        // (Sin cambios, esta sección es funcional)
         // --------------------------------------------------------------------------------
 
-        /**
-         * Carga los datos de inventario y los suscribe a cambios.
-         */
         function loadInventoryData() {
             if (!supabase || !userId || !isAdmin) return;
             
@@ -950,54 +849,37 @@
                 });
         }
         
-        /**
-         * Dibuja la lista de inventario.
-         * @param {Array<object>} items Lista de artículos de inventario.
-         */
         function renderInventory(items) {
             inventoryList.innerHTML = '';
-
             if (items.length === 0) {
                 inventoryList.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500 italic">No hay productos en el inventario.</td></tr>';
             }
-
             items.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-700 transition duration-150';
-
-                // Celda de Foto
-                tr.innerHTML += `<td class="p-2">
-                    ${item.image_url ? `<img src="${item.image_url}" alt="${item.name}" class="inventory-image-preview">` : `<div class="h-12 w-12 bg-gray-600 rounded-lg flex items-center justify-center text-xs text-gray-400">Sin Foto</div>`}
-                </td>`;
-                
-                // Celda de Nombre (Editable)
-                tr.innerHTML += `<td class="px-4 py-3 font-medium text-white">
-                    <span id="inv-name-${item.id}">${item.name}</span>
-                </td>`;
-
-                // Celda de Precio (Editable)
-                tr.innerHTML += `<td class="px-4 py-3 text-white">
-                    <span id="inv-price-${item.id}">$${item.price.toFixed(2)}</span>
-                </td>`;
-
-                // Celda de Acciones
-                tr.innerHTML += `<td class="px-4 py-3 text-right space-x-2">
-                    <button onclick="toggleInventoryEdit(event, '${item.id}', '${item.name}', ${item.price})" class="edit-btn text-yellow-400 hover:text-yellow-300 p-2 rounded-full transition duration-150" data-editing="false">
-                        <i data-lucide="pencil" class="w-4 h-4"></i>
-                    </button>
-                    <button onclick="deleteInventoryItem('${item.id}', '${item.image_path}')" class="text-red-500 hover:text-red-400 p-2 rounded-full transition duration-150">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
-                </td>`;
-                
+                tr.innerHTML = `
+                    <td class="p-2">
+                        ${item.image_url ? `<img src="${item.image_url}" alt="${item.name}" class="inventory-image-preview">` : `<div class="h-12 w-12 bg-gray-600 rounded-lg flex items-center justify-center text-xs text-gray-400">Sin Foto</div>`}
+                    </td>
+                    <td class="px-4 py-3 font-medium text-white">
+                        <span id="inv-name-${item.id}">${item.name}</span>
+                    </td>
+                    <td class="px-4 py-3 text-white">
+                        <span id="inv-price-${item.id}">$${item.price.toFixed(2)}</span>
+                    </td>
+                    <td class="px-4 py-3 text-right space-x-2">
+                        <button onclick="toggleInventoryEdit(event, '${item.id}', '${item.name}', ${item.price})" class="edit-btn text-yellow-400 hover:text-yellow-300 p-2 rounded-full transition duration-150" data-editing="false">
+                            <i data-lucide="pencil" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="deleteInventoryItem('${item.id}', '${item.image_path}')" class="text-red-500 hover:text-red-400 p-2 rounded-full transition duration-150">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>`;
                 inventoryList.appendChild(tr);
             });
             lucide.createIcons();
         }
 
-        /**
-         * Agrega un nuevo artículo de inventario.
-         */
         async function addInventoryItem() {
             if (!isAdmin) return;
             const name = inventoryNameInput.value.trim();
@@ -1016,48 +898,34 @@
             let imageUrl = null;
 
             try {
-                // 1. Subir imagen (si existe)
                 if (file) {
                     imagePath = await uploadFile(file, `inventory/${userId}/${Date.now()}_${file.name}`);
                     imageUrl = getPublicUrl(imagePath);
                 }
 
-                // 2. Insertar en la base de datos
                 const { error } = await supabase
                     .from('inventory')
-                    .insert([{ 
-                        name, 
-                        price, 
-                        image_url: imageUrl, 
-                        image_path: imagePath,
-                        user_id: userId // Aseguramos que se guarde con el user_id
-                    }]);
+                    .insert([{ name, price, image_url: imageUrl, image_path: imagePath, user_id: userId }]);
 
                 if (error) throw error;
                 
-                // 3. Limpiar campos y recargar
                 inventoryNameInput.value = '';
                 inventoryPriceInput.value = '';
                 inventoryImageFile.value = '';
                 displayMessage('Producto añadido con éxito.', inventoryMessage, 'success');
-                loadInventoryData(); // Recargar datos para mostrar el nuevo item
+                loadInventoryData(); 
 
             } catch (e) {
                 console.error("Error al agregar inventario:", e);
                 displayMessage(`Error al agregar: ${e.message}`, inventoryMessage);
-                
-                // Si falla la DB, eliminar archivo subido
                 if (imagePath) deleteFile(imagePath);
-                
             } finally {
-                inventoryAddBtn.textContent = 'Añadir Producto';
+                inventoryAddBtn.innerHTML = '<i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir Producto';
                 inventoryAddBtn.disabled = false;
+                lucide.createIcons();
             }
         }
 
-        /**
-         * Alterna el modo de edición en línea del inventario. (Global para ser accesible desde el HTML)
-         */
         window.toggleInventoryEdit = function(event, id, currentName, currentPrice) {
             if (!isAdmin) return;
             const button = event.currentTarget;
@@ -1066,18 +934,14 @@
             const priceSpan = document.getElementById(`inv-price-${id}`);
 
             if (!isEditing) {
-                // Modo Edición: Cambiar SPANs a INPUTs
                 nameSpan.innerHTML = `<input type="text" id="input-inv-name-${id}" value="${currentName}" class="w-full bg-gray-600 rounded-md p-1 input-dark" />`;
                 priceSpan.innerHTML = `<input type="number" id="input-inv-price-${id}" value="${currentPrice.toFixed(2)}" class="w-full bg-gray-600 rounded-md p-1 input-dark" step="0.01" />`;
-
                 button.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i>';
                 button.classList.remove('text-yellow-400');
                 button.classList.add('text-green-500');
                 button.setAttribute('data-editing', 'true');
                 lucide.createIcons();
-
             } else {
-                // Modo Guardar: Leer INPUTs y guardar en Supabase
                 const newName = document.getElementById(`input-inv-name-${id}`).value.trim();
                 const newPrice = parseFloat(document.getElementById(`input-inv-price-${id}`).value.trim());
 
@@ -1085,14 +949,9 @@
                     displayMessage("Nombre y precio deben ser válidos.", inventoryMessage);
                     return;
                 }
-
-                // Actualizar en Supabase
                 updateInventoryItem(id, newName, newPrice); 
-
-                // Volver al modo normal (será sobrescrito al recargar la data)
                 nameSpan.textContent = newName;
                 priceSpan.textContent = `$${newPrice.toFixed(2)}`;
-
                 button.innerHTML = '<i data-lucide="pencil" class="w-4 h-4"></i>';
                 button.classList.remove('text-green-500');
                 button.classList.add('text-yellow-400');
@@ -1101,46 +960,33 @@
             }
         }
 
-        /**
-         * Actualiza el nombre o precio de un artículo de inventario.
-         */
         async function updateInventoryItem(id, newName, newPrice) {
             const { error } = await supabase
                 .from('inventory')
                 .update({ name: newName, price: newPrice })
-                .eq('id', id)
-                .select(); 
-
+                .eq('id', id); 
             if (error) {
                 console.error("Error al actualizar inventario:", error);
                 displayMessage('Error al actualizar inventario. Revisa RLS.', inventoryMessage);
             } else {
-                loadInventoryData(); // Recargar para sincronizar la interfaz
+                loadInventoryData(); 
             }
         }
 
-        /**
-         * Elimina un artículo de inventario. (Global para ser accesible desde el HTML)
-         */
         window.deleteInventoryItem = async function(id, imagePath) {
             if (!isAdmin || !confirm("¿Estás seguro de que quieres eliminar este producto del inventario?")) return;
             
             try {
-                // 1. Eliminar de Storage (si existe una imagen)
                 if (imagePath && imagePath !== 'null') {
                     await deleteFile(imagePath);
                 }
-
-                // 2. Eliminar de la base de datos
                 const { error } = await supabase
                     .from('inventory')
                     .delete()
                     .eq('id', id);
-
                 if (error) throw error;
-                
                 displayMessage('Producto eliminado con éxito.', inventoryMessage, 'success');
-                loadInventoryData(); // Recargar datos
+                loadInventoryData();
             } catch (e) {
                 console.error("Error al eliminar inventario:", e);
                 displayMessage(`Error al eliminar: ${e.message}`, inventoryMessage);
@@ -1150,21 +996,17 @@
 
         // --------------------------------------------------------------------------------
         // 7. GESTIÓN DE VENTAS (CRUD)
+        // (Sin cambios, esta sección es funcional)
         // --------------------------------------------------------------------------------
 
-        /**
-         * Carga los datos de venta del usuario actual.
-         */
         function loadSalesData() {
             if (!supabase || !userId) return;
-
-            // La comprobación de visibilidad no es necesaria aquí, ya que se encarga el listener de la modal.
             
             supabase
                 .from('sales')
                 .select('*')
                 .eq('user_id', userId)
-                .order('created_at', { ascending: false }) // Ordenar por fecha de creación
+                .order('created_at', { ascending: false }) 
                 .then(({ data, error }) => {
                     if (error) {
                         if (error.code === '42P01') {
@@ -1182,9 +1024,6 @@
                 });
         }
 
-        /**
-         * Agrega un nuevo artículo de venta.
-         */
         async function addSaleItem() {
             if (!userId) {
                 salesAuthMessage.textContent = 'Debes iniciar sesión para registrar ventas.';
@@ -1212,17 +1051,10 @@
                         user_id: userId,
                         created_at: new Date().toISOString()
                     }]);
-
                 if (error) throw error;
-
-                // Limpiar campos después de agregar
                 productNameInput.value = '';
                 productPriceInput.value = '';
-                // Mantener el nombre del cliente para facilitar el registro continuo
-                
-                // Recargar datos (loadSalesData se llama en el listener de Supabase, pero lo forzamos por si acaso)
                 loadSalesData(); 
-
             } catch (e) {
                 console.error("Error al agregar venta:", e);
                 salesAuthMessage.textContent = `Error al agregar venta: ${e.message}`;
@@ -1231,10 +1063,6 @@
             }
         }
 
-        /**
-         * Dibuja la lista de ventas y calcula el total.
-         * @param {Array<object>} items Lista de artículos de venta.
-         */
         function renderSales(items) {
             salesList.innerHTML = '';
             let total = 0;
@@ -1242,48 +1070,34 @@
             if (items.length === 0) {
                 salesList.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500 italic">No hay artículos en el registro de ventas.</td></tr>';
             }
-
             items.forEach(item => {
                 total += item.price;
-                
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-700 transition duration-150';
-
-                // Celda de Destinatario (Editable)
-                tr.innerHTML += `<td class="px-4 py-3 font-medium text-gray-300">
-                    <span id="client-name-${item.id}">${item.clientName || 'N/A'}</span>
-                </td>`;
-
-                // Celda de Producto (Editable)
-                tr.innerHTML += `<td class="px-4 py-3 font-medium text-white">
-                    <span id="sale-name-${item.id}">${item.name}</span>
-                </td>`;
-                
-                // Celda de Precio (Editable)
-                tr.innerHTML += `<td class="px-4 py-3 text-white">
-                    <span id="sale-price-${item.id}">$${item.price.toFixed(2)}</span>
-                </td>`;
-
-                // Celda de Acciones
-                tr.innerHTML += `<td class="px-4 py-3 text-right space-x-2">
-                    <button onclick="toggleSaleEdit(event, '${item.id}', '${item.clientName}', '${item.name}', ${item.price})" class="edit-btn text-yellow-400 hover:text-yellow-300 p-2 rounded-full transition duration-150" data-editing="false">
-                        <i data-lucide="pencil" class="w-4 h-4"></i>
-                    </button>
-                    <button onclick="deleteSaleItem('${item.id}')" class="text-red-500 hover:text-red-400 p-2 rounded-full transition duration-150">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
-                </td>`;
-
+                tr.innerHTML = `
+                    <td class="px-4 py-3 font-medium text-gray-300">
+                        <span id="client-name-${item.id}">${item.clientName || 'N/A'}</span>
+                    </td>
+                    <td class="px-4 py-3 font-medium text-white">
+                        <span id="sale-name-${item.id}">${item.name}</span>
+                    </td>
+                    <td class="px-4 py-3 text-white">
+                        <span id="sale-price-${item.id}">$${item.price.toFixed(2)}</span>
+                    </td>
+                    <td class="px-4 py-3 text-right space-x-2">
+                        <button onclick="toggleSaleEdit(event, '${item.id}', '${item.clientName || ''}', '${item.name}', ${item.price})" class="edit-btn text-yellow-400 hover:text-yellow-300 p-2 rounded-full transition duration-150" data-editing="false">
+                            <i data-lucide="pencil" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="deleteSaleItem('${item.id}')" class="text-red-500 hover:text-red-400 p-2 rounded-full transition duration-150">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>`;
                 salesList.appendChild(tr);
             });
-
             salesTotal.textContent = `$${total.toFixed(2)}`;
             lucide.createIcons();
         }
 
-        /**
-         * Alterna el modo de edición en línea de la venta. (Global para ser accesible desde el HTML)
-         */
         window.toggleSaleEdit = function(event, id, currentClientName, currentName, currentPrice) {
             if (!userId) return;
             const button = event.currentTarget;
@@ -1293,20 +1107,16 @@
             const priceSpan = document.getElementById(`sale-price-${id}`);
 
             if (!isEditing) {
-                // Modo Edición: Cambiar SPANs a INPUTs
                 clientSpan.innerHTML = `<input type="text" id="input-client-${id}" value="${currentClientName}" class="w-full bg-gray-600 rounded-md p-1 input-dark" />`;
                 nameSpan.innerHTML = `<input type="text" id="input-sale-name-${id}" value="${currentName}" class="w-full bg-gray-600 rounded-md p-1 input-dark" />`;
                 priceSpan.innerHTML = `<input type="number" id="input-sale-price-${id}" value="${currentPrice.toFixed(2)}" class="w-full bg-gray-600 rounded-md p-1 input-dark" step="0.01" />`;
-
                 button.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i>';
                 button.classList.remove('text-yellow-400');
                 button.classList.add('text-green-500');
                 button.setAttribute('data-editing', 'true');
                 lucide.createIcons();
-
             } else {
-                // Modo Guardar: Leer INPUTs y guardar en Supabase
-                const newClientName = document.getElementById(`input-client-${id}`).value.trim();
+                const newClientName = document.getElementById(`input-client-${id}`).value.trim() || 'Venta General';
                 const newName = document.getElementById(`input-sale-name-${id}`).value.trim();
                 const newPrice = parseFloat(document.getElementById(`input-sale-price-${id}`).value.trim());
 
@@ -1314,15 +1124,10 @@
                     salesAuthMessage.textContent = "El nombre y el precio deben ser válidos para guardar.";
                     return;
                 }
-
-                // Actualizar en Supabase
                 updateSaleItem(id, newClientName, newName, newPrice); 
-                
-                // Volver al modo normal (será sobrescrito al recargar la data)
                 clientSpan.textContent = newClientName;
                 nameSpan.textContent = newName;
                 priceSpan.textContent = `$${newPrice.toFixed(2)}`;
-
                 button.innerHTML = '<i data-lucide="pencil" class="w-4 h-4"></i>';
                 button.classList.remove('text-green-500');
                 button.classList.add('text-yellow-400');
@@ -1331,40 +1136,30 @@
             }
         }
 
-        /**
-         * Actualiza el nombre o precio de un artículo de venta.
-         */
         async function updateSaleItem(id, newClientName, newName, newPrice) {
             const { error } = await supabase
                 .from('sales')
                 .update({ clientName: newClientName, name: newName, price: newPrice })
-                .eq('id', id)
-                .select(); 
-
+                .eq('id', id); 
             if (error) {
                 console.error("Error al actualizar venta:", error);
                 salesAuthMessage.textContent = 'Error al actualizar venta. Revisa RLS.';
             } else {
-                loadSalesData(); // Recargar para sincronizar la interfaz
+                loadSalesData();
             }
         }
 
-        /**
-         * Elimina un artículo de venta. (Global para ser accesible desde el HTML)
-         */
         window.deleteSaleItem = async function(id) {
             if (!userId || !confirm("¿Estás seguro de que quieres eliminar este artículo de la venta?")) return;
-            
             const { error } = await supabase
                 .from('sales')
                 .delete()
                 .eq('id', id);
-
             if (error) {
                 console.error("Error al eliminar venta:", error);
                 salesAuthMessage.textContent = `Error al eliminar venta: ${error.message}`;
             } else {
-                 loadSalesData(); // Recargar datos
+                 loadSalesData(); 
             }
         }
         
@@ -1381,11 +1176,6 @@
         function closeModal(modal) {
             modal.classList.add('hidden');
             modal.classList.remove('flex');
-            // Al cerrar cualquier modal, asegura que el panel de edición de servicios se oculte
-            if (currentServiceEditPanel) {
-                currentServiceEditPanel.classList.add('hidden');
-                currentServiceEditPanel = null;
-            }
         }
         
         // Cierre de modal al hacer clic fuera
@@ -1401,13 +1191,11 @@
         document.getElementById('open-auth-modal-btn').onclick = () => {
             openModal(authModal);
             if (userId) {
-                // Si ya hay sesión, muestra el panel de logout/info
                 supabase.auth.getSession().then(res => handleAuthChange(res.data.session));
             }
         };
         document.getElementById('close-auth-modal').onclick = () => closeModal(authModal);
         document.getElementById('logout-btn').onclick = handleLogout;
-        
         toggleAuthModeBtn.onclick = () => {
             const isLogin = authTitle.textContent === 'Iniciar Sesión';
             authTitle.textContent = isLogin ? 'Registrarse' : 'Iniciar Sesión';
@@ -1446,28 +1234,14 @@
         document.getElementById('close-sales-modal').onclick = () => closeModal(document.getElementById('sales-modal'));
         addSaleBtn.onclick = addSaleItem;
         
-        // Evento de Subida de Logo (Fuera del módulo para ser re-asignado)
-        // Se inicializa en loadServiceImages
-
         // Inicialización al cargar la ventana
         window.onload = function() {
             initLogoTemplates(); // Inicializa las plantillas antes de initSupabase
             initSupabase();
-            loadServiceImages(); // Inicialmente carga para mostrar los servicios estáticos y el logo si existe
+            loadLogo(); // Inicialmente carga el logo
+            loadSavedTheme(); // Carga el tema guardado
             
-            // Listener global para cerrar paneles de servicio al hacer clic fuera
-            document.addEventListener('click', (e) => {
-                if (currentServiceEditPanel) {
-                    // Si el clic no fue dentro del panel y no fue en el botón de toggle (llave)
-                    const isPanel = currentServiceEditPanel.contains(e.target);
-                    const isToggleBtn = e.target.closest('button') && e.target.closest('button').querySelector('svg[data-lucide="wrench"]');
-
-                    if (!isPanel && !isToggleBtn) {
-                        currentServiceEditPanel.classList.add('hidden');
-                        currentServiceEditPanel = null;
-                    }
-                }
-            });
+            // Listener de servicios eliminado
         };
     </script>
 </body>
