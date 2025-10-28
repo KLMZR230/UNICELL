@@ -241,7 +241,7 @@
             </h2 >
             <p id="inventory-auth-message" class="text-center p-4 text-red-400 hidden">Necesitas iniciar sesión como administrador para gestionar el inventario.</p>
 
-            <div id="inventory-content" class="hidden">
+            <div id="inventory-content-admin" class="hidden">
                 <div class="mb-8 p-4 bg-gray-800 rounded-lg shadow-inner">
                     <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir/Editar Producto</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
@@ -263,7 +263,9 @@
                     </div>
                     <p id="inventory-message" class="text-center text-sm mt-3 text-red-400"></p>
                 </div>
+            </div>
 
+            <div id="inventory-content-public">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-700 rounded-lg">
                         <thead class="bg-gray-700">
@@ -271,7 +273,7 @@
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-20">Foto</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Nombre</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Precio</th>
-                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider w-40">Acciones</th>
+                                <th id="inventory-header-actions" class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider w-40 hidden">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="inventory-list" class="bg-gray-800 divide-y divide-gray-700">
@@ -359,7 +361,7 @@
         // Instancia de Supabase
         let supabase = null;
         let userId = null;
-        let isAdmin = false;
+        let isAdmin = false; // Esta es la variable global clave
         
         // Variables globales para la plantilla del logo
         let logoUploadOverlayHTML = '';
@@ -368,10 +370,6 @@
         
         // Referencias del DOM
         const adminStatusDisplay = document.getElementById('admin-status');
-        const inventoryContent = document.getElementById('inventory-content');
-        const inventoryAuthMessage = document.getElementById('inventory-auth-message');
-        const salesContent = document.getElementById('sales-content');
-        const salesAuthMessage = document.getElementById('sales-auth-message');
         const appErrorDisplay = document.getElementById('app-error-display'); 
         
         // Elementos del Modal de Autenticación
@@ -395,6 +393,8 @@
 
 
         // Elementos de la Modal de Ventas
+        const salesContent = document.getElementById('sales-content');
+        const salesAuthMessage = document.getElementById('sales-auth-message');
         const salesList = document.getElementById('sales-list');
         const salesTotal = document.getElementById('sales-total');
         const clientNameInput = document.getElementById('client-name');
@@ -403,6 +403,8 @@
         const addSaleBtn = document.getElementById('add-btn');
 
         // Elementos de la Modal de Inventario
+        const inventoryContentAdmin = document.getElementById('inventory-content-admin');
+        const inventoryHeaderActions = document.getElementById('inventory-header-actions');
         const inventoryList = document.getElementById('inventory-list');
         const inventoryNameInput = document.getElementById('inventory-name');
         const inventoryPriceInput = document.getElementById('inventory-price');
@@ -463,9 +465,31 @@
                 element.textContent = '';
             }, 5000);
         }
+
+        /**
+         * (NUEVO) Centraliza la actualización de la UI de Admin
+         * @param {boolean} isAdminNow
+         */
+        function updateAdminUI(isAdminNow) {
+            const logoContainer = document.getElementById('logo-container');
+
+            if (isAdminNow) {
+                adminStatusDisplay.classList.remove('hidden');
+                openInventoryModalBtn.classList.remove('hidden'); // Muestra el botón de inventario
+                logoContainer.classList.add('admin-active'); // Activa la subida de logo
+                inventoryContentAdmin.classList.remove('hidden'); // Muestra el formulario de añadir producto
+                inventoryHeaderActions.classList.remove('hidden'); // Muestra la columna "Acciones"
+            } else {
+                adminStatusDisplay.classList.add('hidden');
+                openInventoryModalBtn.classList.add('hidden'); // Oculta el botón de inventario
+                logoContainer.classList.remove('admin-active'); // Desactiva la subida de logo
+                inventoryContentAdmin.classList.add('hidden'); // Oculta el formulario de añadir producto
+                inventoryHeaderActions.classList.add('hidden'); // Oculta la columna "Acciones"
+            }
+        }
         
         // --------------------------------------------------------------------------------
-        // 3. LÓGICA DE AUTENTICACIÓN (VERSIÓN ESTABLE Y MODIFICADA)
+        // 3. LÓGICA DE AUTENTICACIÓN (VERSIÓN PÚBLICA)
         // --------------------------------------------------------------------------------
 
         /**
@@ -481,7 +505,6 @@
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 
                 // Listener de cambios de sesión (ESTA ES LA ÚNICA FUNCIÓN QUE GESTIONA LA SESIÓN)
-                // Se dispara en la carga inicial, en el login, y en el logout.
                 supabase.auth.onAuthStateChange((event, session) => {
                     handleAuthChange(session);
                 });
@@ -497,56 +520,43 @@
          * @param {object} session Objeto de sesión de Supabase.
          */
         function handleAuthChange(session) {
-            const logoContainer = document.getElementById('logo-container');
-            
             if (session && session.user) {
                 userId = session.user.id;
-                currentUserUidDisplay.textContent = session.user.email; // Mostramos email en lugar de ID
-
-                // --- VERIFICACIÓN DE ADMIN POR EMAIL ---
-                isAdmin = (session.user.email === ADMIN_EMAIL_REAL);
+                currentUserUidDisplay.textContent = session.user.email; 
                 
-                if (isAdmin) {
-                    adminStatusDisplay.classList.remove('hidden');
-                    openInventoryModalBtn.classList.remove('hidden');
-                    logoContainer.classList.add('admin-active');
-                }
-                // ------------------------------------
+                // Verifica si el email del usuario es el del admin
+                isAdmin = (session.user.email === ADMIN_EMAIL_REAL);
                 
                 // Muestra el panel de Logout
                 authContainer.classList.add('hidden');
                 logoutContainer.classList.remove('hidden');
-
-                // Carga los datos solo después de autenticación
-                loadLogo();
+                
+                // Carga los datos de ventas (que son privados)
                 loadSalesData();
-                loadInventoryData();
                 
             } else {
                 // No hay sesión
                 userId = null;
-                isAdmin = false; 
-
-                // Ocultar elementos de Admin
-                adminStatusDisplay.classList.add('hidden');
-                openInventoryModalBtn.classList.add('hidden');
-                logoContainer.classList.remove('admin-active');
+                isAdmin = false; // No es admin si no hay sesión
                 
                 // Muestra el panel de Login
                 authContainer.classList.remove('hidden');
                 logoutContainer.classList.add('hidden');
-
-                // Limpia la interfaz si no hay sesión
+                
+                // Limpia la interfaz de ventas
                 salesContent.classList.add('hidden');
                 salesAuthMessage.classList.remove('hidden');
-                inventoryContent.classList.add('hidden');
-                inventoryAuthMessage.classList.remove('hidden');
                 renderSales([]); 
-                renderInventory([]); 
-                
-                // Carga solo el logo
-                loadLogo();
             }
+            
+            // --- ESTO SE EJECUTA SIEMPRE (LOGUEADO O NO) ---
+            
+            // 1. Actualiza la UI de Admin (muestra/oculta botones de admin)
+            updateAdminUI(isAdmin);
+
+            // 2. Carga los datos públicos
+            loadLogo();
+            loadInventoryData();
         }
 
         /**
@@ -602,10 +612,6 @@
         // 4. GESTIÓN DE TEMAS
         // --------------------------------------------------------------------------------
         
-        /**
-         * Aplica un tema a la aplicación y lo guarda en localStorage.
-         * @param {string} themeName 'default', 'feminine', 'masculine'
-         */
         function applyTheme(themeName) {
             document.body.classList.remove('theme-feminine', 'theme-masculine');
             
@@ -630,9 +636,6 @@
             localStorage.setItem('unicell-theme', themeName);
         }
 
-        /**
-         * Carga el tema guardado desde localStorage al iniciar la app.
-         */
         function loadSavedTheme() {
             const savedTheme = localStorage.getItem('unicell-theme') || 'default';
             applyTheme(savedTheme);
@@ -647,12 +650,6 @@
         // 5. GESTIÓN DE STORAGE (LOGO E IMÁGENES DE INVENTARIO)
         // --------------------------------------------------------------------------------
 
-        /**
-         * Sube un archivo a Supabase Storage.
-         * @param {File} file Archivo a subir.
-         * @param {string} path Ruta de destino en el bucket.
-         * @returns {string} La ruta completa del archivo subido.
-         */
         async function uploadFile(file, path) {
             const { data, error } = await supabase.storage
                 .from(ASSETS_BUCKET)
@@ -668,11 +665,6 @@
             return data.path;
         }
 
-        /**
-         * Obtiene la URL pública de un archivo de Supabase Storage.
-         * @param {string} path Ruta completa del archivo.
-         * @returns {string} URL pública del archivo.
-         */
         function getPublicUrl(path) {
             const { data } = supabase.storage
                 .from(ASSETS_BUCKET)
@@ -681,10 +673,6 @@
             return `${data.publicUrl}?v=${Date.now()}`;
         }
         
-        /**
-         * Elimina un archivo de Supabase Storage.
-         * @param {string} path Ruta completa del archivo.
-         */
         async function deleteFile(path) {
             const { error } = await supabase.storage
                 .from(ASSETS_BUCKET)
@@ -694,12 +682,8 @@
             }
         }
         
-        /**
-         * Actualiza el logo de la empresa.
-         * @param {Event} e Evento de cambio de archivo.
-         */
         async function handleLogoUpload(e) {
-            if (!isAdmin) return;
+            if (!isAdmin) return; // Doble chequeo
             const file = e.target.files[0];
             if (!file) return;
 
@@ -707,6 +691,9 @@
             logoContainer.innerHTML = '<div class="w-full h-full flex items-center justify-center text-pink-500 font-bold text-xs animate-pulse">Cargando...</div>'; 
 
             try {
+                // Asegúrate de que userId exista (el admin DEBE estar logueado para subir)
+                if (!userId) throw new Error("El administrador debe iniciar sesión para subir un logo.");
+
                 const path = await uploadFile(file, `logo/${userId}/${file.name}`);
                 const url = getPublicUrl(path);
 
@@ -734,12 +721,13 @@
         }
 
         /**
-         * Carga la URL del logo
+         * Carga la URL del logo (PÚBLICO)
          */
         async function loadLogo() {
             if (!supabase) return;
             
             try {
+                // Esta consulta ahora es pública gracias al SQL que ejecutaste
                 const { data, error } = await supabase
                     .from('services')
                     .select('id, image_url, image_path')
@@ -775,16 +763,20 @@
         }
         
         // --------------------------------------------------------------------------------
-        // 6. GESTIÓN DE INVENTARIO (CRUD)
+        // 6. GESTIÓN DE INVENTARIO (CRUD) (MODIFICADO PARA SER PÚBLICO)
         // --------------------------------------------------------------------------------
 
+        /**
+         * Carga los datos de inventario (PÚBLICO)
+         */
         function loadInventoryData() {
-            if (!supabase || !userId || !isAdmin) return;
+            if (!supabase) return;
             
+            // Consulta modificada: ya no filtra por user_id
+            // Esto es PÚBLICO gracias a la política SQL
             supabase
                 .from('inventory')
                 .select('*')
-                .eq('user_id', userId)
                 .order('name', { ascending: true })
                 .then(({ data, error }) => {
                     if (error) {
@@ -795,22 +787,39 @@
                         }
                         throw error;
                     }
-                    renderInventory(data);
+                    renderInventory(data); // Renderiza los datos
                 })
                 .catch(err => {
                     console.error("Error al cargar inventario de Supabase:", err);
-                    inventoryMessage.textContent = 'Error al cargar inventario. Revisa la consola y RLS.';
+                    inventoryMessage.textContent = 'Error al cargar inventario. Revisa la consola.';
                 });
         }
         
+        /**
+         * Dibuja la lista de inventario (MODIFICADO)
+         * Ahora usa la variable global `isAdmin` para mostrar botones
+         */
         function renderInventory(items) {
             inventoryList.innerHTML = '';
             if (items.length === 0) {
                 inventoryList.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500 italic">No hay productos en el inventario.</td></tr>';
             }
+            
             items.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-700 transition duration-150';
+
+                // Botones de Admin (solo se crean si isAdmin es true)
+                const adminButtons = isAdmin ? `
+                    <button onclick="toggleInventoryEdit(event, '${item.id}', '${item.name}', ${item.price})" class="edit-btn text-yellow-400 hover:text-yellow-300 p-2 rounded-full transition duration-150" data-editing="false">
+                        <i data-lucide="pencil" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="deleteInventoryItem('${item.id}', '${item.image_path}')" class="text-red-500 hover:text-red-400 p-2 rounded-full transition duration-150">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                ` : ''; // Si no es admin, esto queda vacío
+
+                // Renderiza la fila
                 tr.innerHTML = `
                     <td class="p-2">
                         ${item.image_url ? `<img src="${item.image_url}" alt="${item.name}" class="inventory-image-preview">` : `<div class="h-12 w-12 bg-gray-600 rounded-lg flex items-center justify-center text-xs text-gray-400">Sin Foto</div>`}
@@ -822,20 +831,18 @@
                         <span id="inv-price-${item.id}">$${item.price.toFixed(2)}</span>
                     </td>
                     <td class="px-4 py-3 text-right space-x-2">
-                        <button onclick="toggleInventoryEdit(event, '${item.id}', '${item.name}', ${item.price})" class="edit-btn text-yellow-400 hover:text-yellow-300 p-2 rounded-full transition duration-150" data-editing="false">
-                            <i data-lucide="pencil" class="w-4 h-4"></i>
-                        </button>
-                        <button onclick="deleteInventoryItem('${item.id}', '${item.image_path}')" class="text-red-500 hover:text-red-400 p-2 rounded-full transition duration-150">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                    </td>`;
+                        ${adminButtons} </td>`;
                 inventoryList.appendChild(tr);
             });
             lucide.createIcons();
         }
 
         async function addInventoryItem() {
-            if (!isAdmin) return;
+            if (!isAdmin || !userId) { // Admin debe estar logueado
+                 displayMessage("Acción no permitida.", inventoryMessage);
+                return;
+            }
+
             const name = inventoryNameInput.value.trim();
             const price = parseFloat(inventoryPriceInput.value.trim());
             const file = inventoryImageFile.files[0];
@@ -867,7 +874,7 @@
                 inventoryPriceInput.value = '';
                 inventoryImageFile.value = '';
                 displayMessage('Producto añadido con éxito.', inventoryMessage, 'success');
-                loadInventoryData(); 
+                loadInventoryData(); // Recarga la lista pública
 
             } catch (e) {
                 console.error("Error al agregar inventario:", e);
@@ -949,11 +956,11 @@
 
 
         // --------------------------------------------------------------------------------
-        // 7. GESTIÓN DE VENTAS (CRUD)
+        // 7. GESTIÓN DE VENTAS (CRUD) (PRIVADO - SIN CAMBIOS)
         // --------------------------------------------------------------------------------
 
         function loadSalesData() {
-            if (!supabase || !userId) return;
+            if (!supabase || !userId) return; // Solo carga si hay un usuario
             
             supabase
                 .from('sales')
@@ -1156,13 +1163,9 @@
         
         // Eventos de Inventario
         openInventoryModalBtn.onclick = () => {
-            if (isAdmin) {
-                inventoryAuthMessage.classList.add('hidden');
-                inventoryContent.classList.remove('hidden');
-            } else {
-                inventoryAuthMessage.classList.remove('hidden');
-                inventoryContent.classList.add('hidden');
-            }
+            // Este botón solo es visible para el Admin,
+            // así que simplemente abrimos la modal.
+            // Los datos ya se cargan en handleAuthChange
             openModal(document.getElementById('inventory-modal'));
         };
         document.getElementById('close-inventory-modal').onclick = () => closeModal(document.getElementById('inventory-modal'));
@@ -1173,6 +1176,7 @@
             if (userId) {
                 salesAuthMessage.classList.add('hidden');
                 salesContent.classList.remove('hidden');
+                // Los datos ya se cargaron en handleAuthChange
             } else {
                 salesAuthMessage.classList.remove('hidden');
                 salesContent.classList.add('hidden');
@@ -1182,14 +1186,14 @@
         document.getElementById('close-sales-modal').onclick = () => closeModal(document.getElementById('sales-modal'));
         addSaleBtn.onclick = addSaleItem;
         
-        // Inicialización al cargar la ventana (CORREGIDA)
+        // Inicialización al cargar la ventana
         window.onload = function() {
             initLogoTemplates(); 
             initSupabase();      // Inicia Supabase y el listener de auth
             loadSavedTheme();    // Carga el tema guardado
             
             // handleAuthChange() se llamará automáticamente por el listener
-            // y cargará el logo y los datos en el momento correcto.
+            // y cargará el logo y los datos (públicos) en el momento correcto.
         };
     </script>
 </body>
