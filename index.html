@@ -338,7 +338,7 @@
         // --------------------------------------------------------------------------------
 
         // =================================================================================
-        // ¡¡¡ ATENCIÓN !!! TUS CLAVES DE SUPABASE ACTUALIZADAS SE HAN PEGADO AQUÍ:
+        // TUS CLAVES DE SUPABASE ACTUALIZADAS SE HAN PEGADO AQUÍ:
         // =================================================================================
         const SUPABASE_URL = 'https://pavonviwyyjmdwwhxrzm.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhdm9udml3eXlqbWR3d2h4cnptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2MTA2MzcsImV4cCI6MjA3NzE4NjYzN30.dWGKn3MWuVHvOivh608-ZIdfVGsekdpfLu7quc42HBk';
@@ -379,6 +379,12 @@
         const currentUserUidDisplay = document.getElementById('current-user-uid');
         const logoutBtn = document.getElementById('logout-btn');
 
+        // Elementos de la Modal de Ventas e Inventario (SOLUCIÓN AL ReferenceError)
+        // Se mueven a una posición más alta para asegurar que estén disponibles antes de ser usadas en loadData
+        const openSalesModalBtn = document.getElementById('open-sales-modal-btn');
+        const openInventoryModalBtn = document.getElementById('open-inventory-modal-btn');
+
+
         // Elementos de la Modal de Ventas
         const salesList = document.getElementById('sales-list');
         const salesTotal = document.getElementById('sales-total');
@@ -394,7 +400,6 @@
         const inventoryImageFile = document.getElementById('inventory-image-file');
         const inventoryAddBtn = document.getElementById('inventory-add-btn');
         const inventoryMessage = document.getElementById('inventory-message');
-        const openInventoryModalBtn = document.getElementById('open-inventory-modal-btn');
 
 
         // --------------------------------------------------------------------------------
@@ -853,7 +858,8 @@
             if (!supabase || !userId || !isAdmin) return;
             
             // Comprobación de visibilidad de la modal
-            if (openInventoryModalBtn.classList.contains('hidden')) return; 
+            // La visibilidad se maneja ahora en checkAdminStatus(), por lo que esta comprobación es redundante
+            // if (openInventoryModalBtn.classList.contains('hidden')) return; 
 
             supabase
                 .from('inventory')
@@ -1085,9 +1091,8 @@
         function loadSalesData() {
             if (!supabase || !userId) return;
 
-             // Comprobación de visibilidad de la modal
-            if (openSalesModalBtn.classList.contains('hidden')) return; 
-
+            // La comprobación de visibilidad no es necesaria aquí, ya que se encarga el listener de la modal.
+            
             supabase
                 .from('sales')
                 .select('*')
@@ -1298,7 +1303,7 @@
         
 
         // --------------------------------------------------------------------------------
-        // 8. LÓGICA DE MODALES Y EVENT LISTENERS
+        // 9. LÓGICA DE MODALES Y EVENT LISTENERS
         // --------------------------------------------------------------------------------
 
         function openModal(modal) {
@@ -1340,7 +1345,7 @@
         loginForm.onsubmit = handleAuthSubmit;
         
         // Eventos de Inventario
-        document.getElementById('open-inventory-modal-btn').onclick = () => {
+        openInventoryModalBtn.onclick = () => {
             if (isAdmin) {
                 inventoryAuthMessage.classList.add('hidden');
                 inventoryContent.classList.remove('hidden');
@@ -1355,7 +1360,7 @@
         inventoryAddBtn.onclick = addInventoryItem;
         
         // Eventos de Ventas
-        document.getElementById('open-sales-modal-btn').onclick = () => {
+        openSalesModalBtn.onclick = () => {
             if (userId) {
                 salesAuthMessage.classList.add('hidden');
                 salesContent.classList.remove('hidden');
