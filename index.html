@@ -9,17 +9,29 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- ================================================== -->
+    <!-- CAMBIO AQUÍ: Fuentes eliminadas y añadidas -->
+    <!-- ================================================== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;600;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
         /* ================================================================== */
-        /* TEMAS Y ESTILOS GLOBALES */
+        /* TEMAS Y ESTILOS GLOBALES ANTIGUOS (Modificados) */
         /* ================================================================== */
-        :root { --color-primary: #FF4545; --color-secondary: #E91E63; --color-dark: #1F2937; --color-darker: #111827; --color-text: #E5E7EB; --admin-border: #00FF00; --color-primary-gradient: rgba(255, 69, 69, 0.1); --color-secondary-gradient: rgba(233, 30, 99, 0.1); }
-        body.theme-feminine { --color-primary: #F472B6; --color-secondary: #EC4899; --color-dark: #374151; --color-darker: #1F2937; --color-text: #F3F4F6; --admin-border: #A7F3D0; --color-primary-gradient: rgba(244, 114, 182, 0.1); --color-secondary-gradient: rgba(236, 72, 153, 0.1); }
-        body.theme-masculine { --color-primary: #3B82F6; --color-secondary: #2563EB; --color-dark: #1F2937; --color-darker: #111827; --color-text: #F9FAFB; --admin-border: #34D399; --color-primary-gradient: rgba(59, 130, 246, 0.1); --color-secondary-gradient: rgba(37, 99, 235, 0.1); }
         
-        body { font-family: 'Inter', sans-serif; background-color: var(--color-darker); color: var(--color-text); background-image: radial-gradient(at top left, var(--color-primary-gradient), transparent 50%), radial-gradient(at bottom right, var(--color-secondary-gradient), transparent 50%); min-height: 100vh; }
-        .accent-text { color: var(--color-primary); }
+        /* Se eliminaron las definiciones de :root, theme-feminine, y theme-masculine */
+        
+        /* La fuente 'Inter' se eliminó de aquí ya que los nuevos temas la definen */
+        body { 
+            /* background-color y color serán definidos por los nuevos temas */
+            background-image: radial-gradient(at top left, var(--color-primary-gradient), transparent 50%), radial-gradient(at bottom right, var(--color-secondary-gradient), transparent 50%); 
+            min-height: 100vh; 
+        }
+        
+        /* CAMBIO: .accent-text ahora usa la nueva variable de los temas */
+        .accent-text { color: var(--accent-color); }
 
         .input-dark { 
             background-color: var(--color-dark); 
@@ -48,11 +60,192 @@
         }
         
         .theme-btn { width: 2rem; height: 2rem; border-radius: 9999px; border: 3px solid #4B5563; cursor: pointer; transition: border-color 0.2s; }
-        .theme-btn.active, .theme-btn:hover { border-color: var(--color-primary); }
-        #theme-btn-default { background-color: #FF4545; } #theme-btn-feminine { background-color: #F472B6; } #theme-btn-masculine { background-color: #3B82F6; }
+        .theme-btn.active, .theme-btn:hover { border-color: var(--accent-color); }
+        
+        /* CAMBIO: IDs de botones de tema actualizados */
+        #theme-btn-dark { background-color: #818cf8; }
+        #theme-btn-infernal { background-color: #ff4500; }
+        #theme-btn-gold { background-color: #D4AF37; }
+
+
+        /* ================================================== */
+        /* INICIO: NUEVOS ESTILOS AÑADIDOS */
+        /* (Se corrigieron los caracteres de espacio inválidos) */
+        /* ================================================== */
+        
+        /********************************/
+        /* Estilos Base (Comunes a todos los temas) */
+        /********************************/
+        html {
+            height: 100%;
+        }
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.5s ease;
+        }
+        .container.mx-auto {
+            flex-grow: 1;
+        }
+        .product-card, .tool-card { transition: transform 0.2s, box-shadow 0.3s; }
+        .product-card:hover, .tool-card:hover { transform: translateY(-5px); }
+        #logo-upload { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; border: 0; }
+        .hidden { display: none; }
+
+        .skeleton-card { background-color: transparent; border-radius: 0.5rem; padding: 1rem; display: flex; flex-direction: column; }
+        .skeleton-line {
+            background-color: var(--bg-secondary);
+            opacity: 0.7;
+            border-radius: 0.25rem;
+            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse { 50% { opacity: .4; } }
+
+        /********************************/
+        /* TEMA 1: Dark (Predeterminado) */
+        /********************************/
+        .theme-dark {
+            --bg-primary: #1f2937;
+            --bg-secondary: #374151;
+            --bg-header: rgba(31, 41, 55, 0.8);
+            --text-primary: #e5e7eb;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            --border-color: #4b5563;
+            --accent-color: #818cf8;
+            --accent-color-dark: #6366f1;
+            --font-main: 'Poppins', sans-serif;
+            --font-headings: 'Poppins', sans-serif;
+        }
+
+        /********************************/
+        /* TEMA 2: Fuego Infernal */
+        /********************************/
+        .theme-infernal {
+            --bg-primary: #000000;
+            --bg-secondary: #2d1a1a;
+            --bg-header: rgba(17, 7, 0, 0.6);
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            --border-color: #571e1e;
+            --accent-color: #ff4500;
+            --accent-color-dark: #e63e00;
+            --font-main: 'Roboto', sans-serif;
+            --font-headings: 'Roboto', sans-serif;
+        }
+        .theme-infernal { background-image: linear-gradient(180deg, #1a0000 0%, #000000 100%); }
+        .theme-infernal .product-card:hover, .theme-infernal .tool-card:hover { box-shadow: 0 0 25px rgba(255, 69, 0, 0.5); border-color: rgba(255, 69, 0, 0.7); }
+
+        /********************************/
+        /* TEMA 3: Luxury Gold */
+        /********************************/
+        .theme-gold {
+            --bg-primary: #121212;
+            --bg-secondary: #2b2b2b;
+            --bg-header: rgba(18, 18, 18, 0.85);
+            --text-primary: #f1f1f1;
+            --text-secondary: #cccccc;
+            --text-muted: #a0a0a0;
+            --border-color: #444444;
+            --accent-color: #D4AF37;
+            --accent-color-dark: #B8860B;
+            --font-main: 'Poppins', sans-serif;
+            --font-headings: 'Playfair Display', serif;
+        }
+        .theme-gold { background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%232a2a2a" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
+        .theme-gold .product-card:hover, .theme-gold .tool-card:hover { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); border-color: var(--accent-color); }
+        .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
+        .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
+
+
+        /********************************/
+        /* Aplicación de Variables CSS */
+        /********************************/
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+        }
+        h1, h2, h3, h4, h5, h6 { font-family: var(--font-headings); }
+
+        .bg-gray-800, .bg-gray-900\/50 {
+            background-color: var(--bg-header);
+            border: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
+            backdrop-filter: blur(10px);
+        }
+        .text-gray-300 { color: var(--text-secondary); }
+        .text-gray-400 { color: var(--text-muted); }
+        /* CAMBIO: Se usa !important para asegurar la sobreescritura de Tailwind */
+        .bg-gray-600 { background-color: var(--bg-secondary) !important; }
+        .bg-gray-700 { background-color: color-mix(in srgb, var(--bg-secondary) 70%, var(--bg-primary)) !important; }
+        .bg-gray-900 { background-color: var(--bg-primary) !important; }
+        
+        .border-gray-500, .border-gray-600, .border-gray-700 { border-color: var(--border-color); }
+
+        /* Acentos */
+        .text-indigo-400, .text-indigo-300 { color: var(--accent-color); }
+        .border-indigo-500 { border-color: var(--accent-color); }
+        .bg-indigo-500 { background-color: var(--accent-color-dark); color: var(--text-primary); }
+        .hover\:bg-indigo-600:hover { background-color: var(--accent-color); }
+        .focus\:ring-indigo-500:focus { --tw-ring-color: var(--accent-color); }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent-color) !important;
+            box-shadow: 0 0 0 1px var(--accent-color);
+            outline: none;
+        }
+        
+        /* Sobreescribir botones específicos de Tailwind que usas */
+        .bg-pink-600 { background-color: var(--accent-color-dark) !important; }
+        .hover\:bg-pink-700:hover { background-color: var(--accent-color) !important; }
+        .border-pink-500\/50 { border-color: color-mix(in srgb, var(--accent-color) 50%, transparent) !important; }
+        .text-pink-500 { color: var(--accent-color) !important; }
+        .file\:text-pink-700 { color: var(--accent-color-dark) !important; }
+        .file\:bg-pink-50 { background-color: color-mix(in srgb, var(--accent-color) 10%, transparent) !important; }
+        .hover\:file\:bg-pink-100:hover { background-color: color-mix(in srgb, var(--accent-color) 20%, transparent) !important; }
+        
+        .bg-green-600 { background-color: #16a34a !important; } /* Dejar verde para WhatsApp */
+        .hover\:bg-green-700:hover { background-color: #15803d !important; }
+        .shadow-green-700\/50 { box-shadow: 0 10px 15px -3px rgba(21, 128, 61, 0.5), 0 4px 6px -2px rgba(21, 128, 61, 0.5) !important; }
+        
+        .bg-red-600 { background-color: #dc2626 !important; } /* Dejar rojo para logout/delete */
+        .hover\:bg-red-700:hover { background-color: #b91c1c !important; }
+        .text-red-500 { color: #ef4444 !important; }
+        .text-red-400 { color: #f87171 !important; }
+        
+        .text-yellow-400 { color: #facc15 !important; } /* Dejar amarillo para edit */
+        .hover\:text-yellow-300:hover { color: #fde047 !important; }
+        .text-green-500 { color: #22c55e !important; }
+
+        /********************************/
+        /* ESTILOS FIJOS PARA ESTADOS DE VENTA */
+        /********************************/
+        .status-paid {
+            background-color: #16a34a !important; /* Verde */
+            color: #ffffff !important;
+            border-color: #15803d !important;
+        }
+        .status-pending {
+            background-color: #f59e0b !important; /* Naranja/Amarillo */
+            color: #1f2937 !important;
+            border-color: #d97706 !important;
+        }
+        .status-returned {
+            background-color: #dc2626 !important; /* Rojo */
+            color: #ffffff !important;
+            border-color: #b91c1c !important;
+        }
+
+        /* ================================================== */
+        /* FIN: NUEVOS ESTILOS AÑADIDOS */
+        /* ================================================== */
     </style>
 </head>
-<body class="p-4">
+<!-- ================================================== -->
+<!-- CAMBIO AQUÍ: Clase 'theme-dark' añadida por defecto -->
+<!-- ================================================== -->
+<body class="p-4 theme-dark">
 
     <div class="max-w-6xl mx-auto py-8">
 
@@ -62,7 +255,7 @@
                 <div class="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center rounded-lg" id="current-logo">
                     <svg id="default-logo-svg" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 sm:w-12 sm:h-12 accent-text" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 20a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" opacity=".2"/>
-                        <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" fill="var(--color-primary)"/>
+                        <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" fill="var(--accent-color)"/> <!-- CAMBIO: fill de pink a var(--accent-color) -->
                         <path d="M16 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM10 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
                         <path d="M12 14v-2" stroke-width="3"/>
                     </svg>
@@ -74,7 +267,7 @@
 
                 <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
                     UNICELL
-                    <span class="block text-lg sm:text-xl font-light accent-text border-b-2 border-pink-500 inline-block pb-1 pl-1 sm:pl-0">
+                    <span class="block text-lg sm:text-xl font-light accent-text border-b-2 border-indigo-500 inline-block pb-1 pl-1 sm:pl-0"> <!-- CAMBIO: de border-pink-500 a border-indigo-500 (que se mapea a --accent-color) -->
                         SERVICIO TÉCNICO
                     </span>
                 </h1>
@@ -94,10 +287,13 @@
                         <i data-lucide="palette" class="w-5 h-5"></i>
                     </button>
                     <div id="theme-dropdown-menu" class="hidden absolute top-full right-0 mt-2 w-max bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-3 z-50">
+                        <!-- ================================================== -->
+                        <!-- CAMBIO AQUÍ: Botones de tema actualizados -->
+                        <!-- ================================================== -->
                         <div id="theme-selector-container" class="flex space-x-2 items-center">
-                            <button id="theme-btn-default" class="theme-btn" title="Tema Original"></button>
-                            <button id="theme-btn-feminine" class="theme-btn" title="Tema Femenino"></button>
-                            <button id="theme-btn-masculine" class="theme-btn" title="Tema Masculino"></button>
+                            <button id="theme-btn-dark" class="theme-btn" title="Tema Oscuro"></button>
+                            <button id="theme-btn-infernal" class="theme-btn" title="Tema Infernal"></button>
+                            <button id="theme-btn-gold" class="theme-btn" title="Tema Dorado"></button>
                         </div>
                     </div>
                 </div>
@@ -134,6 +330,7 @@
         </footer>
     </div>
 
+    <!-- Modales -->
     <div id="auth-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4">
         <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-gray-700 max-w-sm w-full p-6 relative">
             <button id="close-auth-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
@@ -142,8 +339,8 @@
             <div id="auth-container">
                 <h2 class="text-2xl font-bold text-center mb-6 text-white" id="auth-title">Iniciar Sesión</h2>
                 <form id="login-form" class="space-y-4">
-                    <input id="auth-email" type="email" placeholder="Correo Electrónico" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary" required />
-                    <input id="auth-password" type="password" placeholder="Contraseña" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary" required />
+                    <input id="auth-email" type="email" placeholder="Correo Electrónico" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" required /> <!-- CAMBIO: focus:ring-primary a focus:ring-indigo-500 -->
+                    <input id="auth-password" type="password" placeholder="Contraseña" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" required /> <!-- CAMBIO: focus:ring-primary a focus:ring-indigo-500 -->
                     <button type="submit" id="auth-submit-btn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center">
                         <i data-lucide="log-in" class="w-5 h-5 mr-2"></i>
                         <span id="auth-button-text">Iniciar Sesión</span>
@@ -179,15 +376,15 @@
                 <div class="grid grid-cols-1 sm:grid-cols-5 gap-4 items-end">
                     <div class="sm:col-span-1">
                         <label class="text-gray-400 text-sm">Nombre</label>
-                        <input id="inventory-name" type="text" placeholder="Nombre del Producto" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary" />
+                        <input id="inventory-name" type="text" placeholder="Nombre del Producto" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" />
                     </div>
                     <div class="sm:col-span-1">
                         <label class="text-gray-400 text-sm">Precio</label>
-                        <input id="inventory-price" type="number" placeholder="Precio (Ej: 150.00)" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary" step="0.01" />
+                        <input id="inventory-price" type="number" placeholder="Precio (Ej: 150.00)" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" step="0.01" />
                     </div>
                     <div class="sm:col-span-1">
                         <label class="text-gray-400 text-sm">Categoría</label>
-                        <select id="inventory-category" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary h-[46px]">
+                        <select id="inventory-category" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 h-[46px]">
                             <option value="">Seleccionar...</option>
                             <option value="Placas de Carga">Placas de Carga</option>
                             <option value="Placas">Placas</option>
@@ -246,10 +443,10 @@
             <div id="sales-content"> <div id="sales-add-form-admin" class="hidden mb-8 p-4 bg-gray-800 rounded-lg shadow-inner">
                     <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir Nuevo Artículo</h3>
                     <label class="text-gray-400 text-sm mb-1 block">Destinatario/Cliente</label>
-                    <input id="client-name" type="text" placeholder="Nombre del Destinatario" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary mb-4" />
+                    <input id="client-name" type="text" placeholder="Nombre del Destinatario" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 mb-4" />
                     <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                        <input id="product-name" type="text" placeholder="Nombre del Producto/Servicio" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary" />
-                        <select id="sale-category" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary h-[46px]">
+                        <input id="product-name" type="text" placeholder="Nombre del Producto/Servicio" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" />
+                        <select id="sale-category" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 h-[46px]">
                             <option value="">Seleccionar...</option>
                             <option value="Placas de Carga">Placas de Carga</option>
                             <option value="Placas">Placas</option>
@@ -261,7 +458,7 @@
                             <option value="Hidrogel">Hidrogel</option>
                             <option value="Otro">Otro</option>
                         </select>
-                        <input id="product-price" type="number" placeholder="Precio (Ej: 150.00)" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary" step="0.01" />
+                        <input id="product-price" type="number" placeholder="Precio (Ej: 150.00)" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" step="0.01" />
                         <button id="add-btn" class="col-span-1 bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center disabled:opacity-50">
                             <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir a Venta
                         </button>
@@ -308,9 +505,6 @@
         const ADMIN_EMAIL_REAL = 'unicell2025@gmail.com';
         const ASSETS_BUCKET = 'public_assets';
 
-        // ==================================================
-        // CAMBIO AQUÍ: Constante para las opciones de categoría
-        // ==================================================
         const CATEGORY_OPTIONS_HTML = `
             <option value="Placas de Carga">Placas de Carga</option>
             <option value="Placas">Placas</option>
@@ -358,9 +552,6 @@
         const clientNameInput = document.getElementById('client-name');
         const productNameInput = document.getElementById('product-name');
         const productPriceInput = document.getElementById('product-price');
-        // ==================================================
-        // CAMBIO AQUÍ: Nueva referencia
-        // ==================================================
         const saleCategorySelect = document.getElementById('sale-category');
         const addSaleBtn = document.getElementById('add-btn');
         const salesHeaderActions = document.getElementById('sales-header-actions');
@@ -369,17 +560,19 @@
         const inventoryList = document.getElementById('inventory-list');
         const inventoryNameInput = document.getElementById('inventory-name');
         const inventoryPriceInput = document.getElementById('inventory-price');
-        // ==================================================
-        // CAMBIO AQUÍ: Nueva referencia
-        // ==================================================
         const inventoryCategorySelect = document.getElementById('inventory-category');
         const inventoryImageFile = document.getElementById('inventory-image-file');
         const inventoryAddBtn = document.getElementById('inventory-add-btn');
         const inventoryMessage = document.getElementById('inventory-message');
         const inventoryHeaderActions = document.getElementById('inventory-header-actions');
-        const themeBtnDefault = document.getElementById('theme-btn-default');
-        const themeBtnFeminine = document.getElementById('theme-btn-feminine');
-        const themeBtnMasculine = document.getElementById('theme-btn-masculine');
+        
+        // ==================================================
+        // CAMBIO AQUÍ: Referencias de botones de tema actualizadas
+        // ==================================================
+        const themeBtnDark = document.getElementById('theme-btn-dark');
+        const themeBtnInfernal = document.getElementById('theme-btn-infernal');
+        const themeBtnGold = document.getElementById('theme-btn-gold');
+        
         const openThemeDropdownBtn = document.getElementById('open-theme-dropdown-btn');
         const themeDropdownMenu = document.getElementById('theme-dropdown-menu');
         const themeDropdownWrapper = document.getElementById('theme-dropdown-wrapper');
@@ -494,22 +687,39 @@
 
         // --------------------------------------------------------------------------------
         // 4. GESTIÓN DE TEMAS
-        // --------------------------------------------------------------------------------
+        // ==================================================
+        // CAMBIO AQUÍ: Lógica de applyTheme y loadSavedTheme actualizada
+        // ==================================================
         function applyTheme(themeName) {
-            document.body.classList.remove('theme-feminine', 'theme-masculine');
-            const buttons = { 'default': themeBtnDefault, 'feminine': themeBtnFeminine, 'masculine': themeBtnMasculine };
-            Object.values(buttons).forEach(btn => btn.classList.remove('active'));
-            if (themeName === 'feminine') { document.body.classList.add('theme-feminine'); themeBtnFeminine.classList.add('active'); }
-            else if (themeName === 'masculine') { document.body.classList.add('theme-masculine'); themeBtnMasculine.classList.add('active'); }
-            else { themeBtnDefault.classList.add('active'); }
+            // Quitar todas las clases de tema
+            document.body.classList.remove('theme-dark', 'theme-infernal', 'theme-gold', 'theme-feminine', 'theme-masculine');
+            
+            // Actualizar botones activos
+            const buttons = { 'dark': themeBtnDark, 'infernal': themeBtnInfernal, 'gold': themeBtnGold };
+            Object.values(buttons).forEach(btn => btn && btn.classList.remove('active')); // Añadir '&& btn' for safety
+            
+            // Añadir clase de tema actual
+            if (themeName === 'infernal') {
+                document.body.classList.add('theme-infernal');
+                if(themeBtnInfernal) themeBtnInfernal.classList.add('active');
+            } else if (themeName === 'gold') {
+                document.body.classList.add('theme-gold');
+                if(themeBtnGold) themeBtnGold.classList.add('active');
+            } else {
+                // Default a 'dark'
+                document.body.classList.add('theme-dark');
+                if(themeBtnDark) themeBtnDark.classList.add('active');
+            }
             localStorage.setItem('unicell-theme', themeName);
         }
+
         function loadSavedTheme() {
-             const savedTheme = localStorage.getItem('unicell-theme') || 'default';
+             const savedTheme = localStorage.getItem('unicell-theme') || 'dark'; // Default to 'dark'
              applyTheme(savedTheme);
-             themeBtnDefault.onclick = () => { applyTheme('default'); closeThemeDropdown(); };
-             themeBtnFeminine.onclick = () => { applyTheme('feminine'); closeThemeDropdown(); };
-             themeBtnMasculine.onclick = () => { applyTheme('masculine'); closeThemeDropdown(); };
+             
+             if(themeBtnDark) themeBtnDark.onclick = () => { applyTheme('dark'); closeThemeDropdown(); };
+             if(themeBtnInfernal) themeBtnInfernal.onclick = () => { applyTheme('infernal'); closeThemeDropdown(); };
+             if(themeBtnGold) themeBtnGold.onclick = () => { applyTheme('gold'); closeThemeDropdown(); };
         }
 
         // --------------------------------------------------------------------------------
@@ -593,9 +803,6 @@
         function renderInventory(items) {
             inventoryList.innerHTML = '';
             if (items.length === 0) {
-                // ==================================================
-                // CAMBIO AQUÍ: Colspan actualizado
-                // ==================================================
                 inventoryList.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500 italic">No hay productos en el inventario.</td></tr>';
                 return;
             }
@@ -603,9 +810,6 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-700 transition duration-150';
                 
-                // ==================================================
-                // CAMBIO AQUÍ: Se pasa item.category a la función de editar
-                // ==================================================
                 const adminButtons = isAdmin ? `
                     <button onclick="toggleInventoryEdit(event, '${item.id}', '${item.name.replace(/'/g, "\\'")}', ${item.price}, '${(item.category || '').replace(/'/g, "\\'")}')" class="edit-btn text-yellow-400 hover:text-yellow-300 p-2 rounded-full transition duration-150" data-editing="false">
                         <i data-lucide="pencil" class="w-4 h-4"></i>
@@ -614,9 +818,6 @@
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>` : '';
                 
-                // ==================================================
-                // CAMBIO AQUÍ: Nueva celda (td) para la categoría
-                // ==================================================
                 tr.innerHTML = `
                     <td class="p-2 align-top">
                         ${item.image_url ? `<img src="${item.image_url}" alt="${item.name}" class="inventory-image-preview">` : `<div class="w-full h-[160px] bg-gray-600 rounded-lg flex items-center justify-center text-xs text-gray-400">Sin Foto</div>`}
@@ -633,9 +834,6 @@
         async function addInventoryItem() {
             if (!isAdmin || !userId) { displayMessage("Acción no permitida.", inventoryMessage); return; }
             
-            // ==================================================
-            // CAMBIO AQUÍ: Se obtiene y valida la categoría
-            // ==================================================
             const name = inventoryNameInput.value.trim();
             const price = parseFloat(inventoryPriceInput.value.trim());
             const category = inventoryCategorySelect.value;
@@ -653,15 +851,12 @@
                     imagePath = await uploadFile(file, `inventory/${userId}/${Date.now()}_${file.name}`);
                     imageUrl = getPublicUrl(imagePath);
                 }
-                // ==================================================
-                // CAMBIO AQUÍ: Se inserta la categoría
-                // ==================================================
                 const { error } = await supabase.from('inventory').insert([{ name, price, category, image_url: imageUrl, image_path: imagePath, user_id: userId }]);
                 if (error) throw error;
                 
                 inventoryNameInput.value = ''; 
                 inventoryPriceInput.value = ''; 
-                inventoryCategorySelect.value = ''; // Reset select
+                inventoryCategorySelect.value = ''; 
                 inventoryImageFile.value = '';
                 
                 displayMessage('Producto añadido.', inventoryMessage, 'success');
@@ -670,9 +865,6 @@
             } finally { inventoryAddBtn.innerHTML = '<i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir Producto'; inventoryAddBtn.disabled = false; lucide.createIcons(); }
         }
 
-        // ==================================================
-        // CAMBIO AQUÍ: Función actualizada para editar la categoría
-        // ==================================================
         window.toggleInventoryEdit = function(event, id, currentName, currentPrice, currentCategory) {
             if (!isAdmin) return;
             const button = event.currentTarget; const isEditing = button.getAttribute('data-editing') === 'true';
@@ -684,7 +876,7 @@
                 nameSpan.innerHTML = `<input type="text" id="input-inv-name-${id}" value="${currentName}" class="w-full bg-gray-600 rounded-md p-1 input-dark" />`;
                 priceSpan.innerHTML = `<input type="number" id="input-inv-price-${id}" value="${Number(currentPrice).toFixed(2)}" class="w-full bg-gray-600 rounded-md p-1 input-dark" step="0.01" />`;
                 categorySpan.innerHTML = `<select id="input-inv-category-${id}" class="w-full bg-gray-600 rounded-md p-1 input-dark">${CATEGORY_OPTIONS_HTML}</select>`;
-                document.getElementById(`input-inv-category-${id}`).value = currentCategory; // Pre-seleccionar categoría
+                document.getElementById(`input-inv-category-${id}`).value = currentCategory; 
                 
                 button.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i>'; button.classList.remove('text-yellow-400'); button.classList.add('text-green-500'); button.setAttribute('data-editing', 'true'); lucide.createIcons();
             } else {
@@ -700,9 +892,6 @@
             }
         }
         
-        // ==================================================
-        // CAMBIO AQUÍ: Función actualizada para guardar la categoría
-        // ==================================================
         async function updateInventoryItem(id, newName, newPrice, newCategory) {
              if (!isAdmin) return;
              const { error } = await supabase.from('inventory').update({ name: newName, price: newPrice, category: newCategory, user_id: userId }).eq('id', id);
@@ -744,9 +933,6 @@
             salesList.innerHTML = '';
             let total = 0;
             if (items.length === 0) {
-                // ==================================================
-                // CAMBIO AQUÍ: Colspan actualizado
-                // ==================================================
                 salesList.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500 italic">No hay ventas registradas.</td></tr>';
                 salesTotal.textContent = '$0.00';
                 return;
@@ -756,9 +942,6 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-700 transition duration-150';
                 
-                // ==================================================
-                // CAMBIO AQUÍ: Se pasa item.category a la función de editar
-                // ==================================================
                  const adminButtons = isAdmin ? `
                     <button onclick="toggleSaleEdit(event, '${item.id}', '${(item.clientName || '').replace(/'/g, "\\'")}', '${item.name.replace(/'/g, "\\'")}', ${item.price}, '${(item.category || '').replace(/'/g, "\\'")}')" class="edit-btn text-yellow-400 hover:text-yellow-300 p-2 rounded-full transition duration-150" data-editing="false">
                         <i data-lucide="pencil" class="w-4 h-4"></i>
@@ -767,9 +950,6 @@
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>` : '';
                 
-                // ==================================================
-                // CAMBIO AQUÍ: Nueva celda (td) para la categoría
-                // ==================================================
                 tr.innerHTML = `
                     <td class="px-4 py-3 font-medium text-gray-300"><span id="client-name-${item.id}">${item.clientName || 'N/A'}</span></td>
                     <td class="px-4 py-3 font-medium text-white"><span id="sale-name-${item.id}">${item.name}</span></td>
@@ -785,9 +965,6 @@
         async function addSaleItem() {
             if (!isAdmin || !userId) { salesAuthMessage.textContent = 'Solo el admin puede registrar ventas.'; salesAuthMessage.classList.remove('hidden'); return; }
             
-            // ==================================================
-            // CAMBIO AQUÍ: Se obtiene y valida la categoría
-            // ==================================================
             const clientName = clientNameInput.value.trim() || 'Venta General';
             const name = productNameInput.value.trim();
             const price = parseFloat(productPriceInput.value.trim());
@@ -800,15 +977,12 @@
 
             addSaleBtn.disabled = true;
             try {
-                // ==================================================
-                // CAMBIO AQUÍ: Se inserta la categoría
-                // ==================================================
                 const { error } = await supabase.from('sales').insert([{ clientName, name, price, category, user_id: userId, created_at: new Date().toISOString() }]);
                 if (error) throw error;
                 
                 productNameInput.value = ''; 
                 productPriceInput.value = ''; 
-                saleCategorySelect.value = ''; // Reset select
+                saleCategorySelect.value = ''; 
                 clientNameInput.value = '';
                 
                 loadSalesData();
@@ -816,9 +990,6 @@
             } finally { addSaleBtn.disabled = false; }
         }
 
-        // ==================================================
-        // CAMBIO AQUÍ: Función actualizada para editar la categoría
-        // ==================================================
         window.toggleSaleEdit = function(event, id, currentClientName, currentName, currentPrice, currentCategory) {
             if (!isAdmin) return;
             const button = event.currentTarget; const isEditing = button.getAttribute('data-editing') === 'true';
@@ -832,7 +1003,7 @@
                 nameSpan.innerHTML = `<input type="text" id="input-sale-name-${id}" value="${currentName}" class="w-full bg-gray-600 rounded-md p-1 input-dark" />`;
                 priceSpan.innerHTML = `<input type="number" id="input-sale-price-${id}" value="${Number(currentPrice).toFixed(2)}" class="w-full bg-gray-600 rounded-md p-1 input-dark" step="0.01" />`;
                 categorySpan.innerHTML = `<select id="input-sale-category-${id}" class="w-full bg-gray-600 rounded-md p-1 input-dark">${CATEGORY_OPTIONS_HTML}</select>`;
-                document.getElementById(`input-sale-category-${id}`).value = currentCategory; // Pre-seleccionar
+                document.getElementById(`input-sale-category-${id}`).value = currentCategory; 
                 
                 button.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i>'; button.classList.remove('text-yellow-400'); button.classList.add('text-green-500'); button.setAttribute('data-editing', 'true'); lucide.createIcons();
             } else {
@@ -849,9 +1020,6 @@
             }
         }
         
-        // ==================================================
-        // CAMBIO AQUÍ: Función actualizada para guardar la categoría
-        // ==================================================
         async function updateSaleItem(id, newClientName, newName, newPrice, newCategory) {
             if (!isAdmin) return;
             const { error } = await supabase.from('sales').update({ clientName: newClientName, name: newName, price: newPrice, category: newCategory }).eq('id', id);
@@ -947,7 +1115,7 @@
                     if (event === 'SIGNED_IN') {
                         handleAuthChange(session);
                     } else if (event === 'SIGNED_OUT') {
-                        handleAuthChange(session);
+                        handleAuthChange(null);
                     }
                 });
 
