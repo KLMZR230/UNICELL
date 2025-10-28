@@ -444,6 +444,10 @@
 
             if (error) {
                 console.error("Error al subir archivo:", error);
+                // Si el bucket no se encuentra, mostramos un error más claro en la consola.
+                if (error.message.includes('Bucket not found')) {
+                    console.error("¡ERROR CRÍTICO DE CONFIGURACIÓN! El bucket 'public_assets' NO existe en Supabase Storage. Crea el bucket para que las subidas funcionen.");
+                }
                 return { data: null, error };
             }
 
@@ -543,7 +547,7 @@
             logoContainer.classList.add('group'); 
 
             if (uploadError) {
-                console.error(`Error al subir logo: ${uploadError.message}`);
+                // El error ya se registra en uploadFile, simplemente salimos.
                 return;
             }
 
