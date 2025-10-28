@@ -21,13 +21,13 @@
         .accent-text { color: var(--color-primary); }
         .input-dark { background-color: var(--color-dark); border: 1px solid rgba(var(--color-secondary), 0.3); color: var(--color-text); }
         #logo-upload-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.7); opacity: 0; transition: opacity 0.3s; cursor: pointer; border-radius: 0.5rem; }
-        #logo-container.admin-active #logo-upload-overlay { display: flex; opacity: 1; } /* Modificado para mostrar solo con admin-active */
+        #logo-container.admin-active #logo-upload-overlay { display: flex; opacity: 1; }
         #logo-container:not(.admin-active) #logo-upload-overlay { display: none; }
         
-        /* CAMBIO: Imagen de inventario más grande */
+        /* Imagen de inventario más grande (160px) */
         .inventory-image-preview {
             width: 100%;
-            height: 160px; /* <- Más grande que 120px */
+            height: 160px;
             object-fit: cover;
             border-radius: 0.5rem;
             margin-bottom: 0.5rem;
@@ -253,23 +253,21 @@
         const SUPABASE_URL = 'https://pavonviwyyjmdwwhxrzm.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhdm9udml3eXlqbWR3d2h4cnptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2MTA2MzcsImV4cCI6MjA3NzE4NjYzN30.dWGKn3MWuVHvOivh608-ZIdfVGsekdpfLu7quc42HBk';
         const ADMIN_EMAIL_REAL = 'unicell2025@gmail.com';
-        const ASSETS_BUCKET = 'public_assets'; // Asegúrate que este bucket sea PÚBLICO en Supabase Storage
+        const ASSETS_BUCKET = 'public_assets';
 
         let supabase = null;
         let userId = null;
-        let userEmail = null; // Guardaremos el email
+        let userEmail = null;
         let isAdmin = false;
 
         let logoUploadOverlayHTML = '';
         let defaultSvgHtml = '';
 
-        // Referencias del DOM (Simplificadas y relevantes)
+        // Referencias del DOM
         const adminStatusDisplay = document.getElementById('admin-status');
         const appErrorDisplay = document.getElementById('app-error-display');
         const logoContainer = document.getElementById('logo-container');
         const logoUploadOverlay = document.getElementById('logo-upload-overlay');
-
-        // Auth Modal
         const authModal = document.getElementById('auth-modal');
         const authContainer = document.getElementById('auth-container');
         const logoutContainer = document.getElementById('logout-container');
@@ -283,36 +281,28 @@
         const authMessage = document.getElementById('auth-message');
         const currentUserUidDisplay = document.getElementById('current-user-uid');
         const logoutBtn = document.getElementById('logout-btn');
-
-        // Modales y Botones Principales
         const openSalesModalBtn = document.getElementById('open-sales-modal-btn');
-        const openInventoryModalBtn = document.getElementById('open-inventory-modal-btn'); // Aunque siempre visible, necesitamos la ref
-
-        // Sales Modal Content
+        const openInventoryModalBtn = document.getElementById('open-inventory-modal-btn');
         const salesModal = document.getElementById('sales-modal');
         const salesContent = document.getElementById('sales-content');
         const salesAuthMessage = document.getElementById('sales-auth-message');
-        const salesAddFormAdmin = document.getElementById('sales-add-form-admin'); // Formulario admin
+        const salesAddFormAdmin = document.getElementById('sales-add-form-admin');
         const salesList = document.getElementById('sales-list');
         const salesTotal = document.getElementById('sales-total');
         const clientNameInput = document.getElementById('client-name');
         const productNameInput = document.getElementById('product-name');
         const productPriceInput = document.getElementById('product-price');
         const addSaleBtn = document.getElementById('add-btn');
-        const salesHeaderActions = document.getElementById('sales-header-actions'); // Cabecera acciones admin
-
-        // Inventory Modal Content
+        const salesHeaderActions = document.getElementById('sales-header-actions');
         const inventoryModal = document.getElementById('inventory-modal');
-        const inventoryContentAdmin = document.getElementById('inventory-content-admin'); // Formulario admin
+        const inventoryContentAdmin = document.getElementById('inventory-content-admin');
         const inventoryList = document.getElementById('inventory-list');
         const inventoryNameInput = document.getElementById('inventory-name');
         const inventoryPriceInput = document.getElementById('inventory-price');
         const inventoryImageFile = document.getElementById('inventory-image-file');
         const inventoryAddBtn = document.getElementById('inventory-add-btn');
         const inventoryMessage = document.getElementById('inventory-message');
-        const inventoryHeaderActions = document.getElementById('inventory-header-actions'); // Cabecera acciones admin
-
-        // Temas
+        const inventoryHeaderActions = document.getElementById('inventory-header-actions');
         const themeBtnDefault = document.getElementById('theme-btn-default');
         const themeBtnFeminine = document.getElementById('theme-btn-feminine');
         const themeBtnMasculine = document.getElementById('theme-btn-masculine');
@@ -320,10 +310,10 @@
         // --------------------------------------------------------------------------------
         // 2. UTILIDADES
         // --------------------------------------------------------------------------------
-        function initLogoTemplates() { /* ... (sin cambios) ... */
+        function initLogoTemplates() {
             const overlay = document.getElementById('logo-upload-overlay');
             const svg = document.getElementById('default-logo-svg');
-            if (overlay) { logoUploadOverlayHTML = overlay.outerHTML; /* No lo removemos */ }
+            if (overlay) { logoUploadOverlayHTML = overlay.outerHTML; }
             if (svg) { defaultSvgHtml = svg.outerHTML; }
             if (document.getElementById('current-logo') && !document.getElementById('current-logo').querySelector('img')) {
                 document.getElementById('current-logo').innerHTML = defaultSvgHtml;
@@ -332,69 +322,59 @@
         function handleGlobalError(msg) { appErrorDisplay.textContent = `Error crítico: ${msg}`; appErrorDisplay.classList.remove('hidden'); }
         function displayMessage(msg, element, type = 'error') { element.textContent = msg; element.className = type === 'success' ? 'text-center text-sm text-green-400' : 'text-center text-sm text-red-400'; setTimeout(() => { element.textContent = ''; }, 5000); }
 
-        // Función CENTRALIZADA para actualizar UI basada en si es Admin o está Logueado
         function updateUIBasedOnAuth() {
             if (isAdmin) {
                 adminStatusDisplay.classList.remove('hidden');
-                logoContainer.classList.add('admin-active'); // Activa hover para subir logo
-                logoUploadOverlay.classList.remove('hidden'); // Muestra overlay de subida
-                inventoryContentAdmin.classList.remove('hidden'); // Muestra form añadir inventario
-                inventoryHeaderActions.classList.remove('hidden'); // Muestra cabecera acciones inventario
-                salesAddFormAdmin.classList.remove('hidden'); // Muestra form añadir venta
-                salesHeaderActions.classList.remove('hidden'); // Muestra cabecera acciones venta
-                openSalesModalBtn.classList.remove('hidden'); // Asegura que el botón Ventas sea visible
+                logoContainer.classList.add('admin-active');
+                logoUploadOverlay.classList.remove('hidden');
+                inventoryContentAdmin.classList.remove('hidden');
+                inventoryHeaderActions.classList.remove('hidden');
+                salesAddFormAdmin.classList.remove('hidden');
+                salesHeaderActions.classList.remove('hidden');
+                openSalesModalBtn.classList.remove('hidden');
             } else {
                 adminStatusDisplay.classList.add('hidden');
                 logoContainer.classList.remove('admin-active');
-                logoUploadOverlay.classList.add('hidden'); // Oculta overlay de subida
+                logoUploadOverlay.classList.add('hidden');
                 inventoryContentAdmin.classList.add('hidden');
                 inventoryHeaderActions.classList.add('hidden');
                 salesAddFormAdmin.classList.add('hidden');
                 salesHeaderActions.classList.add('hidden');
-                // Botón Ventas: Visible si está logueado (no admin), oculto si no
                 if (userId) {
                     openSalesModalBtn.classList.remove('hidden');
                 } else {
                     openSalesModalBtn.classList.add('hidden');
                 }
             }
-            // Actualizar renderizados para mostrar/ocultar botones inline
-            loadInventoryData(); // Recarga inventario para mostrar/ocultar botones de fila
-            if (userId) loadSalesData(); // Recarga ventas si está logueado
+            loadInventoryData();
+            if (userId) loadSalesData();
         }
 
         // --------------------------------------------------------------------------------
-        // 3. LÓGICA DE AUTENTICACIÓN (Enfocada en mostrar/ocultar)
+        // 3. LÓGICA DE AUTENTICACIÓN
         // --------------------------------------------------------------------------------
-        function initSupabase() {
-            if (!SUPABASE_URL || !SUPABASE_ANON_KEY) { handleGlobalError('¡ERROR: Faltan la URL o la Clave de Supabase!'); return; }
-            try {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                supabase.auth.onAuthStateChange((event, session) => {
-                    handleAuthChange(session);
-                });
-            } catch (e) { console.error("Error al inicializar Supabase:", e); handleGlobalError('Error al inicializar Supabase.'); }
-        }
 
+        // CAMBIO: Esta es la función principal que maneja el estado
+        // Se llama UNA VEZ al inicio, y LUEGO cada vez que el auth cambia (login/logout)
         function handleAuthChange(session) {
-            console.log('Auth state change detected. Session:', session); // Log de depuración
+            console.log('HandleAuthChange Fired. Session:', session);
             
             if (session && session.user) {
                 userId = session.user.id;
-                userEmail = session.user.email; // Guardamos el email
-                isAdmin = (userEmail === ADMIN_EMAIL_REAL); // Verificamos si es admin
+                userEmail = session.user.email;
+                isAdmin = (userEmail === ADMIN_EMAIL_REAL);
                 currentUserUidDisplay.textContent = userEmail;
 
                 authContainer.classList.add('hidden');
                 logoutContainer.classList.remove('hidden');
 
-                // Carga datos privados (ventas)
-                salesAuthMessage.classList.add('hidden'); // Oculta mensaje de login para ventas
-                salesContent.classList.remove('hidden'); // Muestra contenedor de ventas
-                loadSalesData(); // Carga TODAS las ventas
+                salesAuthMessage.classList.add('hidden');
+                salesContent.classList.remove('hidden');
+                
+                // No llamamos a loadSalesData aquí todavía
+                // Se llama desde updateUIBasedOnAuth
 
             } else {
-                // No hay sesión
                 userId = null;
                 userEmail = null;
                 isAdmin = false;
@@ -402,19 +382,17 @@
                 authContainer.classList.remove('hidden');
                 logoutContainer.classList.add('hidden');
 
-                // Oculta contenido privado (ventas)
-                salesAuthMessage.classList.remove('hidden'); // Muestra mensaje de login para ventas
-                salesContent.classList.add('hidden'); // Oculta contenedor de ventas
-                renderSales([]); // Limpia la tabla de ventas
+                salesAuthMessage.classList.remove('hidden');
+                salesContent.classList.add('hidden');
+                renderSales([]);
             }
 
-            // --- ESTO SE EJECUTA SIEMPRE ---
-            updateUIBasedOnAuth(); // Actualiza toda la UI (botones admin, etc.)
-            loadLogo();            // Carga el logo (público)
-            loadInventoryData();   // Carga el inventario (público)
+            // Estas funciones se ejecutan después de saber quién es el usuario
+            updateUIBasedOnAuth(); // <-- Esta función ahora carga ventas e inventario
+            loadLogo();
         }
 
-        async function handleAuthSubmit(e) { /* ... (sin cambios) ... */
+        async function handleAuthSubmit(e) {
             e.preventDefault();
             const email = authEmailInput.value; const password = authPasswordInput.value;
             const isSigningUp = authTitle.textContent === 'Registrarse';
@@ -428,16 +406,16 @@
             } catch (err) { displayMessage('Error de conexión.', authMessage, 'error'); console.error(err); }
             finally { authSubmitBtn.disabled = false; }
         }
-        async function handleLogout() { /* ... (sin cambios) ... */
+        async function handleLogout() {
              const { error } = await supabase.auth.signOut();
              if (error) console.error("Error al cerrar sesión:", error.message);
-             closeModal(authModal); // onAuthStateChange hará el resto
+             closeModal(authModal); // onAuthStateChange se encargará del resto
         }
 
         // --------------------------------------------------------------------------------
-        // 4. GESTIÓN DE TEMAS (Sin cambios)
+        // 4. GESTIÓN DE TEMAS
         // --------------------------------------------------------------------------------
-        function applyTheme(themeName) { /* ... (sin cambios) ... */
+        function applyTheme(themeName) {
             document.body.classList.remove('theme-feminine', 'theme-masculine');
             const buttons = { 'default': themeBtnDefault, 'feminine': themeBtnFeminine, 'masculine': themeBtnMasculine };
             Object.values(buttons).forEach(btn => btn.classList.remove('active'));
@@ -446,7 +424,7 @@
             else { themeBtnDefault.classList.add('active'); }
             localStorage.setItem('unicell-theme', themeName);
         }
-        function loadSavedTheme() { /* ... (sin cambios) ... */
+        function loadSavedTheme() {
              const savedTheme = localStorage.getItem('unicell-theme') || 'default';
              applyTheme(savedTheme);
              themeBtnDefault.onclick = () => applyTheme('default');
@@ -455,61 +433,69 @@
         }
 
         // --------------------------------------------------------------------------------
-        // 5. GESTIÓN DE STORAGE (LOGO E INVENTARIO) (Subida solo Admin)
+        // 5. GESTIÓN DE STORAGE (LOGO E INVENTARIO)
         // --------------------------------------------------------------------------------
-        async function uploadFile(file, path) { /* ... (sin cambios) ... */
+        async function uploadFile(file, path) {
             const { data, error } = await supabase.storage.from(ASSETS_BUCKET).upload(path, file, { cacheControl: '3600', upsert: true });
             if (error) { console.error("Error al subir archivo a Storage:", error); throw new Error(`Error al subir archivo: ${error.message}`); }
             return data.path;
         }
-        function getPublicUrl(path) { /* ... (sin cambios) ... */
+        function getPublicUrl(path) {
              const { data } = supabase.storage.from(ASSETS_BUCKET).getPublicUrl(path); return `${data.publicUrl}?v=${Date.now()}`;
         }
-        async function deleteFile(path) { /* ... (sin cambios) ... */
-            if (!path || path === 'null') return; // Evitar error si no hay path
+        async function deleteFile(path) {
+            if (!path || path === 'null') return;
             const { error } = await supabase.storage.from(ASSETS_BUCKET).remove([path]);
             if (error) console.error("Error al eliminar archivo de Storage:", error);
         }
 
         async function handleLogoUpload(e) {
-            if (!isAdmin) return; // Solo admin sube
+            if (!isAdmin) return;
             const file = e.target.files[0]; if (!file) return;
             const logoDiv = document.getElementById('current-logo');
             logoDiv.innerHTML = '<div class="w-full h-full flex items-center justify-center text-pink-500 font-bold text-xs animate-pulse">Cargando...</div>';
             try {
-                if (!userId) throw new Error("Admin debe iniciar sesión."); // Necesario para asociar user_id
+                if (!userId) throw new Error("Admin debe iniciar sesión.");
                 const path = await uploadFile(file, `logo/${userId}/${Date.now()}_${file.name}`);
                 const url = getPublicUrl(path);
                 const { error: dbError } = await supabase.from('services').upsert({ id: 'logo', image_url: url, image_path: path, user_id: userId }, { onConflict: 'id' });
                 if (dbError) throw dbError;
-                loadLogo(); // Recarga para mostrar la nueva imagen
+                loadLogo();
                 displayMessage('Logo actualizado.', authMessage, 'success');
-            } catch (error) { console.error("Error al subir logo:", error); displayMessage(`Error al subir logo: ${error.message}`, authMessage, 'error'); loadLogo(); // Recarga para restaurar
+            } catch (error) { console.error("Error al subir logo:", error); displayMessage(`Error al subir logo: ${error.message}`, authMessage, 'error'); loadLogo();
             } finally { e.target.value = null; }
         }
 
-        async function loadLogo() { // Carga pública
+        async function loadLogo() {
             if (!supabase) return;
             try {
-                const { data, error } = await supabase.from('services').select('image_url').eq('id', 'logo').maybeSingle(); // maybeSingle es más eficiente
-                if (error && error.code !== 'PGRST116') throw error; // Ignora 'not found'
+                const { data, error } = await supabase.from('services').select('image_url').eq('id', 'logo').maybeSingle();
+                if (error && error.code !== 'PGRST116') throw error;
                 const logoDiv = document.getElementById('current-logo');
                 if (data && data.image_url) {
                     logoDiv.innerHTML = `<img src="${data.image_url}" class="w-full h-full object-contain rounded-lg" onerror="this.onerror=null; this.src='${defaultSvgHtml}';"><div id="logo-upload-overlay">${logoUploadOverlayHTML}</div>`;
                 } else {
-                    logoDiv.innerHTML = defaultSvgHtml + `<div id="logo-upload-overlay">${logoUploadOverlayHTML}</div>`; // Asegura que el overlay esté
+                    logoDiv.innerHTML = defaultSvgHtml + `<div id="logo-upload-overlay">${logoUploadOverlayHTML}</div>`;
                 }
-                // Reasignar handler y actualizar UI admin
                 const logoInput = document.getElementById('logo-file-input');
                 if (logoInput) logoInput.onchange = handleLogoUpload;
-                updateUIBasedOnAuth(); // Asegura que el overlay se muestre/oculte correctamente
+                
+                // Re-aplicar estado de admin al overlay
+                if(isAdmin) {
+                    logoContainer.classList.add('admin-active');
+                    document.getElementById('logo-upload-overlay').classList.remove('hidden');
+                } else {
+                    logoContainer.classList.remove('admin-active');
+                    document.getElementById('logo-upload-overlay').classList.add('hidden');
+                }
+
             } catch (error) { console.error("Error al cargar logo:", error); const logoDiv = document.getElementById('current-logo'); if(logoDiv) logoDiv.innerHTML = defaultSvgHtml; }
         }
 
         // --------------------------------------------------------------------------------
-        // 6. GESTIÓN DE INVENTARIO (Lectura pública, Escritura Admin)
+        // 6. GESTIÓN DE INVENTARIO
         // --------------------------------------------------------------------------------
-        function loadInventoryData() { // Carga pública
+        function loadInventoryData() {
             if (!supabase) return;
             supabase.from('inventory').select('*').order('name', { ascending: true })
                 .then(({ data, error }) => {
@@ -541,7 +527,7 @@
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>` : '';
                 
-                // CAMBIO: Celdas alineadas arriba (align-top) y 'Sin Foto' adaptado a 160px
+                // Celdas alineadas arriba (align-top) y 'Sin Foto' de 160px
                 tr.innerHTML = `
                     <td class="p-2 align-top">
                         ${item.image_url ? `<img src="${item.image_url}" alt="${item.name}" class="inventory-image-preview">` : `<div class="w-full h-[160px] bg-gray-600 rounded-lg flex items-center justify-center text-xs text-gray-400">Sin Foto</div>`}
@@ -554,7 +540,7 @@
             lucide.createIcons();
         }
 
-        async function addInventoryItem() { // Solo Admin
+        async function addInventoryItem() {
             if (!isAdmin || !userId) { displayMessage("Acción no permitida.", inventoryMessage); return; }
             const name = inventoryNameInput.value.trim();
             const price = parseFloat(inventoryPriceInput.value.trim());
@@ -577,7 +563,7 @@
             } finally { inventoryAddBtn.innerHTML = '<i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir Producto'; inventoryAddBtn.disabled = false; lucide.createIcons(); }
         }
 
-        window.toggleInventoryEdit = function(event, id, currentName, currentPrice) { /* ... (sin cambios, ya verifica isAdmin implícitamente por visibilidad de botones) ... */
+        window.toggleInventoryEdit = function(event, id, currentName, currentPrice) {
             if (!isAdmin) return;
             const button = event.currentTarget; const isEditing = button.getAttribute('data-editing') === 'true';
             const nameSpan = document.getElementById(`inv-name-${id}`); const priceSpan = document.getElementById(`inv-price-${id}`);
@@ -590,19 +576,18 @@
                 const newPrice = parseFloat(document.getElementById(`input-inv-price-${id}`).value.trim());
                 if (!newName || isNaN(newPrice) || newPrice <= 0) { displayMessage("Nombre y precio válidos.", inventoryMessage); return; }
                 updateInventoryItem(id, newName, newPrice);
-                // No actualizamos UI aquí, loadInventoryData lo hará
             }
         }
-        async function updateInventoryItem(id, newName, newPrice) { // Solo Admin
+        async function updateInventoryItem(id, newName, newPrice) {
              if (!isAdmin) return;
              const { error } = await supabase.from('inventory').update({ name: newName, price: newPrice, user_id: userId }).eq('id', id);
              if (error) { console.error("Error al actualizar inventario:", error); displayMessage('Error al actualizar.', inventoryMessage); }
-             loadInventoryData(); // Recarga para reflejar cambios y quitar modo edición
+             loadInventoryData();
         }
-        window.deleteInventoryItem = async function(id, imagePath) { // Solo Admin
+        window.deleteInventoryItem = async function(id, imagePath) {
             if (!isAdmin || !confirm("¿Eliminar este producto del inventario?")) return;
             try {
-                await deleteFile(imagePath); // Intenta borrar imagen primero
+                await deleteFile(imagePath);
                 const { error } = await supabase.from('inventory').delete().eq('id', id);
                 if (error) throw error;
                 displayMessage('Producto eliminado.', inventoryMessage, 'success');
@@ -611,12 +596,10 @@
         }
 
         // --------------------------------------------------------------------------------
-        // 7. GESTIÓN DE VENTAS (Lectura Logueados, Escritura Admin)
+        // 7. GESTIÓN DE VENTAS
         // --------------------------------------------------------------------------------
-        function loadSalesData() { // Carga si está logueado
-            if (!supabase || !userId) { renderSales([]); return; } // Si no hay user, limpia y sale
-
-            // Quitado el filtro .eq('user_id', userId) para ver TODAS las ventas
+        function loadSalesData() {
+            if (!supabase || !userId) { renderSales([]); return; }
             supabase.from('sales').select('*').order('created_at', { ascending: false })
                 .then(({ data, error }) => {
                     if (error) throw error;
@@ -660,7 +643,7 @@
             lucide.createIcons();
         }
 
-        async function addSaleItem() { // Solo Admin
+        async function addSaleItem() {
             if (!isAdmin || !userId) { salesAuthMessage.textContent = 'Solo el admin puede registrar ventas.'; salesAuthMessage.classList.remove('hidden'); return; }
             const clientName = clientNameInput.value.trim() || 'Venta General';
             const name = productNameInput.value.trim();
@@ -669,16 +652,15 @@
 
             addSaleBtn.disabled = true;
             try {
-                // Asociamos la venta al ID del admin que la registra
                 const { error } = await supabase.from('sales').insert([{ clientName, name, price, user_id: userId, created_at: new Date().toISOString() }]);
                 if (error) throw error;
-                productNameInput.value = ''; productPriceInput.value = ''; clientNameInput.value = ''; // Limpiar todo
+                productNameInput.value = ''; productPriceInput.value = ''; clientNameInput.value = '';
                 loadSalesData();
             } catch (e) { console.error("Error al agregar venta:", e); displayMessage(`Error: ${e.message}`, salesAuthMessage);
             } finally { addSaleBtn.disabled = false; }
         }
 
-        window.toggleSaleEdit = function(event, id, currentClientName, currentName, currentPrice) { /* ... (sin cambios, ya verifica isAdmin implícitamente) ... */
+        window.toggleSaleEdit = function(event, id, currentClientName, currentName, currentPrice) {
             if (!isAdmin) return;
             const button = event.currentTarget; const isEditing = button.getAttribute('data-editing') === 'true';
             const clientSpan = document.getElementById(`client-name-${id}`); const nameSpan = document.getElementById(`sale-name-${id}`); const priceSpan = document.getElementById(`sale-price-${id}`);
@@ -693,16 +675,15 @@
                 const newPrice = parseFloat(document.getElementById(`input-sale-price-${id}`).value.trim());
                 if (!newName || isNaN(newPrice) || newPrice <= 0) { displayMessage("Nombre y precio válidos.", salesAuthMessage); return; }
                 updateSaleItem(id, newClientName, newName, newPrice);
-                // No actualizamos UI aquí, loadSalesData lo hará
             }
         }
-        async function updateSaleItem(id, newClientName, newName, newPrice) { // Solo Admin
+        async function updateSaleItem(id, newClientName, newName, newPrice) {
             if (!isAdmin) return;
             const { error } = await supabase.from('sales').update({ clientName: newClientName, name: newName, price: newPrice }).eq('id', id);
             if (error) { console.error("Error al actualizar venta:", error); displayMessage('Error al actualizar.', salesAuthMessage); }
-             loadSalesData(); // Recarga para reflejar cambios y quitar modo edición
+             loadSalesData();
         }
-        window.deleteSaleItem = async function(id) { // Solo Admin
+        window.deleteSaleItem = async function(id) {
             if (!isAdmin || !confirm("¿Eliminar esta venta del registro?")) return;
             const { error } = await supabase.from('sales').delete().eq('id', id);
             if (error) { console.error("Error al eliminar venta:", error); displayMessage(`Error: ${error.message}`, salesAuthMessage); }
@@ -716,11 +697,10 @@
         function closeModal(modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
         document.querySelectorAll('.fixed.inset-0').forEach(modal => { modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(modal); }); });
 
-        // Auth
         document.getElementById('open-auth-modal-btn').onclick = () => openModal(authModal);
         document.getElementById('close-auth-modal').onclick = () => closeModal(authModal);
         logoutBtn.onclick = handleLogout;
-        toggleAuthModeBtn.onclick = () => { /* ... (sin cambios) ... */
+        toggleAuthModeBtn.onclick = () => {
              const isLogin = authTitle.textContent === 'Iniciar Sesión';
              authTitle.textContent = isLogin ? 'Registrarse' : 'Iniciar Sesión';
              authButtonText.textContent = isLogin ? 'Registrarse' : 'Iniciar Sesión';
@@ -728,39 +708,87 @@
         };
         loginForm.onsubmit = handleAuthSubmit;
 
-        // Inventory (Botón siempre visible, modal siempre abre)
         document.getElementById('close-inventory-modal').onclick = () => closeModal(inventoryModal);
-        inventoryAddBtn.onclick = addInventoryItem; // Función interna ya verifica isAdmin
+        inventoryAddBtn.onclick = addInventoryItem;
 
-        // Sales (Botón y modal controlados por estado de login/admin)
         openSalesModalBtn.onclick = () => {
-             if (userId) { // Solo abre si está logueado
+             if (userId) {
                  salesAuthMessage.classList.add('hidden');
                  salesContent.classList.remove('hidden');
-                 // Los datos ya se cargan/actualizan en handleAuthChange
                  openModal(salesModal);
              } else {
-                 // Si por alguna razón el botón fuera visible sin login, muestra error
                  salesAuthMessage.textContent = 'Debes iniciar sesión para acceder a las ventas.';
                  salesAuthMessage.classList.remove('hidden');
                  salesContent.classList.add('hidden');
-                 openModal(salesModal); // Abre modal para mostrar el mensaje
+                 openModal(salesModal);
              }
          };
         document.getElementById('close-sales-modal').onclick = () => closeModal(salesModal);
-        addSaleBtn.onclick = addSaleItem; // Función interna ya verifica isAdmin
+        addSaleBtn.onclick = addSaleItem;
+
 
         // --------------------------------------------------------------------------------
-        // 10. INICIALIZACIÓN
+        // 10. INICIALIZACIÓN (CAMBIO IMPORTANTE)
         // --------------------------------------------------------------------------------
+
+        /**
+         * CAMBIO: Nueva función asíncrona para inicializar Supabase.
+         * Esto EVITA el "race condition" (error de sincronización)
+         * al forzar al script a ESPERAR a que la sesión se cargue
+         * desde localStorage ANTES de pintar la UI.
+         */
+        async function initSupabaseAndSession() {
+            if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+                handleGlobalError('¡ERROR: Faltan la URL o la Clave de Supabase!');
+                return;
+            }
+            
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+                // 1. Obtenemos la sesión ACTUAL (de localStorage)
+                // Esto es clave. Esperamos (await) la respuesta.
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                
+                if (sessionError) {
+                    console.error("Error al obtener la sesión inicial:", sessionError.message);
+                    handleAuthChange(null); // Tratar como deslogueado si hay error
+                } else {
+                    // 2. Llamamos a handleAuthChange con la sesión INICIAL (sea null o válida)
+                    // Esto pinta la UI correctamente LA PRIMERA VEZ.
+                    handleAuthChange(session);
+                }
+
+                // 3. AHORA SÍ, configuramos el listener para CAMBIOS FUTUROS
+                // (Ej: el usuario cierra sesión, o inicia en otra pestaña)
+                supabase.auth.onAuthStateChange((event, session) => {
+                    console.log(`Evento de Auth detectado: ${event}`);
+                    // Solo llamamos a handleAuthChange si NO es el evento inicial,
+                    // porque ya lo manejamos arriba. (Aunque llamarlo de nuevo no haría daño)
+                    if (event !== 'INITIAL_SESSION') {
+                         handleAuthChange(session);
+                    }
+                });
+
+            } catch (e) {
+                console.error("Error crítico al inicializar Supabase:", e);
+                handleGlobalError('Error al inicializar Supabase.');
+            }
+        }
+
         
-        // CAMBIO: Revertido a window.onload. Esto asegura que todas las librerías 
-        // externas (como window.supabase) estén cargadas antes de ejecutar nuestro script.
-        window.onload = function() {
+        // El script ARRANCA aquí cuando la ventana está cargada
+        // Usamos 'async' para poder usar 'await' adentro
+        window.onload = async function() {
             initLogoTemplates();
-            initSupabase();      // Inicia Supabase y el listener de auth
-            loadSavedTheme();    // Carga el tema guardado
-            // handleAuthChange se llamará automáticamente y cargará todo lo demás
+            loadSavedTheme();
+            
+            // CAMBIO: Llamamos a la nueva función asíncrona.
+            // El script pausará aquí hasta que la sesión esté confirmada.
+            await initSupabaseAndSession();
+            
+            // Ya no es necesario llamar a nada más aquí.
+            // handleAuthChange se encargó de todo.
         };
     </script>
 </body>
