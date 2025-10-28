@@ -338,7 +338,7 @@
         // --------------------------------------------------------------------------------
 
         // =================================================================================
-        // TUS CLAVES DE SUPABASE
+        // TUS CLAVES DE SUPABASE ACTUALIZADAS SE HAN PEGADO AQUÍ:
         // =================================================================================
         const SUPABASE_URL = 'https://pavonviwyyjmdwwhxrzm.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhdm9udml3eXlqbWR3d2h4cnptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2MTA2MzcsImV4cCI6MjA3NzE4NjYzN30.dWGKn3MWuVHvOivh608-ZIdfVGsekdpfLu7quc42HBk';
@@ -404,6 +404,9 @@
         const inventoryImageFile = document.getElementById('inventory-image-file');
         const inventoryAddBtn = document.getElementById('inventory-add-btn');
         const inventoryMessage = document.getElementById('inventory-message');
+        
+        // Para gestionar el panel de edición de servicios
+        let currentServiceEditPanel = null;
 
 
         // --------------------------------------------------------------------------------
@@ -427,7 +430,7 @@
             }
             
             // Reinserta solo el SVG en el contenedor inicial si no hay imagen
-            if (logoContainer && !logoContainer.querySelector('img')) {
+            if (logoContainer && document.getElementById('current-logo') && !document.getElementById('current-logo').querySelector('img')) {
                 document.getElementById('current-logo').innerHTML = defaultSvgHtml;
             }
         }
@@ -474,6 +477,26 @@
                 element.textContent = '';
             }, 5000);
         }
+        
+        /**
+         * Alterna la visibilidad del panel de administración de un servicio.
+         * @param {string} serviceId ID del servicio.
+         */
+        window.toggleServiceAdminPanel = function(serviceId) {
+            const newPanel = document.getElementById(`admin-panel-${serviceId}`);
+            
+            // 1. Si hay un panel abierto y no es el que acabamos de tocar, lo cerramos.
+            if (currentServiceEditPanel && currentServiceEditPanel !== newPanel) {
+                currentServiceEditPanel.classList.add('hidden');
+            }
+
+            // 2. Abrimos/cerramos el panel actual.
+            if (newPanel) {
+                newPanel.classList.toggle('hidden');
+                currentServiceEditPanel = newPanel.classList.contains('hidden') ? null : newPanel;
+            }
+        };
+
 
         // --------------------------------------------------------------------------------
         // 3. LÓGICA DE AUTENTICACIÓN
@@ -617,12 +640,6 @@
          * @returns {string} La ruta completa del archivo subido.
          */
         async function uploadFile(file, path) {
-            /* NOTA IMPORTANTE RLS:
-               Si la subida falla con "new row violates row-level security policy",
-               significa que debes ir a tu panel de Supabase > Storage > Bucket: public_assets > Policies
-               y añadir una política que permita a los usuarios autenticados (auth.uid() = user_id del path)
-               ejecutar INSERT (para subida) y UPDATE (para upsert/reemplazo).
-            */
             const { data, error } = await supabase.storage
                 .from(ASSETS_BUCKET)
                 .upload(path, file, {
@@ -646,7 +663,9 @@
             const { data } = supabase.storage
                 .from(ASSETS_BUCKET)
                 .getPublicUrl(path);
-            return data.publicUrl;
+            
+            // Añadir antimáscara de caché
+            return `${data.publicUrl}?v=${Date.now()}`;
         }
         
         /**
@@ -797,28 +816,45 @@
          */
         function renderServices(services) {
             servicesGrid.innerHTML = services.map(service => {
+                
                 const adminPanel = isAdmin ? `
-                    <div class="mt-4 p-3 bg-red-900/50 rounded-lg border border-admin-border" style="z-index: 30;">
-                        <p class="text-sm font-semibold text-admin-border mb-2">Admin: Gestionar Imagen</p>
+                    <button onclick="event.stopPropagation(); toggleServiceAdminPanel('${service.id}')" 
+                            class="absolute top-2 right-2 p-2 rounded-full bg-black/70 hover:bg-black/90 text-admin-border shadow-lg z-50 transition">
+                        <i data-lucide="wrench" class="w-5 h-5"></i>
+                    </button>
+
+                    <div id="admin-panel-${service.id}" class="absolute top-0 left-0 w-full h-full bg-gray-900/95 p-6 rounded-xl hidden z-40 flex flex-col justify-center items-center">
+                        <button onclick="toggleServiceAdminPanel('${service.id}')" 
+                                class="absolute top-3 right-3 text-white hover:text-red-400">
+                            <i data-lucide="x" class="w-6 h-6"></i>
+                        </button>
+                        
+                        <p class="text-lg font-semibold text-admin-border mb-4">Gestionar Imagen de ${service.title}</p>
+                        
                         ${service.image_url ? 
-                            `<div class="flex justify-between items-center mb-2">
-                                <span class="text-xs text-gray-400">Imagen actual</span>
-                                <button onclick="deleteServiceImage('${service.id}', '${service.image_path}')" class="text-red-500 hover:text-red-400 p-1 rounded-full bg-red-900 transition duration-150">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            `<div class="text-center mb-4">
+                                <span class="text-sm text-gray-400 block mb-2">Imagen actual (Clica para eliminar)</span>
+                                <button onclick="deleteServiceImage('${service.id}', '${service.image_path}'); toggleServiceAdminPanel('${service.id}');" 
+                                        class="p-2 rounded-full bg-red-600 hover:bg-red-700 text-white shadow-md transition duration-150">
+                                    <i data-lucide="trash-2" class="w-5 h-5 mr-1"></i> Eliminar
                                 </button>
-                            </div>` : `<span class="text-xs text-gray-500 block mb-2">No hay imagen.</span>`}
-                        <input type="file" onchange="uploadServiceImage(event, '${service.id}')" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100" accept="image/*" />
+                            </div>` : `<span class="text-sm text-gray-500 block mb-4">No hay imagen.</span>`}
+                        
+                        <input type="file" onchange="uploadServiceImage(event, '${service.id}'); toggleServiceAdminPanel('${service.id}');" 
+                                class="w-full max-w-xs text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100" accept="image/*" />
                     </div>
                 ` : '';
 
                 return `
-                    <div class="service-card bg-gray-800 p-6 rounded-xl shadow-lg" 
+                    <div class="service-card bg-gray-800 p-6 rounded-xl shadow-lg relative" 
                         style="${service.image_url ? `background-image: url('${service.image_url}');` : ''}">
+                        
+                        ${adminPanel}
+
                         <div class="relative z-20">
                             <i data-lucide="${service.icon}" class="w-8 h-8 accent-text mb-3"></i>
                             <h3 class="text-xl font-semibold mb-2">${service.title}</h3>
                             <p class="text-gray-400">${service.description}</p>
-                            ${adminPanel}
                         </div>
                     </div>
                 `;
@@ -892,10 +928,6 @@
         function loadInventoryData() {
             if (!supabase || !userId || !isAdmin) return;
             
-            // Comprobación de visibilidad de la modal
-            // La visibilidad se maneja ahora en checkAdminStatus(), por lo que esta comprobación es redundante
-            // if (openInventoryModalBtn.classList.contains('hidden')) return; 
-
             supabase
                 .from('inventory')
                 .select('*')
@@ -1349,6 +1381,11 @@
         function closeModal(modal) {
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+            // Al cerrar cualquier modal, asegura que el panel de edición de servicios se oculte
+            if (currentServiceEditPanel) {
+                currentServiceEditPanel.classList.add('hidden');
+                currentServiceEditPanel = null;
+            }
         }
         
         // Cierre de modal al hacer clic fuera
@@ -1417,6 +1454,20 @@
             initLogoTemplates(); // Inicializa las plantillas antes de initSupabase
             initSupabase();
             loadServiceImages(); // Inicialmente carga para mostrar los servicios estáticos y el logo si existe
+            
+            // Listener global para cerrar paneles de servicio al hacer clic fuera
+            document.addEventListener('click', (e) => {
+                if (currentServiceEditPanel) {
+                    // Si el clic no fue dentro del panel y no fue en el botón de toggle (llave)
+                    const isPanel = currentServiceEditPanel.contains(e.target);
+                    const isToggleBtn = e.target.closest('button') && e.target.closest('button').querySelector('svg[data-lucide="wrench"]');
+
+                    if (!isPanel && !isToggleBtn) {
+                        currentServiceEditPanel.classList.add('hidden');
+                        currentServiceEditPanel = null;
+                    }
+                }
+            });
         };
     </script>
 </body>
