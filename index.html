@@ -103,8 +103,8 @@
         
         /* Estilos del selector de tema */
         .theme-btn {
-            width: 2rem;
-            height: 2rem;
+            width: 2rem; /* 32px */
+            height: 2rem; /* 32px */
             border-radius: 9999px;
             border: 3px solid #4B5563; /* Borde gris por defecto */
             cursor: pointer;
@@ -155,6 +155,13 @@
                     <i data-lucide="receipt-text" class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2"></i>
                     Ventas
                 </button>
+                
+                <div id="theme-selector-container" class="flex space-x-2 items-center">
+                    <button id="theme-btn-default" class="theme-btn" title="Tema Original"></button>
+                    <button id="theme-btn-feminine" class="theme-btn" title="Tema Femenino"></button>
+                    <button id="theme-btn-masculine" class="theme-btn" title="Tema Masculino"></button>
+                </div>
+
                 <button id="open-auth-modal-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 shadow-md flex items-center">
                     <i data-lucide="user" class="w-5 h-5"></i>
                 </button>
@@ -187,15 +194,7 @@
                 <span class="text-green-500">MODO ADMINISTRADOR ACTIVO.</span>
             </p>
             
-            <div class="mt-6">
-                <span class="text-sm text-gray-400 mb-2 block">Seleccionar Tema</span>
-                <div class="flex justify-center space-x-3">
-                    <button id="theme-btn-default" class="theme-btn" title="Tema Original"></button>
-                    <button id="theme-btn-feminine" class="theme-btn" title="Tema Femenino"></button>
-                    <button id="theme-btn-masculine" class="theme-btn" title="Tema Masculino"></button>
-                </div>
-            </div>
-        </footer>
+            </footer>
 
     </div>
     
@@ -487,12 +486,8 @@
             }, 5000);
         }
         
-        // --- Funciones de Servicios Eliminadas ---
-        // window.toggleServiceAdminPanel ya no existe.
-
-
         // --------------------------------------------------------------------------------
-        // 3. LÓGICA DE AUTENTICACIÓN
+        // 3. LÓGICA DE AUTENTICACIÓN (CORREGIDA)
         // --------------------------------------------------------------------------------
 
         /**
@@ -507,20 +502,15 @@
             try {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 
-                // Listener de cambios de sesión
+                // Listener de cambios de sesión (CORREGIDO)
+                // Esta única función maneja todo: carga inicial, inicio de sesión y cierre de sesión.
                 supabase.auth.onAuthStateChange((event, session) => {
                     handleAuthChange(session);
                 });
                 
-                // Intenta obtener la sesión inicial
-                supabase.auth.getSession().then(({ data: { session } }) => {
-                    handleAuthChange(session);
-                }).catch(err => {
-                    // Manejo de error de clave API en la carga inicial
-                    if (err.message && err.message.includes('Invalid API key')) {
-                        handleGlobalError('CLAVE API INVÁLIDA. Revisa tus credenciales en el código.');
-                    }
-                });
+                // --- SE ELIMINÓ LA LLAMADA A getSession() ---
+                // La llamada duplicada a getSession() y onAuthStateChange causaba
+                // el error de cierre de sesión automático (condición de carrera).
 
             } catch (e) {
                 console.error("Error al inicializar Supabase:", e);
@@ -545,7 +535,7 @@
                 checkAdminStatus(); 
 
                 // Carga los datos solo después de autenticación
-                loadLogo(); // <- Modificado
+                loadLogo();
                 loadSalesData();
                 loadInventoryData();
                 
@@ -567,7 +557,7 @@
                 renderInventory([]); // Limpia la lista de inventario
                 
                 // Carga solo el logo
-                loadLogo(); // <- Modificado
+                loadLogo();
             }
         }
 
@@ -596,7 +586,7 @@
                     displayMessage(response.error.message, authMessage, 'error');
                 } else {
                     displayMessage('Éxito. Cerrando modal...', authMessage, 'success');
-                    // handleAuthChange se encargará del resto
+                    // handleAuthChange (el listener) se encargará del resto
                     setTimeout(() => closeModal(authModal), 1000);
                 }
 
@@ -616,12 +606,12 @@
             if (error) {
                 console.error("Error al cerrar sesión:", error.message);
             }
-            // handleAuthChange manejará el resto
+            // handleAuthChange (el listener) manejará el resto
             closeModal(authModal);
         }
         
         // --------------------------------------------------------------------------------
-        // 4. GESTIÓN DE TEMAS (NUEVO)
+        // 4. GESTIÓN DE TEMAS
         // --------------------------------------------------------------------------------
         
         /**
@@ -765,7 +755,7 @@
                 e.target.value = null;
                 // Si falló la subida, recargar el logo
                 if (logoContainer.querySelector('div') && logoContainer.querySelector('div').textContent.includes('Cargando')) {
-                   loadLogo(); // <- Modificado
+                   loadLogo();
                 }
             }
         }
@@ -784,9 +774,7 @@
                     .eq('id', 'logo'); // Solo trae el logo
 
                 if (error) {
-                    // Si la tabla 'services' no existe, o hay otro error (ej. RLS),
-                    // simplemente mostramos el logo por defecto y continuamos.
-                    console.warn("Advertencia al cargar logo (puede ser normal si la tabla no existe o RLS está activo):", error.message);
+                    console.warn("Advertencia al cargar logo:", error.message);
                 }
 
                 const logoItem = data && data.length > 0 ? data[0] : null;
@@ -806,7 +794,6 @@
 
             } catch (error) {
                 console.error("Error fatal al cargar logo de Supabase:", error);
-                // Si falla, al menos muestra el logo por defecto
                 const logoContainer = document.getElementById('current-logo');
                 if(logoContainer) {
                     logoContainer.innerHTML = `${defaultSvgHtml}${logoUploadOverlayHTML}`;
@@ -816,12 +803,9 @@
             }
         }
         
-        // --- Funciones de renderServices, uploadServiceImage, deleteServiceImage eliminadas ---
-
-
         // --------------------------------------------------------------------------------
         // 6. GESTIÓN DE INVENTARIO (CRUD)
-        // (Sin cambios, esta sección es funcional)
+        // (Sin cambios)
         // --------------------------------------------------------------------------------
 
         function loadInventoryData() {
@@ -996,7 +980,7 @@
 
         // --------------------------------------------------------------------------------
         // 7. GESTIÓN DE VENTAS (CRUD)
-        // (Sin cambios, esta sección es funcional)
+        // (Sin cambios)
         // --------------------------------------------------------------------------------
 
         function loadSalesData() {
@@ -1190,9 +1174,7 @@
         // Eventos de Autenticación
         document.getElementById('open-auth-modal-btn').onclick = () => {
             openModal(authModal);
-            if (userId) {
-                supabase.auth.getSession().then(res => handleAuthChange(res.data.session));
-            }
+            // Ya no es necesario recargar la sesión aquí, el listener se encarga
         };
         document.getElementById('close-auth-modal').onclick = () => closeModal(authModal);
         document.getElementById('logout-btn').onclick = handleLogout;
@@ -1209,7 +1191,7 @@
             if (isAdmin) {
                 inventoryAuthMessage.classList.add('hidden');
                 inventoryContent.classList.remove('hidden');
-                loadInventoryData();
+                // loadInventoryData(); // handleAuthChange ya lo hace al inicio
             } else {
                 inventoryAuthMessage.classList.remove('hidden');
                 inventoryContent.classList.add('hidden');
@@ -1224,7 +1206,7 @@
             if (userId) {
                 salesAuthMessage.classList.add('hidden');
                 salesContent.classList.remove('hidden');
-                loadSalesData();
+                // loadSalesData(); // handleAuthChange ya lo hace al inicio
             } else {
                 salesAuthMessage.classList.remove('hidden');
                 salesContent.classList.add('hidden');
@@ -1234,14 +1216,15 @@
         document.getElementById('close-sales-modal').onclick = () => closeModal(document.getElementById('sales-modal'));
         addSaleBtn.onclick = addSaleItem;
         
-        // Inicialización al cargar la ventana
+        // Inicialización al cargar la ventana (CORREGIDA)
         window.onload = function() {
-            initLogoTemplates(); // Inicializa las plantillas antes de initSupabase
-            initSupabase();
-            loadLogo(); // Inicialmente carga el logo
-            loadSavedTheme(); // Carga el tema guardado
+            initLogoTemplates(); // Inicializa las plantillas
+            initSupabase();      // Inicializa Supabase y el listener de auth
+            loadSavedTheme();    // Carga el tema guardado
             
-            // Listener de servicios eliminado
+            // --- SE ELIMINÓ la llamada a loadLogo() ---
+            // handleAuthChange() se encargará de llamar a loadLogo() 
+            // en el momento correcto (después de saber si hay sesión o no).
         };
     </script>
 </body>
