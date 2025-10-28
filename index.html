@@ -354,8 +354,6 @@
         // 3. LÓGICA DE AUTENTICACIÓN
         // --------------------------------------------------------------------------------
 
-        // CAMBIO: Esta es la función principal que maneja el estado
-        // Se llama UNA VEZ al inicio, y LUEGO cada vez que el auth cambia (login/logout)
         function handleAuthChange(session) {
             console.log('HandleAuthChange Fired. Session:', session);
             
@@ -370,9 +368,6 @@
 
                 salesAuthMessage.classList.add('hidden');
                 salesContent.classList.remove('hidden');
-                
-                // No llamamos a loadSalesData aquí todavía
-                // Se llama desde updateUIBasedOnAuth
 
             } else {
                 userId = null;
@@ -387,8 +382,7 @@
                 renderSales([]);
             }
 
-            // Estas funciones se ejecutan después de saber quién es el usuario
-            updateUIBasedOnAuth(); // <-- Esta función ahora carga ventas e inventario
+            updateUIBasedOnAuth();
             loadLogo();
         }
 
@@ -409,7 +403,7 @@
         async function handleLogout() {
              const { error } = await supabase.auth.signOut();
              if (error) console.error("Error al cerrar sesión:", error.message);
-             closeModal(authModal); // onAuthStateChange se encargará del resto
+             closeModal(authModal);
         }
 
         // --------------------------------------------------------------------------------
@@ -480,7 +474,6 @@
                 const logoInput = document.getElementById('logo-file-input');
                 if (logoInput) logoInput.onchange = handleLogoUpload;
                 
-                // Re-aplicar estado de admin al overlay
                 if(isAdmin) {
                     logoContainer.classList.add('admin-active');
                     document.getElementById('logo-upload-overlay').classList.remove('hidden');
@@ -527,7 +520,6 @@
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>` : '';
                 
-                // Celdas alineadas arriba (align-top) y 'Sin Foto' de 160px
                 tr.innerHTML = `
                     <td class="p-2 align-top">
                         ${item.image_url ? `<img src="${item.image_url}" alt="${item.name}" class="inventory-image-preview">` : `<div class="w-full h-[160px] bg-gray-600 rounded-lg flex items-center justify-center text-xs text-gray-400">Sin Foto</div>`}
@@ -633,9 +625,9 @@
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>` : '';
                 tr.innerHTML = `
-                    <td class="px-4 py-3 font-medium text-gray-300"><span id="client-name-${item.id}">${item.clientName || 'N/A'}</span></td>
-                    <td class="px-4 py-3 font-medium text-white"><span id="sale-name-${item.id}">${item.name}</span></td>
-                    <td class="px-4 py-3 text-white"><span id="sale-price-${item.id}">$${Number(item.price || 0).toFixed(2)}</span></td>
+                    <td class="px-4 py-3 font-medium text-gray-300"><span id="client-name-${id}">${item.clientName || 'N/A'}</span></td>
+                    <td class="px-4 py-3 font-medium text-white"><span id="sale-name-${id}">${item.name}</span></td>
+                    <td class="px-4 py-3 text-white"><span id="sale-price-${id}">$${Number(item.price || 0).toFixed(2)}</span></td>
                     <td class="px-4 py-3 text-right space-x-2">${adminButtons}</td>`;
                 salesList.appendChild(tr);
             });
@@ -728,14 +720,12 @@
 
 
         // --------------------------------------------------------------------------------
-        // 10. INICIALIZACIÓN (CAMBIO IMPORTANTE)
+        // 10. INICIALIZACIÓN
         // --------------------------------------------------------------------------------
 
         /**
-         * CAMBIO: Nueva función asíncrona para inicializar Supabase.
-         * Esto EVITA el "race condition" (error de sincronización)
-         * al forzar al script a ESPERAR a que la sesión se cargue
-         * desde localStorage ANTES de pintar la UI.
+         * CAMBIO: Esta es la función asíncrona que arregla el 'race condition'
+         * Y el bucle de 'TOKEN_REFRESHED'.
          */
         async function initSupabaseAndSession() {
             if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
@@ -747,7 +737,7 @@
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
                 // 1. Obtenemos la sesión ACTUAL (de localStorage)
-                // Esto es clave. Esperamos (await) la respuesta.
+                // Esperamos (await) la respuesta antes de continuar.
                 const { data: { session }, error: sessionError } = await supabase.auth.getSession();
                 
                 if (sessionError) {
@@ -760,14 +750,19 @@
                 }
 
                 // 3. AHORA SÍ, configuramos el listener para CAMBIOS FUTUROS
-                // (Ej: el usuario cierra sesión, o inicia en otra pestaña)
                 supabase.auth.onAuthStateChange((event, session) => {
                     console.log(`Evento de Auth detectado: ${event}`);
-                    // Solo llamamos a handleAuthChange si NO es el evento inicial,
-                    // porque ya lo manejamos arriba. (Aunque llamarlo de nuevo no haría daño)
-                    if (event !== 'INITIAL_SESSION') {
-                         handleAuthChange(session);
+
+                    // ===== ESTA ES LA CORRECCIÓN MÁS IMPORTANTE =====
+                    // Solo reaccionamos a los eventos que cambian el estado de sesión.
+                    // IGNORAMOS 'TOKEN_REFRESHED' para romper el bucle infinito.
+                    if (event === 'SIGNED_IN') {
+                        handleAuthChange(session);
+                    } else if (event === 'SIGNED_OUT') {
+                        handleAuthChange(null); // Importante pasar null para desloguear
                     }
+                    // No hacer nada en 'TOKEN_REFRESHED' o 'INITIAL_SESSION'
+                    // rompe el bucle y evita trabajo doble.
                 });
 
             } catch (e) {
@@ -778,17 +773,13 @@
 
         
         // El script ARRANCA aquí cuando la ventana está cargada
-        // Usamos 'async' para poder usar 'await' adentro
         window.onload = async function() {
             initLogoTemplates();
             loadSavedTheme();
             
-            // CAMBIO: Llamamos a la nueva función asíncrona.
+            // Llamamos a la nueva función asíncrona.
             // El script pausará aquí hasta que la sesión esté confirmada.
             await initSupabaseAndSession();
-            
-            // Ya no es necesario llamar a nada más aquí.
-            // handleAuthChange se encargó de todo.
         };
     </script>
 </body>
