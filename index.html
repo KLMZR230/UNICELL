@@ -225,7 +225,7 @@
             <h2 class="text-3xl font-bold text-center mb-6 text-white flex items-center justify-center">
                 <i data-lucide="package" class="w-7 h-7 accent-text mr-3"></i>
                 Inventario de Productos
-            </h2>
+            </h2 >
             <p id="inventory-auth-message" class="text-center p-4 text-red-400 hidden">Necesitas iniciar sesión como administrador para gestionar el inventario.</p>
 
             <div id="inventory-content" class="hidden">
@@ -356,6 +356,11 @@
         let isAdmin = false;
         let currentEditingItemId = null; // Para Inventario
         
+        // Variables globales para la plantilla del logo (para evitar el error de onchange)
+        let logoUploadOverlayHTML = '';
+        let defaultSvgHtml = '';
+
+        
         // Referencias del DOM
         const servicesGrid = document.getElementById('services-grid');
         const adminStatusDisplay = document.getElementById('admin-status');
@@ -379,8 +384,7 @@
         const currentUserUidDisplay = document.getElementById('current-user-uid');
         const logoutBtn = document.getElementById('logout-btn');
 
-        // Elementos de la Modal de Ventas e Inventario (SOLUCIÓN AL ReferenceError)
-        // Se mueven a una posición más alta para asegurar que estén disponibles antes de ser usadas en loadData
+        // Elementos de la Modal de Ventas e Inventario
         const openSalesModalBtn = document.getElementById('open-sales-modal-btn');
         const openInventoryModalBtn = document.getElementById('open-inventory-modal-btn');
 
@@ -407,6 +411,28 @@
         // --------------------------------------------------------------------------------
 
         /**
+         * Inicializa las plantillas HTML para la restauración del logo.
+         */
+        function initLogoTemplates() {
+            const logoContainer = document.getElementById('logo-container');
+            const overlay = document.getElementById('logo-upload-overlay');
+            const svg = document.getElementById('default-logo-svg');
+
+            if (overlay) {
+                logoUploadOverlayHTML = overlay.outerHTML;
+                overlay.remove(); // Elimina el overlay temporalmente de la estructura del contenedor
+            }
+            if (svg) {
+                defaultSvgHtml = svg.outerHTML;
+            }
+            
+            // Reinserta solo el SVG en el contenedor inicial si no hay imagen
+            if (logoContainer && !logoContainer.querySelector('img')) {
+                document.getElementById('current-logo').innerHTML = defaultSvgHtml;
+            }
+        }
+
+        /**
          * Maneja errores a nivel global y los muestra en la interfaz.
          * @param {string} msg Mensaje de error.
          */
@@ -421,14 +447,16 @@
          */
         function checkAdminStatus() {
             isAdmin = (userId === ADMIN_ID_REAL);
+            const logoContainer = document.getElementById('logo-container');
+
             if (isAdmin) {
                 adminStatusDisplay.classList.remove('hidden');
                 openInventoryModalBtn.classList.remove('hidden');
-                document.getElementById('logo-container').classList.add('admin-active');
+                logoContainer.classList.add('admin-active');
             } else {
                 adminStatusDisplay.classList.add('hidden');
                 openInventoryModalBtn.classList.add('hidden');
-                document.getElementById('logo-container').classList.remove('admin-active');
+                logoContainer.classList.remove('admin-active');
             }
             return isAdmin;
         }
@@ -589,6 +617,12 @@
          * @returns {string} La ruta completa del archivo subido.
          */
         async function uploadFile(file, path) {
+            /* NOTA IMPORTANTE RLS:
+               Si la subida falla con "new row violates row-level security policy",
+               significa que debes ir a tu panel de Supabase > Storage > Bucket: public_assets > Policies
+               y añadir una política que permita a los usuarios autenticados (auth.uid() = user_id del path)
+               ejecutar INSERT (para subida) y UPDATE (para upsert/reemplazo).
+            */
             const { data, error } = await supabase.storage
                 .from(ASSETS_BUCKET)
                 .upload(path, file, {
@@ -653,10 +687,12 @@
                 if (dbError) throw dbError;
 
                 // Actualizar la interfaz inmediatamente
-                logoContainer.innerHTML = `<img src="${url}" class="w-full h-full object-contain rounded-lg" onerror="this.onerror=null; this.src='/placeholder.png';"/>`;
+                logoContainer.innerHTML = `<img src="${url}" class="w-full h-full object-contain rounded-lg" onerror="this.onerror=null; this.src='/placeholder.png';"/>${logoUploadOverlayHTML}`;
                 
+                // Reasignar el handler de nuevo
+                document.getElementById('logo-file-input').onchange = handleLogoUpload;
+
                 displayMessage('Logo actualizado con éxito.', authMessage, 'success');
-                setTimeout(() => authMessage.textContent = '', 3000);
 
             } catch (error) {
                 console.error("Error al subir logo:", error);
@@ -703,10 +739,10 @@
                         renderServices(defaultServices);
                         return;
                     }
-                    // FIX: Manejo del error 42703 (columna no existe)
+                    // Manejo del error 42703 (columna no existe)
                     if (error.code === '42703') { 
-                        console.error("Error 42703: La columna 'image_path' o 'image_url' no existe. Por favor, asegúrate de que existan en la tabla 'services'. Renderizando estático.");
-                        renderServices(defaultServices); // Renderiza estático para evitar fallos
+                        console.error("Error 42703: La columna 'image_path' o 'image_url' no existe. Renderizando estático.");
+                        renderServices(defaultServices); 
                         return;
                     }
                     if (error.message && error.message.includes('Invalid API key')) {
@@ -736,16 +772,15 @@
                 const logoContainer = document.getElementById('current-logo');
                 
                 if (logoItem && logoItem.image_url) {
-                    logoContainer.innerHTML = `<img src="${logoItem.image_url}" class="w-full h-full object-contain rounded-lg" onerror="this.onerror=null; this.src='/placeholder.png';"/>`;
+                    // Si hay imagen, usa la imagen y añade el overlay para subir otra
+                    logoContainer.innerHTML = `<img src="${logoItem.image_url}" class="w-full h-full object-contain rounded-lg" onerror="this.onerror=null; this.src='/placeholder.png';"/>${logoUploadOverlayHTML}`;
                 } else {
-                    // Restaurar el SVG por defecto si no hay logo
-                    logoContainer.innerHTML = `<svg id="default-logo-svg" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 sm:w-12 sm:h-12 accent-text" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 20a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" opacity=".2"/><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" fill="var(--color-primary)"/><path d="M16 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM10 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/><path d="M12 14v-2" stroke-width="3"/>
-                    </svg>`;
+                    // Si no hay imagen, usa el SVG por defecto y añade el overlay
+                    logoContainer.innerHTML = `${defaultSvgHtml}${logoUploadOverlayHTML}`;
                 }
 
                 renderServices(servicesWithImages);
-                // Volver a enlazar el handler del logo después de renderizar el logo
+                // FIX: Re-asigna el event handler aquí, garantizando que el input exista
                 document.getElementById('logo-file-input').onchange = handleLogoUpload;
 
 
@@ -1375,11 +1410,11 @@
         addSaleBtn.onclick = addSaleItem;
         
         // Evento de Subida de Logo (Fuera del módulo para ser re-asignado)
-        document.getElementById('logo-file-input').onchange = handleLogoUpload;
-
+        // Se inicializa en loadServiceImages
 
         // Inicialización al cargar la ventana
         window.onload = function() {
+            initLogoTemplates(); // Inicializa las plantillas antes de initSupabase
             initSupabase();
             loadServiceImages(); // Inicialmente carga para mostrar los servicios estáticos y el logo si existe
         };
