@@ -17,14 +17,26 @@
         :root { --color-primary: #FF4545; --color-secondary: #E91E63; --color-dark: #1F2937; --color-darker: #111827; --color-text: #E5E7EB; --admin-border: #00FF00; --color-primary-gradient: rgba(255, 69, 69, 0.1); --color-secondary-gradient: rgba(233, 30, 99, 0.1); }
         body.theme-feminine { --color-primary: #F472B6; --color-secondary: #EC4899; --color-dark: #374151; --color-darker: #1F2937; --color-text: #F3F4F6; --admin-border: #A7F3D0; --color-primary-gradient: rgba(244, 114, 182, 0.1); --color-secondary-gradient: rgba(236, 72, 153, 0.1); }
         body.theme-masculine { --color-primary: #3B82F6; --color-secondary: #2563EB; --color-dark: #1F2937; --color-darker: #111827; --color-text: #F9FAFB; --admin-border: #34D399; --color-primary-gradient: rgba(59, 130, 246, 0.1); --color-secondary-gradient: rgba(37, 99, 235, 0.1); }
+        
         body { font-family: 'Inter', sans-serif; background-color: var(--color-darker); color: var(--color-text); background-image: radial-gradient(at top left, var(--color-primary-gradient), transparent 50%), radial-gradient(at bottom right, var(--color-secondary-gradient), transparent 50%); min-height: 100vh; }
         .accent-text { color: var(--color-primary); }
-        .input-dark { background-color: var(--color-dark); border: 1px solid rgba(var(--color-secondary), 0.3); color: var(--color-text); }
+
+        /* CAMBIO: "Remarcado siempre" - El borde ahora usa el color primario y es visible por defecto */
+        .input-dark { 
+            background-color: var(--color-dark); 
+            border: 1px solid var(--color-primary); /* <-- "Remarcado siempre" */
+            color: var(--color-text); 
+        }
+
+        /* CAMBIO: Nueva regla para que el anillo de foco use el color del tema */
+        .focus\:ring-primary:focus {
+            --tw-ring-color: var(--color-primary) !important;
+        }
+
         #logo-upload-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.7); opacity: 0; transition: opacity 0.3s; cursor: pointer; border-radius: 0.5rem; }
         #logo-container.admin-active #logo-upload-overlay { display: flex; opacity: 1; }
         #logo-container:not(.admin-active) #logo-upload-overlay { display: none; }
         
-        /* Imagen de inventario más grande (160px) */
         .inventory-image-preview {
             width: 100%;
             height: 160px;
@@ -40,7 +52,7 @@
 </head>
 <body class="p-4">
 
-    <div class="max-w-4xl mx-auto py-8">
+    <div class="max-w-6xl mx-auto py-8">
 
         <header class="mb-16 pt-4 relative flex justify-between items-start sm:items-center">
 
@@ -120,8 +132,8 @@
             <div id="auth-container">
                 <h2 class="text-2xl font-bold text-center mb-6 text-white" id="auth-title">Iniciar Sesión</h2>
                 <form id="login-form" class="space-y-4">
-                    <input id="auth-email" type="email" placeholder="Correo Electrónico" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500" required />
-                    <input id="auth-password" type="password" placeholder="Contraseña" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500" required />
+                    <input id="auth-email" type="email" placeholder="Correo Electrónico" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary" required />
+                    <input id="auth-password" type="password" placeholder="Contraseña" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary" required />
                     <button type="submit" id="auth-submit-btn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center">
                         <i data-lucide="log-in" class="w-5 h-5 mr-2"></i>
                         <span id="auth-button-text">Iniciar Sesión</span>
@@ -143,7 +155,7 @@
     </div>
 
     <div id="inventory-modal" class="fixed inset-0 z-40 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4">
-        <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-pink-500/50 max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300">
+        <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-pink-500/50 max-w-6xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300">
             <button id="close-inventory-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
                 <i data-lucide="x" class="w-7 h-7"></i>
             </button>
@@ -157,11 +169,11 @@
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
                     <div class="sm:col-span-1">
                         <label class="text-gray-400 text-sm">Nombre</label>
-                        <input id="inventory-name" type="text" placeholder="Nombre del Producto" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500" />
+                        <input id="inventory-name" type="text" placeholder="Nombre del Producto" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary" />
                     </div>
                     <div class="sm:col-span-1">
                         <label class="text-gray-400 text-sm">Precio</label>
-                        <input id="inventory-price" type="number" placeholder="Precio (Ej: 150.00)" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500" step="0.01" />
+                        <input id="inventory-price" type="number" placeholder="Precio (Ej: 150.00)" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary" step="0.01" />
                     </div>
                     <div class="sm:col-span-1">
                         <label class="text-gray-400 text-sm">Foto (Opcional)</label>
@@ -194,7 +206,7 @@
     </div>
 
     <div id="sales-modal" class="fixed inset-0 z-40 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4">
-        <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-pink-500/50 max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300">
+        <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-pink-500/50 max-w-6xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300">
             <button id="close-sales-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
                 <i data-lucide="x" class="w-7 h-7"></i>
             </button>
@@ -207,10 +219,10 @@
             <div id="sales-content"> <div id="sales-add-form-admin" class="hidden mb-8 p-4 bg-gray-800 rounded-lg shadow-inner">
                     <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir Nuevo Artículo</h3>
                     <label class="text-gray-400 text-sm mb-1 block">Destinatario/Cliente</label>
-                    <input id="client-name" type="text" placeholder="Nombre del Destinatario" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500 mb-4" />
+                    <input id="client-name" type="text" placeholder="Nombre del Destinatario" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary mb-4" />
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <input id="product-name" type="text" placeholder="Nombre del Producto/Servicio" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500" />
-                        <input id="product-price" type="number" placeholder="Precio (Ej: 150.00)" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-pink-500" step="0.01" />
+                        <input id="product-name" type="text" placeholder="Nombre del Producto/Servicio" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary" />
+                        <input id="product-price" type="number" placeholder="Precio (Ej: 150.00)" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary" step="0.01" />
                         <button id="add-btn" class="col-span-1 bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center disabled:opacity-50">
                             <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir a Venta
                         </button>
@@ -282,7 +294,6 @@
         const currentUserUidDisplay = document.getElementById('current-user-uid');
         const logoutBtn = document.getElementById('logout-btn');
         const openSalesModalBtn = document.getElementById('open-sales-modal-btn');
-        // const openInventoryModalBtn = document.getElementById('open-inventory-modal-btn'); // Ya no se necesita aquí
         const salesModal = document.getElementById('sales-modal');
         const salesContent = document.getElementById('sales-content');
         const salesAuthMessage = document.getElementById('sales-auth-message');
@@ -598,7 +609,7 @@
                     renderSales(data || []);
                 })
                 .catch(err => {
-                    console.error("Error al cargar ventas:", err);
+                    console.error("Error al cargar ventas:", err.message); // Imprime el mensaje de error
                     salesList.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-400">Error al cargar ventas.</td></tr>';
                      if (err.message.includes("does not exist")) handleGlobalError("La tabla 'sales' no existe en Supabase.");
                     else if (err.message.includes("permission denied")) handleGlobalError("Permisos incorrectos para leer 'sales'. Revisa las Políticas RLS.");
@@ -625,7 +636,6 @@
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>` : '';
                 
-                // Si 'item.id' no existe, esto fallará (Error 3)
                 tr.innerHTML = `
                     <td class="px-4 py-3 font-medium text-gray-300"><span id="client-name-${item.id}">${item.clientName || 'N/A'}</span></td>
                     <td class="px-4 py-3 font-medium text-white"><span id="sale-name-${item.id}">${item.name}</span></td>
@@ -646,7 +656,6 @@
 
             addSaleBtn.disabled = true;
             try {
-                // Esto falla si las columnas no existen en Supabase (Error 2)
                 const { error } = await supabase.from('sales').insert([{ clientName, name, price, user_id: userId, created_at: new Date().toISOString() }]);
                 if (error) throw error;
                 productNameInput.value = ''; productPriceInput.value = ''; clientNameInput.value = '';
