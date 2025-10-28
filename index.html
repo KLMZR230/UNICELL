@@ -193,8 +193,7 @@
             <p id="admin-status" class="text-xs mt-2 italic hidden">
                 <span class="text-green-500">MODO ADMINISTRADOR ACTIVO.</span>
             </p>
-            
-            </footer>
+        </footer>
 
     </div>
     
@@ -222,7 +221,7 @@
             </div>
             
             <div id="logout-container" class="hidden text-center">
-                <p class="text-lg text-white mb-4">Sesión Iniciada como Admin.</p>
+                <p class="text-lg text-white mb-4">Sesión Iniciada.</p>
                 <p id="current-user-uid" class="text-xs text-gray-500 mb-6 font-mono break-all"></p>
                 <button id="logout-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center">
                     <i data-lucide="log-out" class="w-5 h-5 mr-2"></i> Cerrar Sesión
@@ -351,8 +350,8 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhdm9udml3eXlqbWR3d2h4cnptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2MTA2MzcsImV4cCI6MjA3NzE4NjYzN30.dWGKn3MWuVHvOivh608-ZIdfVGsekdpfLu7quc42HBk';
         // =================================================================================
 
-        // ID del Administrador (PROPORCIONADO POR EL USUARIO)
-        const ADMIN_ID_REAL = '7ca7875e-6ddb-4aff-939d-a448b422b0e1'; 
+        // Correo del Administrador (PROPORCIONADO POR EL USUARIO)
+        const ADMIN_EMAIL_REAL = 'unicell2025@gmail.com'; // <-- ¡ACTUALIZADO!
         
         // Buckets de Storage
         const ASSETS_BUCKET = 'public_assets';
@@ -362,7 +361,7 @@
         let userId = null;
         let isAdmin = false;
         
-        // Variables globales para la plantilla del logo (para evitar el error de onchange)
+        // Variables globales para la plantilla del logo
         let logoUploadOverlayHTML = '';
         let defaultSvgHtml = '';
 
@@ -373,7 +372,7 @@
         const inventoryAuthMessage = document.getElementById('inventory-auth-message');
         const salesContent = document.getElementById('sales-content');
         const salesAuthMessage = document.getElementById('sales-auth-message');
-        const appErrorDisplay = document.getElementById('app-error-display'); // Nuevo elemento para errores globales
+        const appErrorDisplay = document.getElementById('app-error-display'); 
         
         // Elementos del Modal de Autenticación
         const authModal = document.getElementById('auth-modal');
@@ -381,7 +380,7 @@
         const logoutContainer = document.getElementById('logout-container');
         const authTitle = document.getElementById('auth-title');
         const authButtonText = document.getElementById('auth-button-text');
-        const authSubmitBtn = document.getElementById('auth-submit-btn'); // Añadida referencia
+        const authSubmitBtn = document.getElementById('auth-submit-btn'); 
         const toggleAuthModeBtn = document.getElementById('toggle-auth-mode');
         const loginForm = document.getElementById('login-form');
         const authEmailInput = document.getElementById('auth-email');
@@ -411,7 +410,7 @@
         const inventoryAddBtn = document.getElementById('inventory-add-btn');
         const inventoryMessage = document.getElementById('inventory-message');
         
-        // Elementos del selector de tema (NUEVO)
+        // Elementos del selector de tema
         const themeBtnDefault = document.getElementById('theme-btn-default');
         const themeBtnFeminine = document.getElementById('theme-btn-feminine');
         const themeBtnMasculine = document.getElementById('theme-btn-masculine');
@@ -431,13 +430,12 @@
 
             if (overlay) {
                 logoUploadOverlayHTML = overlay.outerHTML;
-                overlay.remove(); // Elimina el overlay temporalmente de la estructura del contenedor
+                overlay.remove(); 
             }
             if (svg) {
                 defaultSvgHtml = svg.outerHTML;
             }
             
-            // Reinserta solo el SVG en el contenedor inicial si no hay imagen
             if (logoContainer && document.getElementById('current-logo') && !document.getElementById('current-logo').querySelector('img')) {
                 document.getElementById('current-logo').innerHTML = defaultSvgHtml;
             }
@@ -450,26 +448,6 @@
         function handleGlobalError(msg) {
             appErrorDisplay.textContent = `Error crítico: ${msg}`;
             appErrorDisplay.classList.remove('hidden');
-        }
-
-        /**
-         * Verifica si el usuario actual es el administrador.
-         * @returns {boolean}
-         */
-        function checkAdminStatus() {
-            isAdmin = (userId === ADMIN_ID_REAL);
-            const logoContainer = document.getElementById('logo-container');
-
-            if (isAdmin) {
-                adminStatusDisplay.classList.remove('hidden');
-                openInventoryModalBtn.classList.remove('hidden');
-                logoContainer.classList.add('admin-active');
-            } else {
-                adminStatusDisplay.classList.add('hidden');
-                openInventoryModalBtn.classList.add('hidden');
-                logoContainer.classList.remove('admin-active');
-            }
-            return isAdmin;
         }
 
         /**
@@ -487,7 +465,7 @@
         }
         
         // --------------------------------------------------------------------------------
-        // 3. LÓGICA DE AUTENTICACIÓN (CORREGIDA)
+        // 3. LÓGICA DE AUTENTICACIÓN (VERSIÓN ESTABLE Y MODIFICADA)
         // --------------------------------------------------------------------------------
 
         /**
@@ -502,15 +480,11 @@
             try {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 
-                // Listener de cambios de sesión (CORREGIDO)
-                // Esta única función maneja todo: carga inicial, inicio de sesión y cierre de sesión.
+                // Listener de cambios de sesión (ESTA ES LA ÚNICA FUNCIÓN QUE GESTIONA LA SESIÓN)
+                // Se dispara en la carga inicial, en el login, y en el logout.
                 supabase.auth.onAuthStateChange((event, session) => {
                     handleAuthChange(session);
                 });
-                
-                // --- SE ELIMINÓ LA LLAMADA A getSession() ---
-                // La llamada duplicada a getSession() y onAuthStateChange causaba
-                // el error de cierre de sesión automático (condición de carrera).
 
             } catch (e) {
                 console.error("Error al inicializar Supabase:", e);
@@ -523,16 +497,25 @@
          * @param {object} session Objeto de sesión de Supabase.
          */
         function handleAuthChange(session) {
+            const logoContainer = document.getElementById('logo-container');
+            
             if (session && session.user) {
                 userId = session.user.id;
-                currentUserUidDisplay.textContent = userId;
+                currentUserUidDisplay.textContent = session.user.email; // Mostramos email en lugar de ID
+
+                // --- VERIFICACIÓN DE ADMIN POR EMAIL ---
+                isAdmin = (session.user.email === ADMIN_EMAIL_REAL);
+                
+                if (isAdmin) {
+                    adminStatusDisplay.classList.remove('hidden');
+                    openInventoryModalBtn.classList.remove('hidden');
+                    logoContainer.classList.add('admin-active');
+                }
+                // ------------------------------------
                 
                 // Muestra el panel de Logout
                 authContainer.classList.add('hidden');
                 logoutContainer.classList.remove('hidden');
-
-                // Llama a checkAdminStatus después de obtener el userId
-                checkAdminStatus(); 
 
                 // Carga los datos solo después de autenticación
                 loadLogo();
@@ -540,21 +523,26 @@
                 loadInventoryData();
                 
             } else {
+                // No hay sesión
                 userId = null;
+                isAdmin = false; 
+
+                // Ocultar elementos de Admin
+                adminStatusDisplay.classList.add('hidden');
+                openInventoryModalBtn.classList.add('hidden');
+                logoContainer.classList.remove('admin-active');
+                
                 // Muestra el panel de Login
                 authContainer.classList.remove('hidden');
                 logoutContainer.classList.add('hidden');
-
-                // Reset Admin status
-                checkAdminStatus(); 
 
                 // Limpia la interfaz si no hay sesión
                 salesContent.classList.add('hidden');
                 salesAuthMessage.classList.remove('hidden');
                 inventoryContent.classList.add('hidden');
                 inventoryAuthMessage.classList.remove('hidden');
-                renderSales([]); // Limpia la lista de ventas
-                renderInventory([]); // Limpia la lista de inventario
+                renderSales([]); 
+                renderInventory([]); 
                 
                 // Carga solo el logo
                 loadLogo();
@@ -619,20 +607,16 @@
          * @param {string} themeName 'default', 'feminine', 'masculine'
          */
         function applyTheme(themeName) {
-            // 1. Limpiar clases de tema anteriores
             document.body.classList.remove('theme-feminine', 'theme-masculine');
             
-            // 2. Definir botones para actualizar clase 'active'
             const buttons = {
                 'default': themeBtnDefault,
                 'feminine': themeBtnFeminine,
                 'masculine': themeBtnMasculine
             };
 
-            // 3. Quitar 'active' de todos
             Object.values(buttons).forEach(btn => btn.classList.remove('active'));
 
-            // 4. Aplicar nueva clase de tema si no es el default
             if (themeName === 'feminine') {
                 document.body.classList.add('theme-feminine');
                 themeBtnFeminine.classList.add('active');
@@ -640,11 +624,9 @@
                 document.body.classList.add('theme-masculine');
                 themeBtnMasculine.classList.add('active');
             } else {
-                // Es 'default'
                 themeBtnDefault.classList.add('active');
             }
             
-            // 5. Guardar en localStorage
             localStorage.setItem('unicell-theme', themeName);
         }
 
@@ -655,7 +637,6 @@
             const savedTheme = localStorage.getItem('unicell-theme') || 'default';
             applyTheme(savedTheme);
             
-            // Asignar eventos a los botones de tema
             themeBtnDefault.onclick = () => applyTheme('default');
             themeBtnFeminine.onclick = () => applyTheme('feminine');
             themeBtnMasculine.onclick = () => applyTheme('masculine');
@@ -697,7 +678,6 @@
                 .from(ASSETS_BUCKET)
                 .getPublicUrl(path);
             
-            // Añadir antimáscara de caché
             return `${data.publicUrl}?v=${Date.now()}`;
         }
         
@@ -723,7 +703,6 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            // Mostrar indicador de carga
             const logoContainer = document.getElementById('current-logo');
             logoContainer.innerHTML = '<div class="w-full h-full flex items-center justify-center text-pink-500 font-bold text-xs animate-pulse">Cargando...</div>'; 
 
@@ -731,18 +710,14 @@
                 const path = await uploadFile(file, `logo/${userId}/${file.name}`);
                 const url = getPublicUrl(path);
 
-                // Actualizar la URL en la tabla 'services' con un ID fijo 'logo'
-                // Esta tabla 'services' se sigue usando, pero solo para el logo.
                 const { error: dbError } = await supabase
                     .from('services')
                     .upsert({ id: 'logo', image_url: url, image_path: path, user_id: userId }, { onConflict: 'id' });
 
                 if (dbError) throw dbError;
 
-                // Actualizar la interfaz inmediatamente
                 logoContainer.innerHTML = `<img src="${url}" class="w-full h-full object-contain rounded-lg" onerror="this.onerror=null; this.src='/placeholder.png';"/>${logoUploadOverlayHTML}`;
                 
-                // Reasignar el handler de nuevo
                 document.getElementById('logo-file-input').onchange = handleLogoUpload;
 
                 displayMessage('Logo actualizado con éxito.', authMessage, 'success');
@@ -751,9 +726,7 @@
                 console.error("Error al subir logo:", error);
                 displayMessage(`Error al subir logo: ${error.message}`, authMessage, 'error');
             } finally {
-                // Restaurar el input para permitir otra subida
                 e.target.value = null;
-                // Si falló la subida, recargar el logo
                 if (logoContainer.querySelector('div') && logoContainer.querySelector('div').textContent.includes('Cargando')) {
                    loadLogo();
                 }
@@ -761,17 +734,16 @@
         }
 
         /**
-         * Carga la URL del logo (REFACTORIZADO)
+         * Carga la URL del logo
          */
         async function loadLogo() {
             if (!supabase) return;
             
             try {
-                // Cargar solo el logo
                 const { data, error } = await supabase
                     .from('services')
                     .select('id, image_url, image_path')
-                    .eq('id', 'logo'); // Solo trae el logo
+                    .eq('id', 'logo'); 
 
                 if (error) {
                     console.warn("Advertencia al cargar logo:", error.message);
@@ -786,7 +758,6 @@
                     logoContainer.innerHTML = `${defaultSvgHtml}${logoUploadOverlayHTML}`;
                 }
 
-                // FIX: Re-asigna el event handler aquí, garantizando que el input exista
                 const logoInput = document.getElementById('logo-file-input');
                 if (logoInput) {
                     logoInput.onchange = handleLogoUpload;
@@ -805,7 +776,6 @@
         
         // --------------------------------------------------------------------------------
         // 6. GESTIÓN DE INVENTARIO (CRUD)
-        // (Sin cambios)
         // --------------------------------------------------------------------------------
 
         function loadInventoryData() {
@@ -980,7 +950,6 @@
 
         // --------------------------------------------------------------------------------
         // 7. GESTIÓN DE VENTAS (CRUD)
-        // (Sin cambios)
         // --------------------------------------------------------------------------------
 
         function loadSalesData() {
@@ -1174,7 +1143,6 @@
         // Eventos de Autenticación
         document.getElementById('open-auth-modal-btn').onclick = () => {
             openModal(authModal);
-            // Ya no es necesario recargar la sesión aquí, el listener se encarga
         };
         document.getElementById('close-auth-modal').onclick = () => closeModal(authModal);
         document.getElementById('logout-btn').onclick = handleLogout;
@@ -1191,7 +1159,6 @@
             if (isAdmin) {
                 inventoryAuthMessage.classList.add('hidden');
                 inventoryContent.classList.remove('hidden');
-                // loadInventoryData(); // handleAuthChange ya lo hace al inicio
             } else {
                 inventoryAuthMessage.classList.remove('hidden');
                 inventoryContent.classList.add('hidden');
@@ -1206,7 +1173,6 @@
             if (userId) {
                 salesAuthMessage.classList.add('hidden');
                 salesContent.classList.remove('hidden');
-                // loadSalesData(); // handleAuthChange ya lo hace al inicio
             } else {
                 salesAuthMessage.classList.remove('hidden');
                 salesContent.classList.add('hidden');
@@ -1218,13 +1184,12 @@
         
         // Inicialización al cargar la ventana (CORREGIDA)
         window.onload = function() {
-            initLogoTemplates(); // Inicializa las plantillas
-            initSupabase();      // Inicializa Supabase y el listener de auth
+            initLogoTemplates(); 
+            initSupabase();      // Inicia Supabase y el listener de auth
             loadSavedTheme();    // Carga el tema guardado
             
-            // --- SE ELIMINÓ la llamada a loadLogo() ---
-            // handleAuthChange() se encargará de llamar a loadLogo() 
-            // en el momento correcto (después de saber si hay sesión o no).
+            // handleAuthChange() se llamará automáticamente por el listener
+            // y cargará el logo y los datos en el momento correcto.
         };
     </script>
 </body>
