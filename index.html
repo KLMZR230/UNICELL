@@ -93,7 +93,6 @@
                     <button id="open-theme-dropdown-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 shadow-md flex items-center">
                         <i data-lucide="palette" class="w-5 h-5"></i>
                     </button>
-            
                     <div id="theme-dropdown-menu" class="hidden absolute top-full right-0 mt-2 w-max bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-3 z-50">
                         <div id="theme-selector-container" class="flex space-x-2 items-center">
                             <button id="theme-btn-default" class="theme-btn" title="Tema Original"></button>
@@ -102,6 +101,7 @@
                         </div>
                     </div>
                 </div>
+
                 <button id="open-auth-modal-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 shadow-md flex items-center">
                     <i data-lucide="user" class="w-5 h-5"></i>
                 </button>
@@ -176,7 +176,7 @@
 
             <div id="inventory-content-admin" class="hidden mb-8 p-4 bg-gray-800 rounded-lg shadow-inner">
                 <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir/Editar Producto</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
+                <div class="grid grid-cols-1 sm:grid-cols-5 gap-4 items-end">
                     <div class="sm:col-span-1">
                         <label class="text-gray-400 text-sm">Nombre</label>
                         <input id="inventory-name" type="text" placeholder="Nombre del Producto" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary" />
@@ -184,6 +184,21 @@
                     <div class="sm:col-span-1">
                         <label class="text-gray-400 text-sm">Precio</label>
                         <input id="inventory-price" type="number" placeholder="Precio (Ej: 150.00)" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary" step="0.01" />
+                    </div>
+                    <div class="sm:col-span-1">
+                        <label class="text-gray-400 text-sm">Categoría</label>
+                        <select id="inventory-category" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary h-[46px]">
+                            <option value="">Seleccionar...</option>
+                            <option value="Placas de Carga">Placas de Carga</option>
+                            <option value="Placas">Placas</option>
+                            <option value="Botones">Botones</option>
+                            <option value="Jacks">Jacks</option>
+                            <option value="Vidrios">Vidrios</option>
+                            <option value="Cargadores">Cargadores</option>
+                            <option value="Privados">Privados</option>
+                            <option value="Hidrogel">Hidrogel</option>
+                            <option value="Otro">Otro</option>
+                        </select>
                     </div>
                     <div class="sm:col-span-1">
                         <label class="text-gray-400 text-sm">Foto (Opcional)</label>
@@ -203,11 +218,13 @@
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-40">Foto</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Nombre</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Categoría</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Precio</th>
-                                <th id="inventory-header-actions" class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider w-40 hidden">Acciones</th> </tr>
+                                <th id="inventory-header-actions" class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider w-40 hidden">Acciones</th> 
+                            </tr>
                         </thead>
                         <tbody id="inventory-list" class="bg-gray-800 divide-y divide-gray-700">
-                            <tr><td colspan="4" class="text-center py-4 text-gray-500 italic">Cargando inventario...</td></tr>
+                            <tr><td colspan="5" class="text-center py-4 text-gray-500 italic">Cargando inventario...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -230,8 +247,20 @@
                     <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir Nuevo Artículo</h3>
                     <label class="text-gray-400 text-sm mb-1 block">Destinatario/Cliente</label>
                     <input id="client-name" type="text" placeholder="Nombre del Destinatario" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary mb-4" />
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                         <input id="product-name" type="text" placeholder="Nombre del Producto/Servicio" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary" />
+                        <select id="sale-category" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary h-[46px]">
+                            <option value="">Seleccionar...</option>
+                            <option value="Placas de Carga">Placas de Carga</option>
+                            <option value="Placas">Placas</option>
+                            <option value="Botones">Botones</option>
+                            <option value="Jacks">Jacks</option>
+                            <option value="Vidrios">Vidrios</option>
+                            <option value="Cargadores">Cargadores</option>
+                            <option value="Privados">Privados</option>
+                            <option value="Hidrogel">Hidrogel</option>
+                            <option value="Otro">Otro</option>
+                        </select>
                         <input id="product-price" type="number" placeholder="Precio (Ej: 150.00)" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-primary" step="0.01" />
                         <button id="add-btn" class="col-span-1 bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center disabled:opacity-50">
                             <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir a Venta
@@ -245,11 +274,13 @@
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Destinatario</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Producto</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Categoría</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Precio</th>
-                                <th id="sales-header-actions" class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider w-40 hidden">Acciones</th> </tr>
+                                <th id="sales-header-actions" class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider w-40 hidden">Acciones</th> 
+                            </tr>
                         </thead>
                         <tbody id="sales-list" class="bg-gray-800 divide-y divide-gray-700">
-                            <tr><td colspan="4" class="text-center py-4 text-gray-500 italic">Cargando ventas...</td></tr>
+                            <tr><td colspan="5" class="text-center py-4 text-gray-500 italic">Cargando ventas...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -276,6 +307,21 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhdm9udml3eXlqbWR3d2h4cnptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2MTA2MzcsImV4cCI6MjA3NzE4NjYzN30.dWGKn3MWuVHvOivh608-ZIdfVGsekdpfLu7quc42HBk';
         const ADMIN_EMAIL_REAL = 'unicell2025@gmail.com';
         const ASSETS_BUCKET = 'public_assets';
+
+        // ==================================================
+        // CAMBIO AQUÍ: Constante para las opciones de categoría
+        // ==================================================
+        const CATEGORY_OPTIONS_HTML = `
+            <option value="Placas de Carga">Placas de Carga</option>
+            <option value="Placas">Placas</option>
+            <option value="Botones">Botones</option>
+            <option value="Jacks">Jacks</option>
+            <option value="Vidrios">Vidrios</option>
+            <option value="Cargadores">Cargadores</option>
+            <option value="Privados">Privados</option>
+            <option value="Hidrogel">Hidrogel</option>
+            <option value="Otro">Otro</option>
+        `;
 
         let supabase = null;
         let userId = null;
@@ -312,6 +358,10 @@
         const clientNameInput = document.getElementById('client-name');
         const productNameInput = document.getElementById('product-name');
         const productPriceInput = document.getElementById('product-price');
+        // ==================================================
+        // CAMBIO AQUÍ: Nueva referencia
+        // ==================================================
+        const saleCategorySelect = document.getElementById('sale-category');
         const addSaleBtn = document.getElementById('add-btn');
         const salesHeaderActions = document.getElementById('sales-header-actions');
         const inventoryModal = document.getElementById('inventory-modal');
@@ -319,6 +369,10 @@
         const inventoryList = document.getElementById('inventory-list');
         const inventoryNameInput = document.getElementById('inventory-name');
         const inventoryPriceInput = document.getElementById('inventory-price');
+        // ==================================================
+        // CAMBIO AQUÍ: Nueva referencia
+        // ==================================================
+        const inventoryCategorySelect = document.getElementById('inventory-category');
         const inventoryImageFile = document.getElementById('inventory-image-file');
         const inventoryAddBtn = document.getElementById('inventory-add-btn');
         const inventoryMessage = document.getElementById('inventory-message');
@@ -326,10 +380,6 @@
         const themeBtnDefault = document.getElementById('theme-btn-default');
         const themeBtnFeminine = document.getElementById('theme-btn-feminine');
         const themeBtnMasculine = document.getElementById('theme-btn-masculine');
-
-        // ==================================================
-        // CAMBIO AQUÍ: Nuevas referencias para el desplegable de temas
-        // ==================================================
         const openThemeDropdownBtn = document.getElementById('open-theme-dropdown-btn');
         const themeDropdownMenu = document.getElementById('theme-dropdown-menu');
         const themeDropdownWrapper = document.getElementById('theme-dropdown-wrapper');
@@ -356,10 +406,6 @@
         }
         function handleGlobalError(msg) { appErrorDisplay.textContent = `Error crítico: ${msg}`; appErrorDisplay.classList.remove('hidden'); }
         function displayMessage(msg, element, type = 'error') { element.textContent = msg; element.className = type === 'success' ? 'text-center text-sm text-green-400' : 'text-center text-sm text-red-400'; setTimeout(() => { element.textContent = ''; }, 5000); }
-
-        // ==================================================
-        // CAMBIO AQUÍ: Nueva función para cerrar el desplegable
-        // ==================================================
         function closeThemeDropdown() {
              if (themeDropdownMenu) themeDropdownMenu.classList.add('hidden');
         }
@@ -461,10 +507,6 @@
         function loadSavedTheme() {
              const savedTheme = localStorage.getItem('unicell-theme') || 'default';
              applyTheme(savedTheme);
-
-             // ==================================================
-             // CAMBIO AQUÍ: Añadir closeThemeDropdown() al seleccionar un tema
-             // ==================================================
              themeBtnDefault.onclick = () => { applyTheme('default'); closeThemeDropdown(); };
              themeBtnFeminine.onclick = () => { applyTheme('feminine'); closeThemeDropdown(); };
              themeBtnMasculine.onclick = () => { applyTheme('masculine'); closeThemeDropdown(); };
@@ -541,8 +583,9 @@
                 })
                 .catch(err => {
                     console.error("Error al cargar inventario:", err);
-                    inventoryList.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-400">Error al cargar inventario.</td></tr>';
-                    if (err.message.includes("does not exist")) handleGlobalError("La tabla 'inventory' no existe en Supabase.");
+                    inventoryList.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-400">Error al cargar inventario.</td></tr>';
+                    if (err.message.includes("column \"category\" does not exist")) handleGlobalError("La columna 'category' no existe en la tabla 'inventory'. Revise las instrucciones.");
+                    else if (err.message.includes("does not exist")) handleGlobalError("La tabla 'inventory' no existe en Supabase.");
                     else if (err.message.includes("permission denied")) handleGlobalError("Permisos incorrectos para leer 'inventory'. Revisa las Políticas RLS.");
                 });
         }
@@ -550,25 +593,36 @@
         function renderInventory(items) {
             inventoryList.innerHTML = '';
             if (items.length === 0) {
-                inventoryList.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500 italic">No hay productos en el inventario.</td></tr>';
+                // ==================================================
+                // CAMBIO AQUÍ: Colspan actualizado
+                // ==================================================
+                inventoryList.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500 italic">No hay productos en el inventario.</td></tr>';
                 return;
             }
             items.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-700 transition duration-150';
+                
+                // ==================================================
+                // CAMBIO AQUÍ: Se pasa item.category a la función de editar
+                // ==================================================
                 const adminButtons = isAdmin ? `
-                    <button onclick="toggleInventoryEdit(event, '${item.id}', '${item.name.replace(/'/g, "\\'")}', ${item.price})" class="edit-btn text-yellow-400 hover:text-yellow-300 p-2 rounded-full transition duration-150" data-editing="false">
+                    <button onclick="toggleInventoryEdit(event, '${item.id}', '${item.name.replace(/'/g, "\\'")}', ${item.price}, '${(item.category || '').replace(/'/g, "\\'")}')" class="edit-btn text-yellow-400 hover:text-yellow-300 p-2 rounded-full transition duration-150" data-editing="false">
                         <i data-lucide="pencil" class="w-4 h-4"></i>
                     </button>
                     <button onclick="deleteInventoryItem('${item.id}', '${item.image_path}')" class="text-red-500 hover:text-red-400 p-2 rounded-full transition duration-150">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>` : '';
                 
+                // ==================================================
+                // CAMBIO AQUÍ: Nueva celda (td) para la categoría
+                // ==================================================
                 tr.innerHTML = `
                     <td class="p-2 align-top">
                         ${item.image_url ? `<img src="${item.image_url}" alt="${item.name}" class="inventory-image-preview">` : `<div class="w-full h-[160px] bg-gray-600 rounded-lg flex items-center justify-center text-xs text-gray-400">Sin Foto</div>`}
                     </td>
                     <td class="px-4 py-3 align-top font-medium text-white"><span id="inv-name-${item.id}">${item.name}</span></td>
+                    <td class="px-4 py-3 align-top text-gray-300"><span id="inv-category-${item.id}">${item.category || 'N/A'}</span></td>
                     <td class="px-4 py-3 align-top text-white"><span id="inv-price-${item.id}">$${Number(item.price || 0).toFixed(2)}</span></td>
                     <td class="px-4 py-3 align-top text-right space-x-2">${adminButtons}</td>`;
                 inventoryList.appendChild(tr);
@@ -578,10 +632,19 @@
 
         async function addInventoryItem() {
             if (!isAdmin || !userId) { displayMessage("Acción no permitida.", inventoryMessage); return; }
+            
+            // ==================================================
+            // CAMBIO AQUÍ: Se obtiene y valida la categoría
+            // ==================================================
             const name = inventoryNameInput.value.trim();
             const price = parseFloat(inventoryPriceInput.value.trim());
+            const category = inventoryCategorySelect.value;
             const file = inventoryImageFile.files[0];
-            if (!name || isNaN(price) || price <= 0) { displayMessage("Nombre y precio válido son requeridos.", inventoryMessage); return; }
+            
+            if (!name || isNaN(price) || price <= 0 || !category) { 
+                displayMessage("Nombre, precio válido y categoría son requeridos.", inventoryMessage); 
+                return; 
+            }
 
             inventoryAddBtn.disabled = true; inventoryAddBtn.textContent = 'Guardando...';
             let imagePath = null; let imageUrl = null;
@@ -590,36 +653,63 @@
                     imagePath = await uploadFile(file, `inventory/${userId}/${Date.now()}_${file.name}`);
                     imageUrl = getPublicUrl(imagePath);
                 }
-                const { error } = await supabase.from('inventory').insert([{ name, price, image_url: imageUrl, image_path: imagePath, user_id: userId }]);
+                // ==================================================
+                // CAMBIO AQUÍ: Se inserta la categoría
+                // ==================================================
+                const { error } = await supabase.from('inventory').insert([{ name, price, category, image_url: imageUrl, image_path: imagePath, user_id: userId }]);
                 if (error) throw error;
-                inventoryNameInput.value = ''; inventoryPriceInput.value = ''; inventoryImageFile.value = '';
+                
+                inventoryNameInput.value = ''; 
+                inventoryPriceInput.value = ''; 
+                inventoryCategorySelect.value = ''; // Reset select
+                inventoryImageFile.value = '';
+                
                 displayMessage('Producto añadido.', inventoryMessage, 'success');
                 loadInventoryData();
             } catch (e) { console.error("Error al agregar inventario:", e); displayMessage(`Error: ${e.message}`, inventoryMessage); if (imagePath) deleteFile(imagePath);
             } finally { inventoryAddBtn.innerHTML = '<i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir Producto'; inventoryAddBtn.disabled = false; lucide.createIcons(); }
         }
 
-        window.toggleInventoryEdit = function(event, id, currentName, currentPrice) {
+        // ==================================================
+        // CAMBIO AQUÍ: Función actualizada para editar la categoría
+        // ==================================================
+        window.toggleInventoryEdit = function(event, id, currentName, currentPrice, currentCategory) {
             if (!isAdmin) return;
             const button = event.currentTarget; const isEditing = button.getAttribute('data-editing') === 'true';
-            const nameSpan = document.getElementById(`inv-name-${id}`); const priceSpan = document.getElementById(`inv-price-${id}`);
+            const nameSpan = document.getElementById(`inv-name-${id}`); 
+            const priceSpan = document.getElementById(`inv-price-${id}`);
+            const categorySpan = document.getElementById(`inv-category-${id}`);
+            
             if (!isEditing) {
                 nameSpan.innerHTML = `<input type="text" id="input-inv-name-${id}" value="${currentName}" class="w-full bg-gray-600 rounded-md p-1 input-dark" />`;
                 priceSpan.innerHTML = `<input type="number" id="input-inv-price-${id}" value="${Number(currentPrice).toFixed(2)}" class="w-full bg-gray-600 rounded-md p-1 input-dark" step="0.01" />`;
+                categorySpan.innerHTML = `<select id="input-inv-category-${id}" class="w-full bg-gray-600 rounded-md p-1 input-dark">${CATEGORY_OPTIONS_HTML}</select>`;
+                document.getElementById(`input-inv-category-${id}`).value = currentCategory; // Pre-seleccionar categoría
+                
                 button.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i>'; button.classList.remove('text-yellow-400'); button.classList.add('text-green-500'); button.setAttribute('data-editing', 'true'); lucide.createIcons();
             } else {
                 const newName = document.getElementById(`input-inv-name-${id}`).value.trim();
                 const newPrice = parseFloat(document.getElementById(`input-inv-price-${id}`).value.trim());
-                if (!newName || isNaN(newPrice) || newPrice <= 0) { displayMessage("Nombre y precio válidos.", inventoryMessage); return; }
-                updateInventoryItem(id, newName, newPrice);
+                const newCategory = document.getElementById(`input-inv-category-${id}`).value;
+                
+                if (!newName || isNaN(newPrice) || newPrice <= 0 || !newCategory) { 
+                    displayMessage("Nombre, precio y categoría válidos.", inventoryMessage); 
+                    return; 
+                }
+                updateInventoryItem(id, newName, newPrice, newCategory);
             }
         }
-        async function updateInventoryItem(id, newName, newPrice) {
+        
+        // ==================================================
+        // CAMBIO AQUÍ: Función actualizada para guardar la categoría
+        // ==================================================
+        async function updateInventoryItem(id, newName, newPrice, newCategory) {
              if (!isAdmin) return;
-             const { error } = await supabase.from('inventory').update({ name: newName, price: newPrice, user_id: userId }).eq('id', id);
+             const { error } = await supabase.from('inventory').update({ name: newName, price: newPrice, category: newCategory, user_id: userId }).eq('id', id);
              if (error) { console.error("Error al actualizar inventario:", error); displayMessage('Error al actualizar.', inventoryMessage); }
              loadInventoryData();
         }
+        
         window.deleteInventoryItem = async function(id, imagePath) {
             if (!isAdmin || !confirm("¿Eliminar este producto del inventario?")) return;
             try {
@@ -643,8 +733,9 @@
                 })
                 .catch(err => {
                     console.error("Error al cargar ventas:", err.message);
-                    salesList.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-400">Error al cargar ventas.</td></tr>';
-                     if (err.message.includes("does not exist")) handleGlobalError("La tabla 'sales' no existe en Supabase.");
+                    salesList.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-400">Error al cargar ventas.</td></tr>';
+                     if (err.message.includes("column \"category\" does not exist")) handleGlobalError("La columna 'category' no existe en la tabla 'sales'. Revise las instrucciones.");
+                     else if (err.message.includes("does not exist")) handleGlobalError("La tabla 'sales' no existe en Supabase.");
                     else if (err.message.includes("permission denied")) handleGlobalError("Permisos incorrectos para leer 'sales'. Revisa las Políticas RLS.");
                 });
         }
@@ -653,7 +744,10 @@
             salesList.innerHTML = '';
             let total = 0;
             if (items.length === 0) {
-                salesList.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500 italic">No hay ventas registradas.</td></tr>';
+                // ==================================================
+                // CAMBIO AQUÍ: Colspan actualizado
+                // ==================================================
+                salesList.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500 italic">No hay ventas registradas.</td></tr>';
                 salesTotal.textContent = '$0.00';
                 return;
             }
@@ -661,18 +755,26 @@
                 total += Number(item.price || 0);
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-700 transition duration-150';
+                
+                // ==================================================
+                // CAMBIO AQUÍ: Se pasa item.category a la función de editar
+                // ==================================================
                  const adminButtons = isAdmin ? `
-                    <button onclick="toggleSaleEdit(event, '${item.id}', '${(item.clientName || '').replace(/'/g, "\\'")}', '${item.name.replace(/'/g, "\\'")}', ${item.price})" class="edit-btn text-yellow-400 hover:text-yellow-300 p-2 rounded-full transition duration-150" data-editing="false">
+                    <button onclick="toggleSaleEdit(event, '${item.id}', '${(item.clientName || '').replace(/'/g, "\\'")}', '${item.name.replace(/'/g, "\\'")}', ${item.price}, '${(item.category || '').replace(/'/g, "\\'")}')" class="edit-btn text-yellow-400 hover:text-yellow-300 p-2 rounded-full transition duration-150" data-editing="false">
                         <i data-lucide="pencil" class="w-4 h-4"></i>
                     </button>
                     <button onclick="deleteSaleItem('${item.id}')" class="text-red-500 hover:text-red-400 p-2 rounded-full transition duration-150">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>` : '';
                 
+                // ==================================================
+                // CAMBIO AQUÍ: Nueva celda (td) para la categoría
+                // ==================================================
                 tr.innerHTML = `
-                    <td class="px-4 py-3 font-medium text-gray-300"><span id="client-name-${id}">${item.clientName || 'N/A'}</span></td>
-                    <td class="px-4 py-3 font-medium text-white"><span id="sale-name-${id}">${item.name}</span></td>
-                    <td class="px-4 py-3 text-white"><span id="sale-price-${id}">$${Number(item.price || 0).toFixed(2)}</span></td>
+                    <td class="px-4 py-3 font-medium text-gray-300"><span id="client-name-${item.id}">${item.clientName || 'N/A'}</span></td>
+                    <td class="px-4 py-3 font-medium text-white"><span id="sale-name-${item.id}">${item.name}</span></td>
+                    <td class="px-4 py-3 align-top text-gray-300"><span id="sale-category-${item.id}">${item.category || 'N/A'}</span></td>
+                    <td class="px-4 py-3 text-white"><span id="sale-price-${item.id}">$${Number(item.price || 0).toFixed(2)}</span></td>
                     <td class="px-4 py-3 text-right space-x-2">${adminButtons}</td>`;
                 salesList.appendChild(tr);
             });
@@ -682,44 +784,81 @@
 
         async function addSaleItem() {
             if (!isAdmin || !userId) { salesAuthMessage.textContent = 'Solo el admin puede registrar ventas.'; salesAuthMessage.classList.remove('hidden'); return; }
+            
+            // ==================================================
+            // CAMBIO AQUÍ: Se obtiene y valida la categoría
+            // ==================================================
             const clientName = clientNameInput.value.trim() || 'Venta General';
             const name = productNameInput.value.trim();
             const price = parseFloat(productPriceInput.value.trim());
-            if (!name || isNaN(price) || price <= 0) { displayMessage("Nombre y precio válido requeridos.", salesAuthMessage); return; }
+            const category = saleCategorySelect.value;
+
+            if (!name || isNaN(price) || price <= 0 || !category) { 
+                displayMessage("Nombre, precio válido y categoría requeridos.", salesAuthMessage); 
+                return; 
+            }
 
             addSaleBtn.disabled = true;
             try {
-                const { error } = await supabase.from('sales').insert([{ clientName, name, price, user_id: userId, created_at: new Date().toISOString() }]);
+                // ==================================================
+                // CAMBIO AQUÍ: Se inserta la categoría
+                // ==================================================
+                const { error } = await supabase.from('sales').insert([{ clientName, name, price, category, user_id: userId, created_at: new Date().toISOString() }]);
                 if (error) throw error;
-                productNameInput.value = ''; productPriceInput.value = ''; clientNameInput.value = '';
+                
+                productNameInput.value = ''; 
+                productPriceInput.value = ''; 
+                saleCategorySelect.value = ''; // Reset select
+                clientNameInput.value = '';
+                
                 loadSalesData();
             } catch (e) { console.error("Error al agregar venta:", e); displayMessage(`Error: ${e.message}`, salesAuthMessage);
             } finally { addSaleBtn.disabled = false; }
         }
 
-        window.toggleSaleEdit = function(event, id, currentClientName, currentName, currentPrice) {
+        // ==================================================
+        // CAMBIO AQUÍ: Función actualizada para editar la categoría
+        // ==================================================
+        window.toggleSaleEdit = function(event, id, currentClientName, currentName, currentPrice, currentCategory) {
             if (!isAdmin) return;
             const button = event.currentTarget; const isEditing = button.getAttribute('data-editing') === 'true';
-            const clientSpan = document.getElementById(`client-name-${id}`); const nameSpan = document.getElementById(`sale-name-${id}`); const priceSpan = document.getElementById(`sale-price-${id}`);
+            const clientSpan = document.getElementById(`client-name-${id}`); 
+            const nameSpan = document.getElementById(`sale-name-${id}`); 
+            const priceSpan = document.getElementById(`sale-price-${id}`);
+            const categorySpan = document.getElementById(`sale-category-${id}`);
+
             if (!isEditing) {
                 clientSpan.innerHTML = `<input type="text" id="input-client-${id}" value="${currentClientName}" class="w-full bg-gray-600 rounded-md p-1 input-dark" />`;
                 nameSpan.innerHTML = `<input type="text" id="input-sale-name-${id}" value="${currentName}" class="w-full bg-gray-600 rounded-md p-1 input-dark" />`;
                 priceSpan.innerHTML = `<input type="number" id="input-sale-price-${id}" value="${Number(currentPrice).toFixed(2)}" class="w-full bg-gray-600 rounded-md p-1 input-dark" step="0.01" />`;
+                categorySpan.innerHTML = `<select id="input-sale-category-${id}" class="w-full bg-gray-600 rounded-md p-1 input-dark">${CATEGORY_OPTIONS_HTML}</select>`;
+                document.getElementById(`input-sale-category-${id}`).value = currentCategory; // Pre-seleccionar
+                
                 button.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i>'; button.classList.remove('text-yellow-400'); button.classList.add('text-green-500'); button.setAttribute('data-editing', 'true'); lucide.createIcons();
             } else {
                 const newClientName = document.getElementById(`input-client-${id}`).value.trim() || 'Venta General';
                 const newName = document.getElementById(`input-sale-name-${id}`).value.trim();
                 const newPrice = parseFloat(document.getElementById(`input-sale-price-${id}`).value.trim());
-                if (!newName || isNaN(newPrice) || newPrice <= 0) { displayMessage("Nombre y precio válidos.", salesAuthMessage); return; }
-                updateSaleItem(id, newClientName, newName, newPrice);
+                const newCategory = document.getElementById(`input-sale-category-${id}`).value;
+                
+                if (!newName || isNaN(newPrice) || newPrice <= 0 || !newCategory) { 
+                    displayMessage("Nombre, precio y categoría válidos.", salesAuthMessage); 
+                    return; 
+                }
+                updateSaleItem(id, newClientName, newName, newPrice, newCategory);
             }
         }
-        async function updateSaleItem(id, newClientName, newName, newPrice) {
+        
+        // ==================================================
+        // CAMBIO AQUÍ: Función actualizada para guardar la categoría
+        // ==================================================
+        async function updateSaleItem(id, newClientName, newName, newPrice, newCategory) {
             if (!isAdmin) return;
-            const { error } = await supabase.from('sales').update({ clientName: newClientName, name: newName, price: newPrice }).eq('id', id);
+            const { error } = await supabase.from('sales').update({ clientName: newClientName, name: newName, price: newPrice, category: newCategory }).eq('id', id);
             if (error) { console.error("Error al actualizar venta:", error); displayMessage('Error al actualizar.', salesAuthMessage); }
              loadSalesData();
         }
+        
         window.deleteSaleItem = async function(id) {
             if (!isAdmin || !confirm("¿Eliminar esta venta del registro?")) return;
             const { error } = await supabase.from('sales').delete().eq('id', id);
@@ -767,17 +906,13 @@
         document.getElementById('close-sales-modal').onclick = () => closeModal(salesModal);
         addSaleBtn.onclick = addSaleItem;
 
-        // ==================================================
-        // CAMBIO AQUÍ: Listeners para el nuevo desplegable de temas
-        // ==================================================
+        // Temas
         if(openThemeDropdownBtn) {
             openThemeDropdownBtn.onclick = (e) => {
-                e.stopPropagation(); // Evita que el clic se propague al 'window'
+                e.stopPropagation(); 
                 themeDropdownMenu.classList.toggle('hidden');
             };
         }
-        
-        // Listener global para cerrar el desplegable si se hace clic fuera
         window.addEventListener('click', (e) => {
             if (themeDropdownWrapper && !themeDropdownWrapper.contains(e.target)) {
                 closeThemeDropdown();
@@ -812,7 +947,7 @@
                     if (event === 'SIGNED_IN') {
                         handleAuthChange(session);
                     } else if (event === 'SIGNED_OUT') {
-                        handleAuthChange(null);
+                        handleAuthChange(session);
                     }
                 });
 
