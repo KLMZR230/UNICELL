@@ -21,20 +21,25 @@
         body { font-family: 'Inter', sans-serif; background-color: var(--color-darker); color: var(--color-text); background-image: radial-gradient(at top left, var(--color-primary-gradient), transparent 50%), radial-gradient(at bottom right, var(--color-secondary-gradient), transparent 50%); min-height: 100vh; }
         .accent-text { color: var(--color-primary); }
 
-        /* CAMBIO: "Remarcado siempre" - El borde ahora usa el color primario y es visible por defecto */
         .input-dark { 
             background-color: var(--color-dark); 
-            border: 1px solid var(--color-primary); /* <-- "Remarcado siempre" */
+            border: 1px solid var(--color-primary);
             color: var(--color-text); 
         }
-
-        /* CAMBIO: Nueva regla para que el anillo de foco use el color del tema */
         .focus\:ring-primary:focus {
             --tw-ring-color: var(--color-primary) !important;
         }
 
         #logo-upload-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.7); opacity: 0; transition: opacity 0.3s; cursor: pointer; border-radius: 0.5rem; }
-        #logo-container.admin-active #logo-upload-overlay { display: flex; opacity: 1; }
+        
+        /* * CAMBIO: El overlay ya no se muestra permanentemente.
+         * Ahora solo aparece cuando (1) eres admin Y (2) pasas el ratón (hover) por encima.
+         */
+        #logo-container.admin-active:hover #logo-upload-overlay { 
+            display: flex; 
+            opacity: 1; 
+        }
+        
         #logo-container:not(.admin-active) #logo-upload-overlay { display: none; }
         
         .inventory-image-preview {
@@ -63,7 +68,7 @@
                         <path d="M16 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM10 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
                         <path d="M12 14v-2" stroke-width="3"/>
                     </svg>
-                    <div id="logo-upload-overlay" class="hidden"> <i data-lucide="upload" class="w-6 h-6 text-white mr-2"></i>
+                    <div id="logo-upload-overlay"> <i data-lucide="upload" class="w-6 h-6 text-white mr-2"></i>
                         <span class="text-white text-sm">Subir Logo</span>
                         <input type="file" id="logo-file-input" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
                     </div>
@@ -279,7 +284,7 @@
         const adminStatusDisplay = document.getElementById('admin-status');
         const appErrorDisplay = document.getElementById('app-error-display');
         const logoContainer = document.getElementById('logo-container');
-        const logoUploadOverlay = document.getElementById('logo-upload-overlay');
+        //const logoUploadOverlay = document.getElementById('logo-upload-overlay'); // Ya no es necesaria una referencia global
         const authModal = document.getElementById('auth-modal');
         const authContainer = document.getElementById('auth-container');
         const logoutContainer = document.getElementById('logout-container');
@@ -327,7 +332,8 @@
             if (overlay) { logoUploadOverlayHTML = overlay.outerHTML; }
             if (svg) { defaultSvgHtml = svg.outerHTML; }
             if (document.getElementById('current-logo') && !document.getElementById('current-logo').querySelector('img')) {
-                document.getElementById('current-logo').innerHTML = defaultSvgHtml;
+                // Rellena con el SVG y el overlay (que está oculto por CSS por defecto)
+                document.getElementById('current-logo').innerHTML = defaultSvgHtml + logoUploadOverlayHTML;
             }
         }
         function handleGlobalError(msg) { appErrorDisplay.textContent = `Error crítico: ${msg}`; appErrorDisplay.classList.remove('hidden'); }
@@ -336,17 +342,17 @@
         function updateUIBasedOnAuth() {
             if (isAdmin) {
                 adminStatusDisplay.classList.remove('hidden');
-                logoContainer.classList.add('admin-active');
-                logoUploadOverlay.classList.remove('hidden');
-                inventoryContentAdmin.classList.remove('hidden');
-                inventoryHeaderActions.classList.remove('hidden');
-                salesAddFormAdmin.classList.remove('hidden');
-                salesHeaderActions.classList.remove('hidden');
-                openSalesModalBtn.classList.remove('hidden');
+                logoContainer.classList.add('admin-active'); // Activa hover para subir logo
+                // CAMBIO: Ya no tocamos el 'logoUploadOverlay' aquí. El CSS lo maneja.
+                inventoryContentAdmin.classList.remove('hidden'); 
+                inventoryHeaderActions.classList.remove('hidden'); 
+                salesAddFormAdmin.classList.remove('hidden'); 
+                salesHeaderActions.classList.remove('hidden'); 
+                openSalesModalBtn.classList.remove('hidden'); 
             } else {
                 adminStatusDisplay.classList.add('hidden');
                 logoContainer.classList.remove('admin-active');
-                logoUploadOverlay.classList.add('hidden');
+                // CAMBIO: Ya no tocamos el 'logoUploadOverlay' aquí.
                 inventoryContentAdmin.classList.add('hidden');
                 inventoryHeaderActions.classList.add('hidden');
                 salesAddFormAdmin.classList.add('hidden');
@@ -422,7 +428,7 @@
         // --------------------------------------------------------------------------------
         function applyTheme(themeName) {
             document.body.classList.remove('theme-feminine', 'theme-masculine');
-            const buttons = { 'default': themeBtnDefault, 'feminine': themeBtnFeminine, 'masculine': themeBtnMasculine };
+            const buttons = { 'default': themeBtnDefault, 'feminINE': themeBtnFeminine, 'masculine': themeBtnMasculine };
             Object.values(buttons).forEach(btn => btn.classList.remove('active'));
             if (themeName === 'feminine') { document.body.classList.add('theme-feminine'); themeBtnFeminine.classList.add('active'); }
             else if (themeName === 'masculine') { document.body.classList.add('theme-masculine'); themeBtnMasculine.classList.add('active'); }
@@ -477,20 +483,24 @@
                 const { data, error } = await supabase.from('services').select('image_url').eq('id', 'logo').maybeSingle();
                 if (error && error.code !== 'PGRST116') throw error;
                 const logoDiv = document.getElementById('current-logo');
+                
+                // Construye el HTML: la imagen (o SVG) + el overlay (que CSS oculta/muestra)
                 if (data && data.image_url) {
-                    logoDiv.innerHTML = `<img src="${data.image_url}" class="w-full h-full object-contain rounded-lg" onerror="this.onerror=null; this.src='${defaultSvgHtml}';"><div id="logo-upload-overlay">${logoUploadOverlayHTML}</div>`;
+                    logoDiv.innerHTML = `<img src="${data.image_url}" class="w-full h-full object-contain rounded-lg" onerror="this.onerror=null; this.src='${defaultSvgHtml}';">${logoUploadOverlayHTML}`;
                 } else {
-                    logoDiv.innerHTML = defaultSvgHtml + `<div id="logo-upload-overlay">${logoUploadOverlayHTML}</div>`;
+                    logoDiv.innerHTML = defaultSvgHtml + logoUploadOverlayHTML;
                 }
+                
+                // Reasigna el listener de subida al nuevo input
                 const logoInput = document.getElementById('logo-file-input');
                 if (logoInput) logoInput.onchange = handleLogoUpload;
                 
+                // CAMBIO: Solo gestionamos la clase 'admin-active' en el *contenedor*.
+                // El CSS se encargará de mostrar/ocultar el overlay en 'hover'.
                 if(isAdmin) {
                     logoContainer.classList.add('admin-active');
-                    document.getElementById('logo-upload-overlay').classList.remove('hidden');
                 } else {
                     logoContainer.classList.remove('admin-active');
-                    document.getElementById('logo-upload-overlay').classList.add('hidden');
                 }
 
             } catch (error) { console.error("Error al cargar logo:", error); const logoDiv = document.getElementById('current-logo'); if(logoDiv) logoDiv.innerHTML = defaultSvgHtml; }
@@ -609,7 +619,7 @@
                     renderSales(data || []);
                 })
                 .catch(err => {
-                    console.error("Error al cargar ventas:", err.message); // Imprime el mensaje de error
+                    console.error("Error al cargar ventas:", err.message);
                     salesList.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-400">Error al cargar ventas.</td></tr>';
                      if (err.message.includes("does not exist")) handleGlobalError("La tabla 'sales' no existe en Supabase.");
                     else if (err.message.includes("permission denied")) handleGlobalError("Permisos incorrectos para leer 'sales'. Revisa las Políticas RLS.");
@@ -714,7 +724,6 @@
         loginForm.onsubmit = handleAuthSubmit;
 
         // Inventory
-        // CAMBIO: Se añade el listener aquí para arreglar el 'openModal is not defined'
         document.getElementById('open-inventory-modal-btn').onclick = () => openModal(inventoryModal);
         document.getElementById('close-inventory-modal').onclick = () => closeModal(inventoryModal);
         inventoryAddBtn.onclick = addInventoryItem;
@@ -749,23 +758,17 @@
             try {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-                // 1. Obtenemos la sesión ACTUAL (de localStorage)
                 const { data: { session }, error: sessionError } = await supabase.auth.getSession();
                 
                 if (sessionError) {
                     console.error("Error al obtener la sesión inicial:", sessionError.message);
                     handleAuthChange(null);
                 } else {
-                    // 2. Llamamos a handleAuthChange con la sesión INICIAL
                     handleAuthChange(session);
                 }
 
-                // 3. Configuramos el listener para CAMBIOS FUTUROS
                 supabase.auth.onAuthStateChange((event, session) => {
                     console.log(`Evento de Auth detectado: ${event}`);
-
-                    // Solo reaccionamos a los eventos que cambian el estado de sesión.
-                    // IGNORAMOS 'TOKEN_REFRESHED' y 'INITIAL_SESSION'
                     if (event === 'SIGNED_IN') {
                         handleAuthChange(session);
                     } else if (event === 'SIGNED_OUT') {
@@ -783,8 +786,6 @@
         window.onload = async function() {
             initLogoTemplates();
             loadSavedTheme();
-            
-            // Llamamos a la nueva función asíncrona.
             await initSupabaseAndSession();
         };
     </script>
