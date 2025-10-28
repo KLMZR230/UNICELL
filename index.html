@@ -14,203 +14,80 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;600;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* ================================================================== */
-        /* Estilos base de UNICELL + Nuevos Temas */
-        /* ================================================================== */
-        
-        body { 
-            background-image: radial-gradient(at top left, var(--color-primary-gradient), transparent 50%), radial-gradient(at bottom right, var(--color-secondary-gradient), transparent 50%); 
-            min-height: 100vh; 
-            padding-top: 5rem; /* Compensar header fijo */
-        }
-        
+        /* Estilos base + Nuevos Temas */
+        body { background-image: radial-gradient(at top left, var(--color-primary-gradient), transparent 50%), radial-gradient(at bottom right, var(--color-secondary-gradient), transparent 50%); min-height: 100vh; padding-top: 5rem; }
         .accent-text { color: var(--accent-color); }
-
-        .input-dark { 
-            background-color: var(--bg-secondary); 
-            border: 1px solid var(--border-color);
-            color: var(--text-primary); 
-        }
-        .focus\:ring-primary:focus {
-            --tw-ring-color: var(--accent-color) !important;
-        }
-
+        .input-dark { background-color: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); }
+        .focus\:ring-primary:focus { --tw-ring-color: var(--accent-color) !important; }
         #logo-upload-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.7); opacity: 0; transition: opacity 0.3s; cursor: pointer; border-radius: 9999px; }
-        
         #logo-container.admin-active:hover #logo-upload-overlay { display: flex; opacity: 1; }
         #logo-container:not(.admin-active) #logo-upload-overlay { display: none; }
-        
-        .inventory-image-preview {
-            width: 100%;
-            /* CAMBIO: Altura ajustada para tarjetas */
-            height: 150px; 
-            object-fit: cover;
-            /* CAMBIO: Redondeo superior para tarjetas */
-            border-top-left-radius: 0.5rem; 
-            border-top-right-radius: 0.5rem;
-            margin-bottom: 0.75rem; /* Espacio debajo de la imagen */
-        }
-        
+        .inventory-image-preview { width: 100%; height: 150px; object-fit: cover; border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem; margin-bottom: 0.75rem; }
         .theme-btn { width: 2rem; height: 2rem; border-radius: 9999px; border: 3px solid #4B5563; cursor: pointer; transition: border-color 0.2s; }
         .theme-btn.active, .theme-btn:hover { border-color: var(--accent-color); }
-        
-        #theme-btn-dark { background-color: #818cf8; }
-        #theme-btn-infernal { background-color: #ff4500; }
-        #theme-btn-gold { background-color: #D4AF37; }
+        #theme-btn-dark { background-color: #818cf8; } #theme-btn-infernal { background-color: #ff4500; } #theme-btn-gold { background-color: #D4AF37; }
 
-        /* ================================================== */
-        /* INICIO: TUS NUEVOS ESTILOS DE TEMA */
-        /* ================================================== */
-        
-        /********************************/
-        /* Estilos Base (Comunes a todos los temas) */
-        /********************************/
+        /* Estilos Nuevos Temas */
         html { height: 100%; }
         body { min-height: 100vh; display: flex; flex-direction: column; transition: background-color 0.5s ease; }
         .max-w-6xl.mx-auto { flex-grow: 1; }
-        
-        /* CAMBIO: Estilos para .product-card añadidos */
-        .product-card { 
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem; /* Redondeo general de la tarjeta */
-            overflow: hidden; /* Para que la imagen respete el redondeo */
-            transition: transform 0.2s, box-shadow 0.3s; 
-            display: flex; /* Para controlar el pie de la tarjeta */
-            flex-direction: column; /* Apilar imagen, contenido, acciones */
-        }
-        .product-card:hover { 
-            transform: translateY(-5px); 
-            box-shadow: 0 10px 15px -3px color-mix(in srgb, var(--accent-color) 20%, transparent), 0 4px 6px -2px color-mix(in srgb, var(--accent-color) 15%, transparent);
-        }
-        .product-card-content {
-            padding: 0 0.75rem 0.75rem; /* Padding solo horizontal y abajo */
-            flex-grow: 1; /* Empuja las acciones hacia abajo */
-        }
-         .product-card-actions {
-            padding: 0.5rem 0.75rem;
-            border-top: 1px solid var(--border-color);
-            background-color: color-mix(in srgb, var(--bg-secondary) 80%, black);
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-        }
-
+        .product-card { background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.5rem; overflow: hidden; transition: transform 0.2s, box-shadow 0.3s; display: flex; flex-direction: column; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px color-mix(in srgb, var(--accent-color) 20%, transparent), 0 4px 6px -2px color-mix(in srgb, var(--accent-color) 15%, transparent); }
+        .product-card-content { padding: 0 0.75rem 0.75rem; flex-grow: 1; }
+        .product-card-actions { padding: 0.5rem 0.75rem; border-top: 1px solid var(--border-color); background-color: color-mix(in srgb, var(--bg-secondary) 80%, black); display: flex; justify-content: flex-end; gap: 0.5rem; }
         #logo-upload { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; border: 0; }
-
         .skeleton-card { background-color: transparent; border-radius: 0.5rem; padding: 1rem; display: flex; flex-direction: column; }
         .skeleton-line { background-color: var(--bg-secondary); opacity: 0.7; border-radius: 0.25rem; animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         @keyframes pulse { 50% { opacity: .4; } }
-
-        /********************************/
-        /* TEMA 1: Dark (Predeterminado) */
-        /********************************/
-        .theme-dark {
-            --bg-primary: #1f2937; --bg-secondary: #374151; --bg-header: rgba(31, 41, 55, 0.8);
-            --text-primary: #e5e7eb; --text-secondary: #d1d5db; --text-muted: #9ca3af;
-            --border-color: #4b5563; --accent-color: #818cf8; --accent-color-dark: #6366f1;
-            --font-main: 'Poppins', sans-serif; --font-headings: 'Poppins', sans-serif;
-            --color-primary-gradient: rgba(129, 140, 248, 0.1); --color-secondary-gradient: rgba(99, 102, 241, 0.1);
-        }
-
-        /********************************/
-        /* TEMA 2: Fuego Infernal */
-        /********************************/
-        .theme-infernal {
-            --bg-primary: #000000; --bg-secondary: #2d1a1a; --bg-header: rgba(17, 7, 0, 0.6);
-            --text-primary: #f9fafb; --text-secondary: #d1d5db; --text-muted: #9ca3af;
-            --border-color: #571e1e; --accent-color: #ff4500; --accent-color-dark: #e63e00;
-            --font-main: 'Roboto', sans-serif; --font-headings: 'Roboto', sans-serif;
-            --color-primary-gradient: rgba(255, 69, 0, 0.1); --color-secondary-gradient: rgba(230, 62, 0, 0.1);
-        }
+        .theme-dark { --bg-primary: #1f2937; --bg-secondary: #374151; --bg-header: rgba(31, 41, 55, 0.8); --text-primary: #e5e7eb; --text-secondary: #d1d5db; --text-muted: #9ca3af; --border-color: #4b5563; --accent-color: #818cf8; --accent-color-dark: #6366f1; --font-main: 'Poppins', sans-serif; --font-headings: 'Poppins', sans-serif; --color-primary-gradient: rgba(129, 140, 248, 0.1); --color-secondary-gradient: rgba(99, 102, 241, 0.1); }
+        .theme-infernal { --bg-primary: #000000; --bg-secondary: #2d1a1a; --bg-header: rgba(17, 7, 0, 0.6); --text-primary: #f9fafb; --text-secondary: #d1d5db; --text-muted: #9ca3af; --border-color: #571e1e; --accent-color: #ff4500; --accent-color-dark: #e63e00; --font-main: 'Roboto', sans-serif; --font-headings: 'Roboto', sans-serif; --color-primary-gradient: rgba(255, 69, 0, 0.1); --color-secondary-gradient: rgba(230, 62, 0, 0.1); }
         .theme-infernal { background-image: linear-gradient(180deg, #1a0000 0%, #000000 100%); }
         .theme-infernal .product-card:hover { box-shadow: 0 0 25px rgba(255, 69, 0, 0.5); border-color: rgba(255, 69, 0, 0.7); }
-
-        /********************************/
-        /* TEMA 3: Luxury Gold */
-        /********************************/
-        .theme-gold {
-            --bg-primary: #121212; --bg-secondary: #2b2b2b; --bg-header: rgba(18, 18, 18, 0.85);
-            --text-primary: #f1f1f1; --text-secondary: #cccccc; --text-muted: #a0a0a0;
-            --border-color: #444444; --accent-color: #D4AF37; --accent-color-dark: #B8860B;
-            --font-main: 'Poppins', sans-serif; --font-headings: 'Playfair Display', serif;
-            --color-primary-gradient: rgba(212, 175, 55, 0.05); --color-secondary-gradient: rgba(184, 134, 11, 0.05);
-        }
+        .theme-gold { --bg-primary: #121212; --bg-secondary: #2b2b2b; --bg-header: rgba(18, 18, 18, 0.85); --text-primary: #f1f1f1; --text-secondary: #cccccc; --text-muted: #a0a0a0; --border-color: #444444; --accent-color: #D4AF37; --accent-color-dark: #B8860B; --font-main: 'Poppins', sans-serif; --font-headings: 'Playfair Display', serif; --color-primary-gradient: rgba(212, 175, 55, 0.05); --color-secondary-gradient: rgba(184, 134, 11, 0.05); }
         .theme-gold { background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%232a2a2a" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
         .theme-gold .product-card:hover { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); border-color: var(--accent-color); }
         .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
         .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
-
-
-        /********************************/
-        /* Aplicación de Variables CSS */
-        /********************************/
         body { background-color: var(--bg-primary); color: var(--text-primary); font-family: var(--font-main); }
         h1, h2, h3, h4, h5, h6 { font-family: var(--font-headings); }
         header.sticky { background-color: var(--bg-header); border-bottom: 1px solid var(--border-color); backdrop-filter: blur(10px); }
         .bg-gray-800 { background-color: var(--bg-secondary) !important; } 
         .bg-gray-900 { background-color: var(--bg-primary) !important; }
-        .text-gray-300 { color: var(--text-secondary); }
-        .text-gray-400 { color: var(--text-muted); }
+        .text-gray-300 { color: var(--text-secondary); } .text-gray-400 { color: var(--text-muted); }
         .bg-gray-600 { background-color: var(--bg-secondary) !important; }
         .bg-gray-700 { background-color: color-mix(in srgb, var(--bg-secondary) 70%, var(--bg-primary)) !important; }
         .border-gray-500, .border-gray-600, .border-gray-700 { border-color: var(--border-color); }
-        .divide-gray-700 > :not([hidden]) ~ :not([hidden]) { border-color: var(--border-color); } /* Para divisores en tablas/listas */
-
-        /* Acentos */
-        .text-indigo-400, .text-indigo-300 { color: var(--accent-color); }
-        .border-indigo-500 { border-color: var(--accent-color); }
-        .bg-indigo-500 { background-color: var(--accent-color-dark); color: var(--text-primary); }
-        .hover\:bg-indigo-600:hover { background-color: var(--accent-color); }
+        .divide-gray-700 > :not([hidden]) ~ :not([hidden]) { border-color: var(--border-color); }
+        .text-indigo-400, .text-indigo-300 { color: var(--accent-color); } .border-indigo-500 { border-color: var(--accent-color); }
+        .bg-indigo-500 { background-color: var(--accent-color-dark); color: var(--text-primary); } .hover\:bg-indigo-600:hover { background-color: var(--accent-color); }
         .focus\:ring-indigo-500:focus { --tw-ring-color: var(--accent-color); }
         input:focus, select:focus, textarea:focus { border-color: var(--accent-color) !important; box-shadow: 0 0 0 1px var(--accent-color); outline: none; }
-        
-        /* Mapeo de colores UNICELL */
-        .bg-pink-600 { background-color: var(--accent-color-dark) !important; }
-        .hover\:bg-pink-700:hover { background-color: var(--accent-color) !important; }
-        .border-pink-500\/50 { border-color: color-mix(in srgb, var(--accent-color) 50%, transparent) !important; }
-        .text-pink-500 { color: var(--accent-color) !important; }
-        .file\:text-pink-700 { color: var(--accent-color-dark) !important; }
-        .file\:bg-pink-50 { background-color: color-mix(in srgb, var(--accent-color) 10%, transparent) !important; }
+        .bg-pink-600 { background-color: var(--accent-color-dark) !important; } .hover\:bg-pink-700:hover { background-color: var(--accent-color) !important; }
+        .border-pink-500\/50 { border-color: color-mix(in srgb, var(--accent-color) 50%, transparent) !important; } .text-pink-500 { color: var(--accent-color) !important; }
+        .file\:text-pink-700 { color: var(--accent-color-dark) !important; } .file\:bg-pink-50 { background-color: color-mix(in srgb, var(--accent-color) 10%, transparent) !important; }
         .hover\:file\:bg-pink-100:hover { background-color: color-mix(in srgb, var(--accent-color) 20%, transparent) !important; }
-        
-        /* Colores Fijos */
         .bg-green-600 { background-color: #16a34a !important; } .hover\:bg-green-700:hover { background-color: #15803d !important; }
         .shadow-green-700\/50 { box-shadow: 0 10px 15px -3px rgba(21, 128, 61, 0.5), 0 4px 6px -2px rgba(21, 128, 61, 0.5) !important; }
         .bg-red-600 { background-color: #dc2626 !important; } .hover\:bg-red-700:hover { background-color: #b91c1c !important; }
         .text-red-500 { color: #ef4444 !important; } .text-red-400 { color: #f87171 !important; }
         .text-yellow-400 { color: #facc15 !important; } .hover\:text-yellow-300:hover { color: #fde047 !important; }
         .text-green-500 { color: #22c55e !important; }
-
-        /* ESTADOS DE VENTA */
         .status-paid { background-color: #16a34a !important; color: #ffffff !important; border-color: #15803d !important; }
         .status-pending { background-color: #f59e0b !important; color: #1f2937 !important; border-color: #d97706 !important; }
         .status-returned { background-color: #dc2626 !important; color: #ffffff !important; border-color: #b91c1c !important; }
-        
-        /* ================================================== */
-        /* FIN: NUEVOS ESTILOS DE TEMA */
-        /* ================================================== */
     </style>
 </head>
 <body class="theme-dark">
 
     <header class="sticky top-0 z-10 shadow-lg p-4 flex items-center justify-between">
         <div class="flex items-center space-x-4">
-            <div class="relative" id="logo-container">
-                <div class="relative w-12 h-12 flex items-center justify-center rounded-full border-2 border-indigo-500 shadow-md bg-gray-700" id="current-logo"> 
-                     <svg id="default-logo-svg" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 accent-text" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M12 20a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" opacity=".2"/> <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" fill="var(--accent-color)"/> <path d="M16 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM10 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/> <path d="M12 14v-2" stroke-width="3"/> </svg>
-                    <div id="logo-upload-overlay"> <i data-lucide="upload" class="w-5 h-5 text-white"></i> <input type="file" id="logo-file-input" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*"> </div>
-                </div>
-            </div>
+            <div class="relative" id="logo-container"> <div class="relative w-12 h-12 flex items-center justify-center rounded-full border-2 border-indigo-500 shadow-md bg-gray-700" id="current-logo"> <svg id="default-logo-svg" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 accent-text" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M12 20a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" opacity=".2"/> <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" fill="var(--accent-color)"/> <path d="M16 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM10 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/> <path d="M12 14v-2" stroke-width="3"/> </svg> <div id="logo-upload-overlay"> <i data-lucide="upload" class="w-5 h-5 text-white"></i> <input type="file" id="logo-file-input" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*"> </div> </div> </div>
             <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white"> UNICELL <span class="block text-sm sm:text-base font-light accent-text border-b border-indigo-500 inline-block pb-0"> SERVICIO TÉCNICO </span> </h1>
         </div>
         <div class="flex items-center space-x-3">
             <button id="open-inventory-modal-btn" class="bg-indigo-500 text-white font-medium py-1.5 px-3 rounded-lg text-sm shadow-md transition duration-300 flex items-center"> <i data-lucide="package" class="w-4 h-4 mr-1"></i> Inventario </button>
             <button id="open-sales-modal-btn" class="bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm hidden flex items-center"> <i data-lucide="receipt-text" class="w-4 h-4 mr-1"></i> Ventas </button>
-            <div class="relative" id="theme-dropdown-wrapper">
-                <button id="open-theme-dropdown-btn" class="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-full transition duration-300 shadow-md flex items-center"> <i data-lucide="palette" class="w-5 h-5"></i> </button>
-                <div id="theme-dropdown-menu" class="hidden absolute top-full right-0 mt-2 w-max bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-3 z-50"> <div id="theme-selector-container" class="flex space-x-2 items-center"> <button id="theme-btn-dark" class="theme-btn" title="Tema Oscuro"></button> <button id="theme-btn-infernal" class="theme-btn" title="Tema Infernal"></button> <button id="theme-btn-gold" class="theme-btn" title="Tema Dorado"></button> </div> </div>
-            </div>
+            <div class="relative" id="theme-dropdown-wrapper"> <button id="open-theme-dropdown-btn" class="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-full transition duration-300 shadow-md flex items-center"> <i data-lucide="palette" class="w-5 h-5"></i> </button> <div id="theme-dropdown-menu" class="hidden absolute top-full right-0 mt-2 w-max bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-3 z-50"> <div id="theme-selector-container" class="flex space-x-2 items-center"> <button id="theme-btn-dark" class="theme-btn" title="Tema Oscuro"></button> <button id="theme-btn-infernal" class="theme-btn" title="Tema Infernal"></button> <button id="theme-btn-gold" class="theme-btn" title="Tema Dorado"></button> </div> </div> </div>
             <button id="open-auth-modal-btn" class="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-full transition duration-300 shadow-md flex items-center"> <i data-lucide="user" class="w-5 h-5"></i> </button>
         </div>
     </header>
@@ -222,32 +99,7 @@
     </div>
 
     <div id="auth-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4"> <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-gray-700 max-w-sm w-full p-6 relative"> <button id="close-auth-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"> <i data-lucide="x" class="w-6 h-6"></i> </button> <div id="auth-container"> <h2 class="text-2xl font-bold text-center mb-6 text-white" id="auth-title">Iniciar Sesión</h2> <form id="login-form" class="space-y-4"> <input id="auth-email" type="email" placeholder="Correo Electrónico" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" required /> <input id="auth-password" type="password" placeholder="Contraseña" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" required /> <button type="submit" id="auth-submit-btn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center"> <i data-lucide="log-in" class="w-5 h-5 mr-2"></i> <span id="auth-button-text">Iniciar Sesión</span> </button> <p id="auth-message" class="text-center text-sm text-red-400"></p> </form> <button id="toggle-auth-mode" class="w-full mt-4 text-center text-sm text-gray-400 hover:text-white transition"> ¿No tienes cuenta? Regístrate </button> </div> <div id="logout-container" class="hidden text-center"> <p class="text-lg text-white mb-4">Sesión Iniciada.</p> <p id="current-user-uid" class="text-xs text-gray-500 mb-6 font-mono break-all"></p> <button id="logout-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center"> <i data-lucide="log-out" class="w-5 h-5 mr-2"></i> Cerrar Sesión </button> </div> </div> </div>
-
-    <div id="inventory-modal" class="fixed inset-0 z-40 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4">
-        <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-pink-500/50 max-w-6xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300">
-            <button id="close-inventory-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"> <i data-lucide="x" class="w-7 h-7"></i> </button>
-            <h2 class="text-3xl font-bold text-center mb-6 text-white flex items-center justify-center"> <i data-lucide="package" class="w-7 h-7 accent-text mr-3"></i> Inventario de Productos </h2>
-            
-            <div id="inventory-content-admin" class="hidden mb-8 p-4 bg-gray-800 rounded-lg shadow-inner">
-                 <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir/Editar Producto</h3>
-                 <div class="grid grid-cols-1 sm:grid-cols-5 gap-4 items-end">
-                     <div> <label class="text-gray-400 text-sm">Nombre</label> <input id="inventory-name" type="text" placeholder="Nombre del Producto" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" /> </div>
-                     <div> <label class="text-gray-400 text-sm">Precio</label> <input id="inventory-price" type="number" placeholder="Precio (Ej: 150.00)" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" step="0.01" /> </div>
-                     <div> <label class="text-gray-400 text-sm">Categoría</label> <select id="inventory-category" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 h-[46px]"> <option value="">Seleccionar...</option> <option value="Placas de Carga">Placas de Carga</option> <option value="Placas">Placas</option> <option value="Botones">Botones</option> <option value="Jacks">Jacks</option> <option value="Vidrios">Vidrios</option> <option value="Cargadores">Cargadores</option> <option value="Privados">Privados</option> <option value="Hidrogel">Hidrogel</option> <option value="Otro">Otro</option> </select> </div>
-                     <div> <label class="text-gray-400 text-sm">Foto (Opcional)</label> <input type="file" id="inventory-image-file" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100" accept="image/*" /> </div>
-                     <button id="inventory-add-btn" class="sm:col-span-1 bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center disabled:opacity-50"> <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir Producto </button>
-                 </div>
-                 <p id="inventory-message" class="text-center text-sm mt-3 text-red-400"></p>
-            </div>
-
-            <div id="inventory-content-public">
-                <div id="inventory-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    <p id="inventory-loading-msg" class="text-center text-gray-500 italic sm:col-span-2 lg:col-span-3 xl:col-span-4 py-4">Cargando inventario...</p> 
-                </div>
-                 <p id="inventory-empty-msg" class="text-center text-gray-500 italic hidden py-8">No hay productos en el inventario.</p>
-            </div>
-        </div>
-    </div>
+    <div id="inventory-modal" class="fixed inset-0 z-40 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4"> <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-pink-500/50 max-w-6xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300"> <button id="close-inventory-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"> <i data-lucide="x" class="w-7 h-7"></i> </button> <h2 class="text-3xl font-bold text-center mb-6 text-white flex items-center justify-center"> <i data-lucide="package" class="w-7 h-7 accent-text mr-3"></i> Inventario de Productos </h2> <div id="inventory-content-admin" class="hidden mb-8 p-4 bg-gray-800 rounded-lg shadow-inner"> <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir/Editar Producto</h3> <div class="grid grid-cols-1 sm:grid-cols-5 gap-4 items-end"> <div> <label class="text-gray-400 text-sm">Nombre</label> <input id="inventory-name" type="text" placeholder="Nombre del Producto" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" /> </div> <div> <label class="text-gray-400 text-sm">Precio</label> <input id="inventory-price" type="number" placeholder="Precio (Ej: 150.00)" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" step="0.01" /> </div> <div> <label class="text-gray-400 text-sm">Categoría</label> <select id="inventory-category" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 h-[46px]"> <option value="">Seleccionar...</option> <option value="Placas de Carga">Placas de Carga</option> <option value="Placas">Placas</option> <option value="Botones">Botones</option> <option value="Jacks">Jacks</option> <option value="Vidrios">Vidrios</option> <option value="Cargadores">Cargadores</option> <option value="Privados">Privados</option> <option value="Hidrogel">Hidrogel</option> <option value="Otro">Otro</option> </select> </div> <div> <label class="text-gray-400 text-sm">Foto (Opcional)</label> <input type="file" id="inventory-image-file" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100" accept="image/*" /> </div> <button id="inventory-add-btn" class="sm:col-span-1 bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center disabled:opacity-50"> <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir Producto </button> </div> <p id="inventory-message" class="text-center text-sm mt-3 text-red-400"></p> </div> <div id="inventory-content-public"> <div id="inventory-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"> <p id="inventory-loading-msg" class="text-center text-gray-500 italic sm:col-span-2 lg:col-span-3 xl:col-span-4 py-4">Cargando inventario...</p> </div> <p id="inventory-empty-msg" class="text-center text-gray-500 italic hidden py-8">No hay productos en el inventario.</p> </div> </div> </div>
     <div id="sales-modal" class="fixed inset-0 z-40 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4"> <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-pink-500/50 max-w-6xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300"> <button id="close-sales-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"> <i data-lucide="x" class="w-7 h-7"></i> </button> <h2 class="text-3xl font-bold text-center mb-6 text-white flex items-center justify-center"> <i data-lucide="receipt-text" class="w-7 h-7 accent-text mr-3"></i> Registro de Ventas </h2> <p id="sales-auth-message" class="text-center p-4 text-red-400 hidden">Debes iniciar sesión para ver o registrar ventas.</p> <div id="sales-content"> <div id="sales-add-form-admin" class="hidden mb-8 p-4 bg-gray-800 rounded-lg shadow-inner"> <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir Nuevo Artículo</h3> <label class="text-gray-400 text-sm mb-1 block">Destinatario/Cliente</label> <input id="client-name" type="text" placeholder="Nombre del Destinatario" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 mb-4" /> <div class="grid grid-cols-1 sm:grid-cols-4 gap-4"> <input id="product-name" type="text" placeholder="Nombre del Producto/Servicio" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" /> <select id="sale-category" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 h-[46px]"> <option value="">Seleccionar...</option> <option value="Placas de Carga">Placas de Carga</option> <option value="Placas">Placas</option> <option value="Botones">Botones</option> <option value="Jacks">Jacks</option> <option value="Vidrios">Vidrios</option> <option value="Cargadores">Cargadores</option> <option value="Privados">Privados</option> <option value="Hidrogel">Hidrogel</option> <option value="Otro">Otro</option> </select> <input id="product-price" type="number" placeholder="Precio (Ej: 150.00)" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" step="0.01" /> <button id="add-btn" class="col-span-1 bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center disabled:opacity-50"> <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir a Venta </button> </div> </div> <div class="overflow-x-auto"> <table class="min-w-full divide-y divide-gray-700 rounded-lg"> <thead class="bg-gray-700"> <tr> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Destinatario</th> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Producto</th> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Categoría</th> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Precio</th> <th id="sales-header-actions" class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider w-40 hidden">Acciones</th> </tr> </thead> <tbody id="sales-list" class="bg-gray-800 divide-y divide-gray-700"> <tr><td colspan="5" class="text-center py-4 text-gray-500 italic">Cargando ventas...</td></tr> </tbody> </table> </div> <div class="mt-4 p-4 bg-gray-700 rounded-lg flex justify-between items-center font-bold text-white text-xl"> <span>TOTAL VENTA:</span> <span id="sales-total" class="accent-text text-2xl">$0.00</span> </div> </div> </div> </div>
 
     <script> lucide.createIcons(); </script>
@@ -263,155 +115,73 @@
         let logoUploadOverlayHTML = '', defaultSvgHtml = '';
 
         // --- REFERENCIAS DOM ---
-        const adminStatusDisplay=document.getElementById('admin-status'), appErrorDisplay=document.getElementById('app-error-display'), logoContainer=document.getElementById('logo-container'), authModal=document.getElementById('auth-modal'), authContainer=document.getElementById('auth-container'), logoutContainer=document.getElementById('logout-container'), authTitle=document.getElementById('auth-title'), authButtonText=document.getElementById('auth-button-text'), authSubmitBtn=document.getElementById('auth-submit-btn'), toggleAuthModeBtn=document.getElementById('toggle-auth-mode'), loginForm=document.getElementById('login-form'), authEmailInput=document.getElementById('auth-email'), authPasswordInput=document.getElementById('auth-password'), authMessage=document.getElementById('auth-message'), currentUserUidDisplay=document.getElementById('current-user-uid'), logoutBtn=document.getElementById('logout-btn'), openSalesModalBtn=document.getElementById('open-sales-modal-btn'), salesModal=document.getElementById('sales-modal'), salesContent=document.getElementById('sales-content'), salesAuthMessage=document.getElementById('sales-auth-message'), salesAddFormAdmin=document.getElementById('sales-add-form-admin'), salesList=document.getElementById('sales-list'), salesTotal=document.getElementById('sales-total'), clientNameInput=document.getElementById('client-name'), productNameInput=document.getElementById('product-name'), productPriceInput=document.getElementById('product-price'), saleCategorySelect=document.getElementById('sale-category'), addSaleBtn=document.getElementById('add-btn'), salesHeaderActions=document.getElementById('sales-header-actions'), inventoryModal=document.getElementById('inventory-modal'), inventoryContentAdmin=document.getElementById('inventory-content-admin'), 
-        // CAMBIO: Referencia a inventory-grid en lugar de inventory-list
-        inventoryGridContainer = document.getElementById('inventory-grid'), 
-        inventoryLoadingMsg = document.getElementById('inventory-loading-msg'),
-        inventoryEmptyMsg = document.getElementById('inventory-empty-msg'),
-        inventoryNameInput=document.getElementById('inventory-name'), inventoryPriceInput=document.getElementById('inventory-price'), inventoryCategorySelect=document.getElementById('inventory-category'), inventoryImageFile=document.getElementById('inventory-image-file'), inventoryAddBtn=document.getElementById('inventory-add-btn'), inventoryMessage=document.getElementById('inventory-message'), inventoryHeaderActions=document.getElementById('inventory-header-actions'), themeBtnDark=document.getElementById('theme-btn-dark'), themeBtnInfernal=document.getElementById('theme-btn-infernal'), themeBtnGold=document.getElementById('theme-btn-gold'), openThemeDropdownBtn=document.getElementById('open-theme-dropdown-btn'), themeDropdownMenu=document.getElementById('theme-dropdown-menu'), themeDropdownWrapper=document.getElementById('theme-dropdown-wrapper');
+        const adminStatusDisplay=document.getElementById('admin-status'), appErrorDisplay=document.getElementById('app-error-display'), logoContainer=document.getElementById('logo-container'), authModal=document.getElementById('auth-modal'), authContainer=document.getElementById('auth-container'), logoutContainer=document.getElementById('logout-container'), authTitle=document.getElementById('auth-title'), authButtonText=document.getElementById('auth-button-text'), authSubmitBtn=document.getElementById('auth-submit-btn'), toggleAuthModeBtn=document.getElementById('toggle-auth-mode'), loginForm=document.getElementById('login-form'), authEmailInput=document.getElementById('auth-email'), authPasswordInput=document.getElementById('auth-password'), authMessage=document.getElementById('auth-message'), currentUserUidDisplay=document.getElementById('current-user-uid'), logoutBtn=document.getElementById('logout-btn'), openSalesModalBtn=document.getElementById('open-sales-modal-btn'), salesModal=document.getElementById('sales-modal'), salesContent=document.getElementById('sales-content'), salesAuthMessage=document.getElementById('sales-auth-message'), salesAddFormAdmin=document.getElementById('sales-add-form-admin'), salesList=document.getElementById('sales-list'), salesTotal=document.getElementById('sales-total'), clientNameInput=document.getElementById('client-name'), productNameInput=document.getElementById('product-name'), productPriceInput=document.getElementById('product-price'), saleCategorySelect=document.getElementById('sale-category'), addSaleBtn=document.getElementById('add-btn'), salesHeaderActions=document.getElementById('sales-header-actions'), inventoryModal=document.getElementById('inventory-modal'), inventoryContentAdmin=document.getElementById('inventory-content-admin'), inventoryGridContainer = document.getElementById('inventory-grid'), inventoryLoadingMsg = document.getElementById('inventory-loading-msg'), inventoryEmptyMsg = document.getElementById('inventory-empty-msg'), inventoryNameInput=document.getElementById('inventory-name'), inventoryPriceInput=document.getElementById('inventory-price'), inventoryCategorySelect=document.getElementById('inventory-category'), inventoryImageFile=document.getElementById('inventory-image-file'), inventoryAddBtn=document.getElementById('inventory-add-btn'), inventoryMessage=document.getElementById('inventory-message'), 
+        // CORRECCIÓN: Se elimina la referencia a inventoryHeaderActions
+        themeBtnDark=document.getElementById('theme-btn-dark'), themeBtnInfernal=document.getElementById('theme-btn-infernal'), themeBtnGold=document.getElementById('theme-btn-gold'), openThemeDropdownBtn=document.getElementById('open-theme-dropdown-btn'), themeDropdownMenu=document.getElementById('theme-dropdown-menu'), themeDropdownWrapper=document.getElementById('theme-dropdown-wrapper');
 
         // --- UTILIDADES ---
         function initLogoTemplates(){const a=document.getElementById("logo-upload-overlay"),b=document.getElementById("default-logo-svg");a&&(logoUploadOverlayHTML=a.outerHTML,a.parentNode&&a.remove()),b&&(defaultSvgHtml=b.outerHTML);const c=document.getElementById("current-logo");c&&!c.querySelector("img")&&defaultSvgHtml&&(c.innerHTML=defaultSvgHtml+(logoUploadOverlayHTML||""),logoUploadOverlayHTML&&lucide.createIcons())}
         function handleGlobalError(a){appErrorDisplay.textContent=`Error crítico: ${a}`,appErrorDisplay.classList.remove("hidden")}
         function displayMessage(a,b,c="error"){b.textContent=a,b.className="success"===c?"text-center text-sm text-green-400":"text-center text-sm text-red-400",setTimeout(()=>{b.textContent=""},5e3)}
         function closeThemeDropdown(){themeDropdownMenu&&themeDropdownMenu.classList.add("hidden")}
-        function updateUIBasedOnAuth(){isAdmin?(adminStatusDisplay.classList.remove("hidden"),logoContainer.classList.add("admin-active"),inventoryContentAdmin.classList.remove("hidden"),inventoryHeaderActions.classList.remove("hidden"),salesAddFormAdmin.classList.remove("hidden"),salesHeaderActions.classList.remove("hidden"),openSalesModalBtn.classList.remove("hidden"),openSalesModalBtn.classList.remove("bg-transparent","text-gray-300"),openSalesModalBtn.classList.add("bg-indigo-500","text-white")):(adminStatusDisplay.classList.add("hidden"),logoContainer.classList.remove("admin-active"),inventoryContentAdmin.classList.add("hidden"),inventoryHeaderActions.classList.add("hidden"),salesAddFormAdmin.classList.add("hidden"),salesHeaderActions.classList.add("hidden"),userId?(openSalesModalBtn.classList.remove("hidden"),openSalesModalBtn.classList.remove("bg-indigo-500","text-white"),openSalesModalBtn.classList.add("bg-transparent","text-gray-300")):openSalesModalBtn.classList.add("hidden")),loadInventoryData(),userId&&loadSalesData()}
+        // ==================================================
+        // CORRECCIÓN AQUÍ: Se eliminan las referencias a inventoryHeaderActions
+        // ==================================================
+        function updateUIBasedOnAuth(){
+            if (isAdmin){
+                adminStatusDisplay.classList.remove("hidden");
+                logoContainer.classList.add("admin-active"); 
+                inventoryContentAdmin.classList.remove("hidden"); 
+                // inventoryHeaderActions ya no existe -> LÍNEA ELIMINADA
+                salesAddFormAdmin.classList.remove("hidden"); 
+                salesHeaderActions.classList.remove("hidden"); // Este sí existe (para ventas)
+                openSalesModalBtn.classList.remove("hidden"); 
+                openSalesModalBtn.classList.remove("bg-transparent","text-gray-300");
+                openSalesModalBtn.classList.add("bg-indigo-500","text-white");
+            } else {
+                adminStatusDisplay.classList.add("hidden");
+                logoContainer.classList.remove("admin-active"); 
+                inventoryContentAdmin.classList.add("hidden"); 
+                // inventoryHeaderActions ya no existe -> LÍNEA ELIMINADA
+                salesAddFormAdmin.classList.add("hidden"); 
+                salesHeaderActions.classList.add("hidden");
+                if (userId){
+                    openSalesModalBtn.classList.remove("hidden");
+                    openSalesModalBtn.classList.remove("bg-indigo-500","text-white");
+                    openSalesModalBtn.classList.add("bg-transparent","text-gray-300");
+                } else { 
+                    openSalesModalBtn.classList.add("hidden"); 
+                }
+            }
+            loadInventoryData(); // Carga inventario (ahora en grid)
+            if (userId) loadSalesData(); // Carga ventas (sigue en tabla)
+        }
 
-        // --- AUTENTICACIÓN ---
+        // --- AUTENTICACIÓN --- (Sin cambios)
         function handleAuthChange(a){console.log("HandleAuthChange Fired. Session:",a),a&&a.user?(userId=a.user.id,userEmail=a.user.email,isAdmin=userEmail===ADMIN_EMAIL_REAL,currentUserUidDisplay.textContent=userEmail,authContainer.classList.add("hidden"),logoutContainer.classList.remove("hidden"),salesAuthMessage.classList.add("hidden"),salesContent.classList.remove("hidden")):(userId=null,userEmail=null,isAdmin=!1,authContainer.classList.remove("hidden"),logoutContainer.classList.add("hidden"),salesAuthMessage.classList.remove("hidden"),salesContent.classList.add("hidden"),renderSales([])),updateUIBasedOnAuth(),loadLogo()}
         async function handleAuthSubmit(a){a.preventDefault();const b=authEmailInput.value,c=authPasswordInput.value,d="Registrarse"===authTitle.textContent;authSubmitBtn.disabled=!0,authMessage.textContent="Procesando...";let e;try{e=d?await supabase.auth.signUp({email:b,password:c}):await supabase.auth.signInWithPassword({email:b,password:c}),e.error?displayMessage(e.error.message,authMessage,"error"):(displayMessage("Éxito. Cerrando modal...",authMessage,"success"),setTimeout(()=>closeModal(authModal),1e3))}catch(f){displayMessage("Error de conexión.",authMessage,"error"),console.error(f)}finally{authSubmitBtn.disabled=!1}}
         async function handleLogout(){const{error:a}=await supabase.auth.signOut();a&&console.error("Error al cerrar sesión:",a.message),closeModal(authModal)}
 
-        // --- TEMAS ---
+        // --- TEMAS --- (Sin cambios)
         function applyTheme(a){document.body.classList.remove("theme-dark","theme-infernal","theme-gold");const b={dark:themeBtnDark,infernal:themeBtnInfernal,gold:themeBtnGold};Object.values(b).forEach(c=>c&&c.classList.remove("active")),"infernal"===a?(document.body.classList.add("theme-infernal"),themeBtnInfernal&&themeBtnInfernal.classList.add("active")):"gold"===a?(document.body.classList.add("theme-gold"),themeBtnGold&&themeBtnGold.classList.add("active")):(document.body.classList.add("theme-dark"),themeBtnDark&&themeBtnDark.classList.add("active")),localStorage.setItem("unicell-theme",a)}
         function loadSavedTheme(){const a=localStorage.getItem("unicell-theme")||"dark";applyTheme(a),themeBtnDark&&(themeBtnDark.onclick=()=>{applyTheme("dark"),closeThemeDropdown()}),themeBtnInfernal&&(themeBtnInfernal.onclick=()=>{applyTheme("infernal"),closeThemeDropdown()}),themeBtnGold&&(themeBtnGold.onclick=()=>{applyTheme("gold"),closeThemeDropdown()})}
 
-        // --- STORAGE ---
+        // --- STORAGE --- (Sin cambios)
         async function uploadFile(a,b){const{data:c,error:d}=await supabase.storage.from(ASSETS_BUCKET).upload(b,a,{cacheControl:"3600",upsert:!0});if(d)throw console.error("Error al subir archivo a Storage:",d),Error(`Error al subir archivo: ${d.message}`);return c.path}
         function getPublicUrl(a){const{data:b}=supabase.storage.from(ASSETS_BUCKET).getPublicUrl(a);return`${b.publicUrl}?v=${Date.now()}`}
         async function deleteFile(a){if(!a||"null"===a)return;const{error:b}=await supabase.storage.from(ASSETS_BUCKET).remove([a]);b&&console.error("Error al eliminar archivo de Storage:",b)}
         async function handleLogoUpload(a){if(!isAdmin)return;const b=a.target.files[0];if(!b)return;const c=document.getElementById("current-logo"),d=new FileReader;d.onload=b=>{let d=c.querySelector("img");d||(c.innerHTML="",d=document.createElement("img"),d.className="w-full h-full object-cover rounded-full",c.appendChild(d)),d.src=b.target.result,logoUploadOverlayHTML&&!c.querySelector("#logo-upload-overlay")&&(c.insertAdjacentHTML("beforeend",logoUploadOverlayHTML),(()=>{const a=document.getElementById("logo-file-input");a&&(a.onchange=handleLogoUpload),lucide.createIcons()})())},d.readAsDataURL(b),c.insertAdjacentHTML("beforeend",'<div class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full"><div class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div></div>');try{if(!userId)throw Error("Admin debe iniciar sesión.");const f=await uploadFile(b,`logo/${userId}/${Date.now()}_${b.name}`),g=getPublicUrl(f),{error:h}=await supabase.from("services").upsert({id:"logo",image_url:g,image_path:f,user_id:userId},{onConflict:"id"});if(h)throw h;displayMessage("Logo actualizado.",authMessage,"success")}catch(i){console.error("Error al subir logo:",i),displayMessage(`Error al subir logo: ${i.message}`,authMessage,"error"),loadLogo()}finally{const j=c.querySelector(".animate-spin");j&&j.parentElement.remove(),logoUploadOverlayHTML&&!c.querySelector("#logo-upload-overlay")&&(c.insertAdjacentHTML("beforeend",logoUploadOverlayHTML),(()=>{const a=document.getElementById("logo-file-input");a&&(a.onchange=handleLogoUpload),lucide.createIcons()})()),a.target.value=null}}
         async function loadLogo(){if(!supabase)return;try{const{data:a,error:b}=await supabase.from("services").select("image_url").eq("id","logo").maybeSingle();if(b&&"PGRST116"!==b.code)throw b;const c=document.getElementById("current-logo");c.innerHTML="",a&&a.image_url?c.innerHTML=`<img src="${a.image_url}" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null; this.parentElement.innerHTML = '${defaultSvgHtml.replace(/'/g,"\\'")}' + '${logoUploadOverlayHTML.replace(/'/g,"\\'")}'; lucide.createIcons();">${logoUploadOverlayHTML}`:c.innerHTML=defaultSvgHtml+logoUploadOverlayHTML;const d=document.getElementById("logo-file-input");d&&(d.onchange=handleLogoUpload),isAdmin?logoContainer.classList.add("admin-active"):logoContainer.classList.remove("admin-active"),lucide.createIcons()}catch(e){console.error("Error al cargar logo:",e);const f=document.getElementById("current-logo");f&&(f.innerHTML=defaultSvgHtml+logoUploadOverlayHTML,(()=>{const a=document.getElementById("logo-file-input");a&&(a.onchange=handleLogoUpload),lucide.createIcons()})())}}
 
-        // ==================================================
-        // INICIO: LÓGICA DE INVENTARIO MODIFICADA PARA GRID
-        // ==================================================
-        function loadInventoryData() {
-            if (!supabase) return;
-            inventoryGridContainer.innerHTML = ''; // Limpiar grid
-            inventoryLoadingMsg.classList.remove('hidden'); // Mostrar cargando
-            inventoryEmptyMsg.classList.add('hidden'); // Ocultar mensaje vacío
-            
-            supabase.from('inventory').select('*').order('name', { ascending: true })
-                .then(({ data, error }) => {
-                    inventoryLoadingMsg.classList.add('hidden'); // Ocultar cargando
-                    if (error) throw error;
-                    renderInventory(data || []);
-                })
-                .catch(err => {
-                    inventoryLoadingMsg.classList.add('hidden'); // Ocultar cargando
-                    console.error("Error al cargar inventario:", err);
-                    inventoryGridContainer.innerHTML = '<p class="text-center text-red-400 italic sm:col-span-2 lg:col-span-3 xl:col-span-4 py-4">Error al cargar inventario.</p>';
-                    // ... (Manejo de errores específicos) ...
-                });
-        }
-
-        function renderInventory(items) {
-            inventoryGridContainer.innerHTML = ''; // Limpiar grid por si acaso
-            if (items.length === 0) {
-                 inventoryEmptyMsg.classList.remove('hidden'); // Mostrar mensaje vacío
-                return;
-            }
-             inventoryEmptyMsg.classList.add('hidden'); // Asegurar que mensaje vacío está oculto
-
-            items.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.id = `inv-item-${item.id}`; // Añadir ID a la tarjeta para edición/eliminación
-
-                const adminButtons = isAdmin ? `
-                    <button onclick="toggleInventoryEdit(event, '${item.id}', '${item.name.replace(/'/g, "\\'")}', ${item.price}, '${(item.category || '').replace(/'/g, "\\'")}')" class="edit-btn text-yellow-400 hover:text-yellow-300 p-1 rounded-full transition duration-150" data-editing="false">
-                        <i data-lucide="pencil" class="w-4 h-4"></i>
-                    </button>
-                    <button onclick="deleteInventoryItem('${item.id}', '${item.image_path}')" class="text-red-500 hover:text-red-400 p-1 rounded-full transition duration-150">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>` : '';
-
-                card.innerHTML = `
-                    ${item.image_url 
-                        ? `<img src="${item.image_url}" alt="${item.name}" class="inventory-image-preview">` 
-                        : `<div class="w-full h-[150px] bg-gray-700 flex items-center justify-center text-xs text-gray-400 border-b border-gray-600">Sin Foto</div>`
-                    }
-                    <div class="product-card-content">
-                        <h3 class="font-semibold text-base mb-1" id="inv-name-${item.id}">${item.name}</h3>
-                        <p class="text-sm text-gray-400 mb-2" id="inv-category-${item.id}">${item.category || 'Sin Categoría'}</p>
-                        <p class="font-bold text-lg accent-text" id="inv-price-${item.id}">$${Number(item.price || 0).toFixed(2)}</p>
-                    </div>
-                    ${isAdmin ? `<div class="product-card-actions">${adminButtons}</div>` : ''} 
-                `;
-                inventoryGridContainer.appendChild(card);
-            });
-            lucide.createIcons(); // Crear iconos después de añadir todas las tarjetas
-        }
-        
-        // Función addInventoryItem (sin cambios lógicos, solo resetea campos)
-         async function addInventoryItem(){if(!isAdmin||!userId)return void displayMessage("Acción no permitida.",inventoryMessage);const a=inventoryNameInput.value.trim(),b=parseFloat(inventoryPriceInput.value.trim()),c=inventoryCategorySelect.value,d=inventoryImageFile.files[0];if(!a||isNaN(b)||0>=b||!c)return void displayMessage("Nombre, precio válido y categoría son requeridos.",inventoryMessage);inventoryAddBtn.disabled=!0,inventoryAddBtn.innerHTML='<i data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin"></i> Guardando...',lucide.createIcons();let e=null,f=null;try{d&&(e=await uploadFile(d,`inventory/${userId}/${Date.now()}_${d.name}`),f=getPublicUrl(e));const{error:g}=await supabase.from("inventory").insert([{name:a,price:b,category:c,image_url:f,image_path:e,user_id:userId}]);if(g)throw g;inventoryNameInput.value="",inventoryPriceInput.value="",inventoryCategorySelect.value="",inventoryImageFile.value="",displayMessage("Producto añadido.",inventoryMessage,"success"),loadInventoryData()}catch(h){console.error("Error al agregar inventario:",h),displayMessage(`Error: ${h.message}`,inventoryMessage),e&&deleteFile(e)}finally{inventoryAddBtn.innerHTML='<i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir Producto',inventoryAddBtn.disabled=!1,lucide.createIcons()}}
-
-        // Función toggleInventoryEdit adaptada para tarjetas
-        window.toggleInventoryEdit = function(event, id, currentName, currentPrice, currentCategory) {
-            if (!isAdmin) return;
-            
-            const card = document.getElementById(`inv-item-${id}`);
-            if (!card) return; // Salir si la tarjeta no se encuentra
-            
-            const contentDiv = card.querySelector('.product-card-content');
-            const button = event.currentTarget; 
-            const isEditing = button.getAttribute('data-editing') === 'true';
-
-            if (!isEditing) {
-                // Guardar contenido original por si acaso (aunque no lo usaremos si recargamos)
-                // const originalContent = contentDiv.innerHTML;
-                
-                // Reemplazar contenido con inputs
-                contentDiv.innerHTML = `
-                    <input type="text" id="input-inv-name-${id}" value="${currentName}" class="w-full bg-gray-600 rounded-md p-1 mb-1 input-dark text-base font-semibold" placeholder="Nombre"/>
-                    <select id="input-inv-category-${id}" class="w-full bg-gray-600 rounded-md p-1 mb-2 input-dark text-sm">${CATEGORY_OPTIONS_HTML}</select>
-                    <input type="number" id="input-inv-price-${id}" value="${Number(currentPrice).toFixed(2)}" class="w-full bg-gray-600 rounded-md p-1 input-dark font-bold text-lg accent-text" step="0.01" placeholder="Precio"/>
-                `;
-                document.getElementById(`input-inv-category-${id}`).value = currentCategory; // Pre-seleccionar categoría
-                
-                // Cambiar botón a Guardar
-                button.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i>'; 
-                button.classList.remove('text-yellow-400', 'hover:text-yellow-300'); 
-                button.classList.add('text-green-500', 'hover:text-green-400'); // Cambiar color a verde
-                button.setAttribute('data-editing', 'true'); 
-                lucide.createIcons();
-            } else {
-                // Obtener valores de los inputs
-                const newName = document.getElementById(`input-inv-name-${id}`).value.trim();
-                const newPrice = parseFloat(document.getElementById(`input-inv-price-${id}`).value.trim());
-                const newCategory = document.getElementById(`input-inv-category-${id}`).value;
-                
-                if (!newName || isNaN(newPrice) || newPrice <= 0 || !newCategory) { 
-                    displayMessage("Nombre, precio y categoría válidos.", inventoryMessage); 
-                    // Podríamos restaurar el contenido original aquí si no quisiéramos recargar
-                    return; 
-                }
-                // Llamar a updateInventoryItem (que luego llamará a loadInventoryData para redibujar)
-                updateInventoryItem(id, newName, newPrice, newCategory); 
-            }
-        }
-        
-        // Función updateInventoryItem (sin cambios lógicos, llama a loadInventoryData)
+        // --- INVENTARIO (Lógica adaptada a grid) ---
+        function loadInventoryData(){if(!supabase)return;inventoryGridContainer.innerHTML="",inventoryLoadingMsg.classList.remove("hidden"),inventoryEmptyMsg.classList.add("hidden"),supabase.from("inventory").select("*").order("name",{ascending:!0}).then(({data:a,error:b})=>{inventoryLoadingMsg.classList.add("hidden"),(()=>{if(b)throw b})(),renderInventory(a||[])}).catch(c=>{inventoryLoadingMsg.classList.add("hidden"),console.error("Error al cargar inventario:",c),inventoryGridContainer.innerHTML='<p class="text-center text-red-400 italic sm:col-span-2 lg:col-span-3 xl:col-span-4 py-4">Error al cargar inventario.</p>',c.message.includes('column "category" does not exist')?handleGlobalError("La columna 'category' no existe en la tabla 'inventory'. Revise las instrucciones."):c.message.includes("does not exist")?handleGlobalError("La tabla 'inventory' no existe en Supabase."):c.message.includes("permission denied")&&handleGlobalError("Permisos incorrectos para leer 'inventory'. Revisa las Políticas RLS.")})}
+        function renderInventory(a){inventoryGridContainer.innerHTML="",0===a.length?(inventoryEmptyMsg.classList.remove("hidden"),1):inventoryEmptyMsg.classList.add("hidden"),a.forEach(b=>{const c=document.createElement("div");c.className="product-card",c.id=`inv-item-${b.id}`;const d=isAdmin?`<button onclick="toggleInventoryEdit(event, '${b.id}', '${b.name.replace(/'/g,"\\'")}', ${b.price}, '${(b.category||"").replace(/'/g,"\\'")}')" class="edit-btn text-yellow-400 hover:text-yellow-300 p-1 rounded-full transition duration-150" data-editing="false"><i data-lucide="pencil" class="w-4 h-4"></i></button><button onclick="deleteInventoryItem('${b.id}', '${b.image_path}')" class="text-red-500 hover:text-red-400 p-1 rounded-full transition duration-150"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`:"";c.innerHTML=`${b.image_url?`<img src="${b.image_url}" alt="${b.name}" class="inventory-image-preview">`:`<div class="w-full h-[150px] bg-gray-700 flex items-center justify-center text-xs text-gray-400 border-b border-gray-600">Sin Foto</div>`}<div class="product-card-content"><h3 class="font-semibold text-base mb-1" id="inv-name-${b.id}">${b.name}</h3><p class="text-sm text-gray-400 mb-2" id="inv-category-${b.id}">${b.category||"Sin Categoría"}</p><p class="font-bold text-lg accent-text" id="inv-price-${b.id}">$${Number(b.price||0).toFixed(2)}</p></div>${isAdmin?`<div class="product-card-actions">${d}</div>`:""}`,inventoryGridContainer.appendChild(c)}),lucide.createIcons()}
+        async function addInventoryItem(){if(!isAdmin||!userId)return void displayMessage("Acción no permitida.",inventoryMessage);const a=inventoryNameInput.value.trim(),b=parseFloat(inventoryPriceInput.value.trim()),c=inventoryCategorySelect.value,d=inventoryImageFile.files[0];if(!a||isNaN(b)||0>=b||!c)return void displayMessage("Nombre, precio válido y categoría son requeridos.",inventoryMessage);inventoryAddBtn.disabled=!0,inventoryAddBtn.innerHTML='<i data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin"></i> Guardando...',lucide.createIcons();let e=null,f=null;try{d&&(e=await uploadFile(d,`inventory/${userId}/${Date.now()}_${d.name}`),f=getPublicUrl(e));const{error:g}=await supabase.from("inventory").insert([{name:a,price:b,category:c,image_url:f,image_path:e,user_id:userId}]);if(g)throw g;inventoryNameInput.value="",inventoryPriceInput.value="",inventoryCategorySelect.value="",inventoryImageFile.value="",displayMessage("Producto añadido.",inventoryMessage,"success"),loadInventoryData()}catch(h){console.error("Error al agregar inventario:",h),displayMessage(`Error: ${h.message}`,inventoryMessage),e&&deleteFile(e)}finally{inventoryAddBtn.innerHTML='<i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir Producto',inventoryAddBtn.disabled=!1,lucide.createIcons()}}
+        window.toggleInventoryEdit = function(a,b,c,d,e){if(!isAdmin)return;const f=document.getElementById(`inv-item-${b}`);if(!f)return;const g=f.querySelector(".product-card-content"),h=a.currentTarget,i="true"===h.getAttribute("data-editing");i?(()=>{const a=document.getElementById(`input-inv-name-${b}`).value.trim(),c=parseFloat(document.getElementById(`input-inv-price-${b}`).value.trim()),d=document.getElementById(`input-inv-category-${b}`).value;return!a||isNaN(c)||0>=c||!d?void displayMessage("Nombre, precio y categoría válidos.",inventoryMessage):void updateInventoryItem(b,a,c,d)})():(g.innerHTML=`<input type="text" id="input-inv-name-${b}" value="${c}" class="w-full bg-gray-600 rounded-md p-1 mb-1 input-dark text-base font-semibold" placeholder="Nombre"/><select id="input-inv-category-${b}" class="w-full bg-gray-600 rounded-md p-1 mb-2 input-dark text-sm">${CATEGORY_OPTIONS_HTML}</select><input type="number" id="input-inv-price-${b}" value="${Number(d).toFixed(2)}" class="w-full bg-gray-600 rounded-md p-1 input-dark font-bold text-lg accent-text" step="0.01" placeholder="Precio"/>`,document.getElementById(`input-inv-category-${b}`).value=e,h.innerHTML='<i data-lucide="save" class="w-4 h-4"></i>',h.classList.remove("text-yellow-400","hover:text-yellow-300"),h.classList.add("text-green-500","hover:text-green-400"),h.setAttribute("data-editing","true"),lucide.createIcons())}
         async function updateInventoryItem(a,b,c,d){if(!isAdmin)return;const{error:e}=await supabase.from("inventory").update({name:b,price:c,category:d,user_id:userId}).eq("id",a);e&&(console.error("Error al actualizar inventario:",e),displayMessage("Error al actualizar.",inventoryMessage)),loadInventoryData()}
-        
-        // Función deleteInventoryItem (sin cambios lógicos, llama a loadInventoryData)
         window.deleteInventoryItem = async function(a,b){if(!isAdmin||!confirm("¿Eliminar este producto del inventario?"))return;try{await deleteFile(b);const{error:c}=await supabase.from("inventory").delete().eq("id",a);if(c)throw c;displayMessage("Producto eliminado.",inventoryMessage,"success"),loadInventoryData()}catch(d){console.error("Error al eliminar inventario:",d),displayMessage(`Error: ${d.message}`,inventoryMessage)}}
-        // ==================================================
-        // FIN: LÓGICA DE INVENTARIO MODIFICADA
-        // ==================================================
-
-        // --- VENTAS ---
+        
+        // --- VENTAS --- (Sin cambios)
         function loadSalesData(){if(!supabase||!userId)return void renderSales([]);supabase.from("sales").select("*").order("created_at",{ascending:!1}).then(({data:a,error:b})=>{if(b)throw b;renderSales(a||[])}).catch(c=>{console.error("Error al cargar ventas:",c.message),salesList.innerHTML='<tr><td colspan="5" class="text-center py-4 text-red-400">Error al cargar ventas.</td></tr>',c.message.includes('column "category" does not exist')?handleGlobalError("La columna 'category' no existe en la tabla 'sales'. Revise las instrucciones."):c.message.includes("does not exist")?handleGlobalError("La tabla 'sales' no existe en Supabase."):c.message.includes("permission denied")&&handleGlobalError("Permisos incorrectos para leer 'sales'. Revisa las Políticas RLS.")})}
         function renderSales(a){salesList.innerHTML="";let b=0;if(0===a.length)return salesList.innerHTML='<tr><td colspan="5" class="text-center py-4 text-gray-500 italic">No hay ventas registradas.</td></tr>',void(salesTotal.textContent="$0.00");a.forEach(c=>{b+=Number(c.price||0);const d=document.createElement("tr");d.className="hover:bg-gray-700 transition duration-150";const e=isAdmin?`<button onclick="toggleSaleEdit(event, '${c.id}', '${(c.clientName||"").replace(/'/g,"\\'")}', '${c.name.replace(/'/g,"\\'")}', ${c.price}, '${(c.category||"").replace(/'/g,"\\'")}')" class="edit-btn text-yellow-400 hover:text-yellow-300 p-2 rounded-full transition duration-150" data-editing="false"><i data-lucide="pencil" class="w-4 h-4"></i></button><button onclick="deleteSaleItem('${c.id}')" class="text-red-500 hover:text-red-400 p-2 rounded-full transition duration-150"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`:"";d.innerHTML=`<td class="px-4 py-3 font-medium text-gray-300"><span id="client-name-${c.id}">${c.clientName||"N/A"}</span></td><td class="px-4 py-3 font-medium text-white"><span id="sale-name-${c.id}">${c.name}</span></td><td class="px-4 py-3 align-top text-gray-300"><span id="sale-category-${c.id}">${c.category||"N/A"}</span></td><td class="px-4 py-3 text-white"><span id="sale-price-${c.id}">$${Number(c.price||0).toFixed(2)}</span></td><td class="px-4 py-3 text-right space-x-2">${e}</td>`,salesList.appendChild(d)}),salesTotal.textContent=`$${b.toFixed(2)}`,lucide.createIcons()}
         async function addSaleItem(){if(!isAdmin||!userId)return salesAuthMessage.textContent="Solo el admin puede registrar ventas.",void salesAuthMessage.classList.remove("hidden");const a=clientNameInput.value.trim()||"Venta General",b=productNameInput.value.trim(),c=parseFloat(productPriceInput.value.trim()),d=saleCategorySelect.value;if(!b||isNaN(c)||0>=c||!d)return void displayMessage("Nombre, precio válido y categoría requeridos.",salesAuthMessage);addSaleBtn.disabled=!0,addSaleBtn.innerHTML='<i data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin"></i> Añadiendo...',lucide.createIcons();try{const{error:e}=await supabase.from("sales").insert([{clientName:a,name:b,price:c,category:d,user_id:userId,created_at:(new Date).toISOString()}]);if(e)throw e;productNameInput.value="",productPriceInput.value="",saleCategorySelect.value="",clientNameInput.value="",loadSalesData()}catch(f){console.error("Error al agregar venta:",f),displayMessage(`Error: ${f.message}`,salesAuthMessage)}finally{addSaleBtn.disabled=!1,addSaleBtn.innerHTML='<i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir a Venta',lucide.createIcons()}}
@@ -419,10 +189,8 @@
         async function updateSaleItem(a,b,c,d,e){if(!isAdmin)return;const{error:f}=await supabase.from("sales").update({clientName:b,name:c,price:d,category:e}).eq("id",a);f&&(console.error("Error al actualizar venta:",f),displayMessage("Error al actualizar.",salesAuthMessage)),loadSalesData()}
         window.deleteSaleItem=async function(a){if(!isAdmin||!confirm("¿Eliminar esta venta del registro?"))return;const{error:b}=await supabase.from("sales").delete().eq("id",a);b?(console.error("Error al eliminar venta:",b),displayMessage(`Error: ${b.message}`,salesAuthMessage)):loadSalesData()}
 
-        // --- MODALES Y EVENT LISTENERS ---
-        function openModal(a){a.classList.remove("hidden"),a.classList.add("flex")}
-        function closeModal(a){a.classList.add("hidden"),a.classList.remove("flex")}
-        document.querySelectorAll(".fixed.inset-0").forEach(a=>{a.addEventListener("click",b=>{b.target===a&&closeModal(a)})}),document.getElementById("open-auth-modal-btn").onclick=()=>openModal(authModal),document.getElementById("close-auth-modal").onclick=()=>closeModal(authModal),logoutBtn.onclick=handleLogout,toggleAuthModeBtn.onclick=()=>{const a="Iniciar Sesión"===authTitle.textContent;authTitle.textContent=a?"Registrarse":"Iniciar Sesión",authButtonText.textContent=a?"Registrarse":"Iniciar Sesión",toggleAuthModeBtn.textContent=a?"¿Ya tienes cuenta? Inicia Sesión":"¿No tienes cuenta? Regístrate"},loginForm.onsubmit=handleAuthSubmit,document.getElementById("open-inventory-modal-btn").onclick=()=>openModal(inventoryModal),document.getElementById("close-inventory-modal").onclick=()=>closeModal(inventoryModal),inventoryAddBtn.onclick=addInventoryItem,openSalesModalBtn.onclick=()=>{userId?(salesAuthMessage.classList.add("hidden"),salesContent.classList.remove("hidden"),openModal(salesModal)):(salesAuthMessage.textContent="Debes iniciar sesión para acceder a las ventas.",salesAuthMessage.classList.remove("hidden"),salesContent.classList.add("hidden"),openModal(salesModal))},document.getElementById("close-sales-modal").onclick=()=>closeModal(salesModal),addSaleBtn.onclick=addSaleItem,openThemeDropdownBtn&&openThemeDropdownBtn.onclick,openThemeDropdownBtn.onclick=a=>{a.stopPropagation(),themeDropdownMenu.classList.toggle("hidden")},window.addEventListener("click",a=>{themeDropdownWrapper&&!themeDropdownWrapper.contains(a.target)&&closeThemeDropdown()});
+        // --- MODALES Y EVENT LISTENERS --- (Sin cambios)
+        function openModal(a){a.classList.remove("hidden"),a.classList.add("flex")} function closeModal(a){a.classList.add("hidden"),a.classList.remove("flex")} document.querySelectorAll(".fixed.inset-0").forEach(a=>{a.addEventListener("click",b=>{b.target===a&&closeModal(a)})}),document.getElementById("open-auth-modal-btn").onclick=()=>openModal(authModal),document.getElementById("close-auth-modal").onclick=()=>closeModal(authModal),logoutBtn.onclick=handleLogout,toggleAuthModeBtn.onclick=()=>{const a="Iniciar Sesión"===authTitle.textContent;authTitle.textContent=a?"Registrarse":"Iniciar Sesión",authButtonText.textContent=a?"Registrarse":"Iniciar Sesión",toggleAuthModeBtn.textContent=a?"¿Ya tienes cuenta? Inicia Sesión":"¿No tienes cuenta? Regístrate"},loginForm.onsubmit=handleAuthSubmit,document.getElementById("open-inventory-modal-btn").onclick=()=>openModal(inventoryModal),document.getElementById("close-inventory-modal").onclick=()=>closeModal(inventoryModal),inventoryAddBtn.onclick=addInventoryItem,openSalesModalBtn.onclick=()=>{userId?(salesAuthMessage.classList.add("hidden"),salesContent.classList.remove("hidden"),openModal(salesModal)):(salesAuthMessage.textContent="Debes iniciar sesión para acceder a las ventas.",salesAuthMessage.classList.remove("hidden"),salesContent.classList.add("hidden"),openModal(salesModal))},document.getElementById("close-sales-modal").onclick=()=>closeModal(salesModal),addSaleBtn.onclick=addSaleItem,openThemeDropdownBtn&&openThemeDropdownBtn.onclick,openThemeDropdownBtn.onclick=a=>{a.stopPropagation(),themeDropdownMenu.classList.toggle("hidden")},window.addEventListener("click",a=>{themeDropdownWrapper&&!themeDropdownWrapper.contains(a.target)&&closeThemeDropdown()});
 
         // --- INICIALIZACIÓN ---
         async function initSupabaseAndSession() {
