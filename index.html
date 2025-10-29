@@ -15,26 +15,14 @@
     
     <style>
         /* Estilos base + Nuevos Temas */
-        body { background-image: radial-gradient(at top left, var(--color-primary-gradient), transparent 50%), radial-gradient(at bottom right, var(--color-secondary-gradient), transparent 50%); min-height: 100vh; padding-top: 5rem; /* Ajustar si la altura del header cambia */ }
+        body { background-image: radial-gradient(at top left, var(--color-primary-gradient), transparent 50%), radial-gradient(at bottom right, var(--color-secondary-gradient), transparent 50%); min-height: 100vh; padding-top: 5rem; }
         .accent-text { color: var(--accent-color); }
         .input-dark { background-color: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); }
         .focus\:ring-primary:focus { --tw-ring-color: var(--accent-color) !important; }
         #logo-upload-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.7); opacity: 0; transition: opacity 0.3s; cursor: pointer; border-radius: 9999px; }
         #logo-container.admin-active:hover #logo-upload-overlay { display: flex; opacity: 1; }
         #logo-container:not(.admin-active) #logo-upload-overlay { display: none; }
-        
-        /* ================================================== */
-        /* CAMBIO AQUÍ: Altura de la imagen aumentada */
-        /* ================================================== */
-        .inventory-image-preview { 
-            width: 100%; 
-            height: 200px; /* Aumentado de 150px */
-            object-fit: cover; 
-            border-top-left-radius: 0.5rem; 
-            border-top-right-radius: 0.5rem; 
-            margin-bottom: 0.75rem; 
-        }
-        
+        .inventory-image-preview { width: 100%; height: 200px; object-fit: cover; border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem; margin-bottom: 0.75rem; }
         .theme-btn { width: 2rem; height: 2rem; border-radius: 9999px; border: 3px solid #4B5563; cursor: pointer; transition: border-color 0.2s; }
         .theme-btn.active, .theme-btn:hover { border-color: var(--accent-color); }
         #theme-btn-dark { background-color: #818cf8; } #theme-btn-infernal { background-color: #ff4500; } #theme-btn-gold { background-color: #D4AF37; }
@@ -92,16 +80,16 @@
         <div class="flex items-center space-x-4">
             <div class="relative" id="logo-container"> 
                 <div class="relative w-16 h-16 flex items-center justify-center rounded-full border-2 border-indigo-500 shadow-md bg-gray-700" id="current-logo"> 
-                    <svg id="default-logo-svg" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 accent-text" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> 
-                        <path d="M12 20a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" opacity=".2"/> 
-                        <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" fill="var(--accent-color)"/> 
-                        <path d="M16 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM10 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/> 
-                        <path d="M12 14v-2" stroke-width="3"/> 
-                    </svg> 
+                    <svg id="default-logo-svg" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 accent-text" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M12 20a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" opacity=".2"/> <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" fill="var(--accent-color)"/> <path d="M16 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM10 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/> <path d="M12 14v-2" stroke-width="3"/> </svg> 
                     <div id="logo-upload-overlay"> <i data-lucide="upload" class="w-5 h-5 text-white"></i> <input type="file" id="logo-file-input" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*"> </div> 
                 </div> 
             </div>
-            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white"> UNICELL <span class="block text-sm sm:text-base font-light accent-text border-b border-indigo-500 inline-block pb-0"> SERVICIO TÉCNICO </span> </h1>
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight uppercase accent-text"> 
+                UNICELL 
+                <span class="block text-sm sm:text-base font-light accent-text border-b border-indigo-500 inline-block pb-0"> 
+                    SERVICIO TÉCNICO 
+                </span> 
+            </h1>
         </div>
         <div class="flex items-center space-x-3">
             <button id="open-sales-modal-btn" class="bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm hidden flex items-center"> <i data-lucide="receipt-text" class="w-4 h-4 mr-1"></i> Ventas </button>
@@ -182,7 +170,7 @@
         async function handleLogoUpload(a){if(!isAdmin)return;const b=a.target.files[0];if(!b)return;const c=document.getElementById("current-logo"),d=new FileReader;d.onload=b=>{let d=c.querySelector("img");d||(c.innerHTML="",d=document.createElement("img"),d.className="w-full h-full object-cover rounded-full",c.appendChild(d)),d.src=b.target.result,logoUploadOverlayHTML&&!c.querySelector("#logo-upload-overlay")&&(c.insertAdjacentHTML("beforeend",logoUploadOverlayHTML),lucide.createIcons(),attachLogoInputListener())},d.readAsDataURL(b);c.insertAdjacentHTML("beforeend",'<div class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full"><div class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div></div>');try{if(!userId)throw Error("Admin debe iniciar sesión.");const f=await uploadFile(b,`logo/${userId}/${Date.now()}_${b.name}`),g=getPublicUrl(f),{error:h}=await supabase.from("services").upsert({id:"logo",image_url:g,image_path:f,user_id:userId},{onConflict:"id"});if(h)throw h;displayMessage("Logo actualizado.",authMessage,"success")}catch(i){console.error("Error al subir logo:",i),displayMessage(`Error al subir logo: ${i.message}`,authMessage,"error"),loadLogo()}finally{const j=c.querySelector(".animate-spin");j&&j.parentElement.remove(),logoUploadOverlayHTML&&!c.querySelector("#logo-upload-overlay")&&(c.insertAdjacentHTML("beforeend",logoUploadOverlayHTML),lucide.createIcons(),attachLogoInputListener()),a.target.value=null}}
         
         // ==================================================
-        // CORRECCIÓN loadLogo: onError string corregido FINAL (v2)
+        // CORRECCIÓN FINAL loadLogo: onError string 
         // ==================================================
         async function loadLogo() {
             if (!supabase) return;
@@ -190,30 +178,27 @@
                 const { data: a, error: b } = await supabase.from("services").select("image_url").eq("id", "logo").maybeSingle(); 
                 if (b && "PGRST116" !== b.code) throw b;
                 const c = document.getElementById("current-logo"); 
-                c.innerHTML = ""; // Limpiar siempre
+                c.innerHTML = ""; 
                 
                 // Definir el contenido del onerror de forma segura
-                // Quitamos el ">" extra al final
                 const onErrorContent = `this.onerror=null; this.parentElement.innerHTML = '${defaultSvgHtml.replace(/'/g, "\\'")}' + '${logoUploadOverlayHTML.replace(/'/g, "\\'")}'; lucide.createIcons(); attachLogoInputListener();`;
 
                 if (a && a.image_url) {
-                    // Cargar imagen de Supabase
+                    // Cargar imagen de Supabase (Corregido: Quitados ">" extra)
                     c.innerHTML = `<img src="${a.image_url}" class="w-full h-full object-cover rounded-full" onerror="${onErrorContent.replace(/"/g, '&quot;')}">${logoUploadOverlayHTML}`; 
                 } else {
-                     // Mostrar SVG por defecto + overlay
                     c.innerHTML = defaultSvgHtml + logoUploadOverlayHTML;
                 }
                 
-                attachLogoInputListener(); // Adjuntar listener después de cambiar innerHTML
+                attachLogoInputListener(); 
                 isAdmin ? logoContainer.classList.add("admin-active") : logoContainer.classList.remove("admin-active");
-                lucide.createIcons() // Asegurar iconos
+                lucide.createIcons() 
             } catch (e) { 
                 console.error("Error al cargar logo:", e); 
                 const f = document.getElementById("current-logo"); 
                 f && (f.innerHTML = defaultSvgHtml + logoUploadOverlayHTML, attachLogoInputListener(), lucide.createIcons()) 
             }
         }
-
 
         // --- INVENTARIO ---
         function loadInventoryData(){if(!supabase)return;inventoryGridContainer.innerHTML="",inventoryLoadingMsg.classList.remove("hidden"),inventoryEmptyMsg.classList.add("hidden"),supabase.from("inventory").select("*").order("name",{ascending:!0}).then(({data:a,error:b})=>{inventoryLoadingMsg.classList.add("hidden"),(()=>{if(b)throw b})(),renderInventory(a||[])}).catch(c=>{inventoryLoadingMsg.classList.add("hidden"),console.error("Error al cargar inventario:",c),inventoryGridContainer.innerHTML='<p class="text-center text-red-400 italic sm:col-span-2 lg:col-span-3 xl:col-span-4 py-4">Error al cargar inventario.</p>',c.message.includes('column "category" does not exist')?handleGlobalError("La columna 'category' no existe en la tabla 'inventory'. Revise las instrucciones."):c.message.includes("does not exist")?handleGlobalError("La tabla 'inventory' no existe en Supabase."):c.message.includes("permission denied")&&handleGlobalError("Permisos incorrectos para leer 'inventory'. Revisa las Políticas RLS.")})}
