@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNICELL Servicio Técnico | Inventario</title> <script src="https://cdn.tailwindcss.com"></script>
+    <title>UNICELL Servicio Técnico | Inventario</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -13,12 +15,7 @@
     
     <style>
         /* Estilos base + Nuevos Temas */
-        body { 
-            background-image: radial-gradient(at top left, var(--color-primary-gradient), transparent 50%), radial-gradient(at bottom right, var(--color-secondary-gradient), transparent 50%); 
-            min-height: 100vh; 
-            padding-top: 5rem; /* Compensar header fijo */
-        }
-        
+        body { background-image: radial-gradient(at top left, var(--color-primary-gradient), transparent 50%), radial-gradient(at bottom right, var(--color-secondary-gradient), transparent 50%); min-height: 100vh; padding-top: 5rem; }
         .accent-text { color: var(--accent-color); }
         .input-dark { background-color: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); }
         .focus\:ring-primary:focus { --tw-ring-color: var(--accent-color) !important; }
@@ -33,7 +30,6 @@
         /* Estilos Nuevos Temas */
         html { height: 100%; }
         body { min-height: 100vh; display: flex; flex-direction: column; transition: background-color 0.5s ease; }
-        /* CAMBIO: .main-content now takes flex-grow */
         .main-content { flex-grow: 1; } 
         .product-card { background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.5rem; overflow: hidden; transition: transform 0.2s, box-shadow 0.3s; display: flex; flex-direction: column; }
         .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px color-mix(in srgb, var(--accent-color) 20%, transparent), 0 4px 6px -2px color-mix(in srgb, var(--accent-color) 15%, transparent); }
@@ -93,11 +89,10 @@
     </header>
 
     <div class="main-content max-w-6xl mx-auto px-4 py-8"> 
-        <h2 class="text-3xl font-bold text-center mb-6 text-white flex items-center justify-center"> 
-            <i data-lucide="package" class="w-7 h-7 accent-text mr-3"></i> 
-            Inventario de Productos 
-        </h2>
-        <p id="app-error-display" class="my-4 text-red-500 font-bold hidden text-center"></p> <div id="inventory-content-admin" class="hidden mb-8 p-4 bg-gray-800 rounded-lg shadow-inner">
+        <h2 class="text-3xl font-bold text-center mb-6 text-white flex items-center justify-center"> <i data-lucide="package" class="w-7 h-7 accent-text mr-3"></i> Inventario de Productos </h2>
+        <p id="app-error-display" class="my-4 text-red-500 font-bold hidden text-center"></p>
+
+        <div id="inventory-content-admin" class="hidden mb-8 p-4 bg-gray-800 rounded-lg shadow-inner">
              <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir/Editar Producto</h3>
              <div class="grid grid-cols-1 sm:grid-cols-5 gap-4 items-end">
                  <div> <label class="text-gray-400 text-sm">Nombre</label> <input id="inventory-name" type="text" placeholder="Nombre del Producto" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" /> </div>
@@ -120,7 +115,8 @@
             <span class="text-green-500">MODO ADMINISTRADOR ACTIVO.</span> 
         </p>
     </div>
-     <div id="auth-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4"> <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-gray-700 max-w-sm w-full p-6 relative"> <button id="close-auth-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"> <i data-lucide="x" class="w-6 h-6"></i> </button> <div id="auth-container"> <h2 class="text-2xl font-bold text-center mb-6 text-white" id="auth-title">Iniciar Sesión</h2> <form id="login-form" class="space-y-4"> <input id="auth-email" type="email" placeholder="Correo Electrónico" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" required /> <input id="auth-password" type="password" placeholder="Contraseña" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" required /> <button type="submit" id="auth-submit-btn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center"> <i data-lucide="log-in" class="w-5 h-5 mr-2"></i> <span id="auth-button-text">Iniciar Sesión</span> </button> <p id="auth-message" class="text-center text-sm text-red-400"></p> </form> <button id="toggle-auth-mode" class="w-full mt-4 text-center text-sm text-gray-400 hover:text-white transition"> ¿No tienes cuenta? Regístrate </button> </div> <div id="logout-container" class="hidden text-center"> <p class="text-lg text-white mb-4">Sesión Iniciada.</p> <p id="current-user-uid" class="text-xs text-gray-500 mb-6 font-mono break-all"></p> <button id="logout-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center"> <i data-lucide="log-out" class="w-5 h-5 mr-2"></i> Cerrar Sesión </button> </div> </div> </div>
+
+    <div id="auth-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4"> <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-gray-700 max-w-sm w-full p-6 relative"> <button id="close-auth-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"> <i data-lucide="x" class="w-6 h-6"></i> </button> <div id="auth-container"> <h2 class="text-2xl font-bold text-center mb-6 text-white" id="auth-title">Iniciar Sesión</h2> <form id="login-form" class="space-y-4"> <input id="auth-email" type="email" placeholder="Correo Electrónico" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" required /> <input id="auth-password" type="password" placeholder="Contraseña" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" required /> <button type="submit" id="auth-submit-btn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center"> <i data-lucide="log-in" class="w-5 h-5 mr-2"></i> <span id="auth-button-text">Iniciar Sesión</span> </button> <p id="auth-message" class="text-center text-sm text-red-400"></p> </form> <button id="toggle-auth-mode" class="w-full mt-4 text-center text-sm text-gray-400 hover:text-white transition"> ¿No tienes cuenta? Regístrate </button> </div> <div id="logout-container" class="hidden text-center"> <p class="text-lg text-white mb-4">Sesión Iniciada.</p> <p id="current-user-uid" class="text-xs text-gray-500 mb-6 font-mono break-all"></p> <button id="logout-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center"> <i data-lucide="log-out" class="w-5 h-5 mr-2"></i> Cerrar Sesión </button> </div> </div> </div>
     <div id="sales-modal" class="fixed inset-0 z-40 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4"> <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-pink-500/50 max-w-6xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300"> <button id="close-sales-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"> <i data-lucide="x" class="w-7 h-7"></i> </button> <h2 class="text-3xl font-bold text-center mb-6 text-white flex items-center justify-center"> <i data-lucide="receipt-text" class="w-7 h-7 accent-text mr-3"></i> Registro de Ventas </h2> <p id="sales-auth-message" class="text-center p-4 text-red-400 hidden">Debes iniciar sesión para ver o registrar ventas.</p> <div id="sales-content"> <div id="sales-add-form-admin" class="hidden mb-8 p-4 bg-gray-800 rounded-lg shadow-inner"> <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir Nuevo Artículo</h3> <label class="text-gray-400 text-sm mb-1 block">Destinatario/Cliente</label> <input id="client-name" type="text" placeholder="Nombre del Destinatario" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 mb-4" /> <div class="grid grid-cols-1 sm:grid-cols-4 gap-4"> <input id="product-name" type="text" placeholder="Nombre del Producto/Servicio" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" /> <select id="sale-category" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 h-[46px]"> <option value="">Seleccionar...</option> <option value="Placas de Carga">Placas de Carga</option> <option value="Placas">Placas</option> <option value="Botones">Botones</option> <option value="Jacks">Jacks</option> <option value="Vidrios">Vidrios</option> <option value="Cargadores">Cargadores</option> <option value="Privados">Privados</option> <option value="Hidrogel">Hidrogel</option> <option value="Otro">Otro</option> </select> <input id="product-price" type="number" placeholder="Precio (Ej: 150.00)" class="col-span-1 sm:col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" step="0.01" /> <button id="add-btn" class="col-span-1 bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center disabled:opacity-50"> <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir a Venta </button> </div> </div> <div class="overflow-x-auto"> <table class="min-w-full divide-y divide-gray-700 rounded-lg"> <thead class="bg-gray-700"> <tr> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Destinatario</th> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Producto</th> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Categoría</th> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Precio</th> <th id="sales-header-actions" class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider w-40 hidden">Acciones</th> </tr> </thead> <tbody id="sales-list" class="bg-gray-800 divide-y divide-gray-700"> <tr><td colspan="5" class="text-center py-4 text-gray-500 italic">Cargando ventas...</td></tr> </tbody> </table> </div> <div class="mt-4 p-4 bg-gray-700 rounded-lg flex justify-between items-center font-bold text-white text-xl"> <span>TOTAL VENTA:</span> <span id="sales-total" class="accent-text text-2xl">$0.00</span> </div> </div> </div> </div>
 
     <script> lucide.createIcons(); </script>
@@ -137,38 +133,57 @@
 
         // --- REFERENCIAS DOM ---
         const adminStatusDisplay=document.getElementById('admin-status'), appErrorDisplay=document.getElementById('app-error-display'), logoContainer=document.getElementById('logo-container'), authModal=document.getElementById('auth-modal'), authContainer=document.getElementById('auth-container'), logoutContainer=document.getElementById('logout-container'), authTitle=document.getElementById('auth-title'), authButtonText=document.getElementById('auth-button-text'), authSubmitBtn=document.getElementById('auth-submit-btn'), toggleAuthModeBtn=document.getElementById('toggle-auth-mode'), loginForm=document.getElementById('login-form'), authEmailInput=document.getElementById('auth-email'), authPasswordInput=document.getElementById('auth-password'), authMessage=document.getElementById('auth-message'), currentUserUidDisplay=document.getElementById('current-user-uid'), logoutBtn=document.getElementById('logout-btn'), openSalesModalBtn=document.getElementById('open-sales-modal-btn'), salesModal=document.getElementById('sales-modal'), salesContent=document.getElementById('sales-content'), salesAuthMessage=document.getElementById('sales-auth-message'), salesAddFormAdmin=document.getElementById('sales-add-form-admin'), salesList=document.getElementById('sales-list'), salesTotal=document.getElementById('sales-total'), clientNameInput=document.getElementById('client-name'), productNameInput=document.getElementById('product-name'), productPriceInput=document.getElementById('product-price'), saleCategorySelect=document.getElementById('sale-category'), addSaleBtn=document.getElementById('add-btn'), salesHeaderActions=document.getElementById('sales-header-actions'), 
-        // CAMBIO: inventoryModal ya no existe como contenedor principal del inventario
-        inventoryContentAdmin = document.getElementById('inventory-content-admin'), // Formulario admin
-        inventoryGridContainer = document.getElementById('inventory-grid'), // Grid de productos
-        inventoryLoadingMsg = document.getElementById('inventory-loading-msg'), 
-        inventoryEmptyMsg = document.getElementById('inventory-empty-msg'), 
-        inventoryNameInput=document.getElementById('inventory-name'), inventoryPriceInput=document.getElementById('inventory-price'), inventoryCategorySelect=document.getElementById('inventory-category'), inventoryImageFile=document.getElementById('inventory-image-file'), inventoryAddBtn=document.getElementById('inventory-add-btn'), inventoryMessage=document.getElementById('inventory-message'), 
+        inventoryContentAdmin = document.getElementById('inventory-content-admin'), inventoryGridContainer = document.getElementById('inventory-grid'), inventoryLoadingMsg = document.getElementById('inventory-loading-msg'), inventoryEmptyMsg = document.getElementById('inventory-empty-msg'), inventoryNameInput=document.getElementById('inventory-name'), inventoryPriceInput=document.getElementById('inventory-price'), inventoryCategorySelect=document.getElementById('inventory-category'), inventoryImageFile=document.getElementById('inventory-image-file'), inventoryAddBtn=document.getElementById('inventory-add-btn'), inventoryMessage=document.getElementById('inventory-message'), 
         themeBtnDark=document.getElementById('theme-btn-dark'), themeBtnInfernal=document.getElementById('theme-btn-infernal'), themeBtnGold=document.getElementById('theme-btn-gold'), openThemeDropdownBtn=document.getElementById('open-theme-dropdown-btn'), themeDropdownMenu=document.getElementById('theme-dropdown-menu'), themeDropdownWrapper=document.getElementById('theme-dropdown-wrapper');
 
         // --- UTILIDADES ---
-        function attachLogoInputListener(){const a=document.getElementById("logo-file-input");a?a.onchange=handleLogoUpload:console.log("Logo input not found for attaching listener.")}
+        function attachLogoInputListener(){const a=document.getElementById("logo-file-input");a?a.onchange=handleLogoUpload:console.log("Logo input not found.")} // Log simplificado
         function initLogoTemplates(){const a=document.getElementById("logo-upload-overlay"),b=document.getElementById("default-logo-svg");a&&(logoUploadOverlayHTML=a.outerHTML,a.parentNode&&a.remove()),b&&(defaultSvgHtml=b.outerHTML);const c=document.getElementById("current-logo");c&&!c.querySelector("img")&&defaultSvgHtml&&(c.innerHTML=defaultSvgHtml+(logoUploadOverlayHTML||""),logoUploadOverlayHTML&&(lucide.createIcons(),attachLogoInputListener()))}
         function handleGlobalError(a){appErrorDisplay.textContent=`Error crítico: ${a}`,appErrorDisplay.classList.remove("hidden")}
         function displayMessage(a,b,c="error"){b.textContent=a,b.className="success"===c?"text-center text-sm text-green-400":"text-center text-sm text-red-400",setTimeout(()=>{b.textContent=""},5e3)}
         function closeThemeDropdown(){themeDropdownMenu&&themeDropdownMenu.classList.add("hidden")}
-        // Modificado updateUIBasedOnAuth para reflejar que el inventario siempre está visible
         function updateUIBasedOnAuth(){if(isAdmin){adminStatusDisplay.classList.remove("hidden"),logoContainer.classList.add("admin-active"),inventoryContentAdmin.classList.remove("hidden"),salesAddFormAdmin.classList.remove("hidden"),salesHeaderActions.classList.remove("hidden"),openSalesModalBtn.classList.remove("hidden"),openSalesModalBtn.classList.remove("bg-transparent","text-gray-300"),openSalesModalBtn.classList.add("bg-indigo-500","text-white")}else{adminStatusDisplay.classList.add("hidden"),logoContainer.classList.remove("admin-active"),inventoryContentAdmin.classList.add("hidden"),salesAddFormAdmin.classList.add("hidden"),salesHeaderActions.classList.add("hidden"),userId?(openSalesModalBtn.classList.remove("hidden"),openSalesModalBtn.classList.remove("bg-indigo-500","text-white"),openSalesModalBtn.classList.add("bg-transparent","text-gray-300")):openSalesModalBtn.classList.add("hidden")}loadInventoryData(),userId&&loadSalesData()}
 
-        // --- AUTENTICACIÓN --- (Sin cambios lógicos)
+        // --- AUTENTICACIÓN ---
         function handleAuthChange(a){console.log("HandleAuthChange Fired. Session:",a),a&&a.user?(userId=a.user.id,userEmail=a.user.email,isAdmin=userEmail===ADMIN_EMAIL_REAL,currentUserUidDisplay.textContent=userEmail,authContainer.classList.add("hidden"),logoutContainer.classList.remove("hidden"),salesAuthMessage.classList.add("hidden"),salesContent.classList.remove("hidden")):(userId=null,userEmail=null,isAdmin=!1,authContainer.classList.remove("hidden"),logoutContainer.classList.add("hidden"),salesAuthMessage.classList.remove("hidden"),salesContent.classList.add("hidden"),renderSales([])),updateUIBasedOnAuth(),loadLogo()}
         async function handleAuthSubmit(a){a.preventDefault();const b=authEmailInput.value,c=authPasswordInput.value,d="Registrarse"===authTitle.textContent;authSubmitBtn.disabled=!0,authMessage.textContent="Procesando...";let e;try{e=d?await supabase.auth.signUp({email:b,password:c}):await supabase.auth.signInWithPassword({email:b,password:c}),e.error?displayMessage(e.error.message,authMessage,"error"):(displayMessage("Éxito. Cerrando modal...",authMessage,"success"),setTimeout(()=>closeModal(authModal),1e3))}catch(f){displayMessage("Error de conexión.",authMessage,"error"),console.error(f)}finally{authSubmitBtn.disabled=!1}}
         async function handleLogout(){const{error:a}=await supabase.auth.signOut();a&&console.error("Error al cerrar sesión:",a.message),closeModal(authModal)}
 
-        // --- TEMAS --- (Sin cambios)
+        // --- TEMAS ---
         function applyTheme(a){document.body.classList.remove("theme-dark","theme-infernal","theme-gold");const b={dark:themeBtnDark,infernal:themeBtnInfernal,gold:themeBtnGold};Object.values(b).forEach(c=>c&&c.classList.remove("active")),"infernal"===a?(document.body.classList.add("theme-infernal"),themeBtnInfernal&&themeBtnInfernal.classList.add("active")):"gold"===a?(document.body.classList.add("theme-gold"),themeBtnGold&&themeBtnGold.classList.add("active")):(document.body.classList.add("theme-dark"),themeBtnDark&&themeBtnDark.classList.add("active")),localStorage.setItem("unicell-theme",a)}
         function loadSavedTheme(){const a=localStorage.getItem("unicell-theme")||"dark";applyTheme(a),themeBtnDark&&(themeBtnDark.onclick=()=>{applyTheme("dark"),closeThemeDropdown()}),themeBtnInfernal&&(themeBtnInfernal.onclick=()=>{applyTheme("infernal"),closeThemeDropdown()}),themeBtnGold&&(themeBtnGold.onclick=()=>{applyTheme("gold"),closeThemeDropdown()})}
 
-        // --- STORAGE --- (Sin cambios lógicos)
+        // --- STORAGE ---
         async function uploadFile(a,b){const{data:c,error:d}=await supabase.storage.from(ASSETS_BUCKET).upload(b,a,{cacheControl:"3600",upsert:!0});if(d)throw console.error("Error al subir archivo a Storage:",d),Error(`Error al subir archivo: ${d.message}`);return c.path}
         function getPublicUrl(a){const{data:b}=supabase.storage.from(ASSETS_BUCKET).getPublicUrl(a);return`${b.publicUrl}?v=${Date.now()}`}
         async function deleteFile(a){if(!a||"null"===a)return;const{error:b}=await supabase.storage.from(ASSETS_BUCKET).remove([a]);b&&console.error("Error al eliminar archivo de Storage:",b)}
         async function handleLogoUpload(a){if(!isAdmin)return;const b=a.target.files[0];if(!b)return;const c=document.getElementById("current-logo"),d=new FileReader;d.onload=b=>{let d=c.querySelector("img");d||(c.innerHTML="",d=document.createElement("img"),d.className="w-full h-full object-cover rounded-full",c.appendChild(d)),d.src=b.target.result,logoUploadOverlayHTML&&!c.querySelector("#logo-upload-overlay")&&(c.insertAdjacentHTML("beforeend",logoUploadOverlayHTML),lucide.createIcons(),attachLogoInputListener())},d.readAsDataURL(b);c.insertAdjacentHTML("beforeend",'<div class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full"><div class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div></div>');try{if(!userId)throw Error("Admin debe iniciar sesión.");const f=await uploadFile(b,`logo/${userId}/${Date.now()}_${b.name}`),g=getPublicUrl(f),{error:h}=await supabase.from("services").upsert({id:"logo",image_url:g,image_path:f,user_id:userId},{onConflict:"id"});if(h)throw h;displayMessage("Logo actualizado.",authMessage,"success")}catch(i){console.error("Error al subir logo:",i),displayMessage(`Error al subir logo: ${i.message}`,authMessage,"error"),loadLogo()}finally{const j=c.querySelector(".animate-spin");j&&j.parentElement.remove(),logoUploadOverlayHTML&&!c.querySelector("#logo-upload-overlay")&&(c.insertAdjacentHTML("beforeend",logoUploadOverlayHTML),lucide.createIcons(),attachLogoInputListener()),a.target.value=null}}
-        async function loadLogo(){if(!supabase)return;try{const{data:a,error:b}=await supabase.from("services").select("image_url").eq("id","logo").maybeSingle();if(b&&"PGRST116"!==b.code)throw b;const c=document.getElementById("current-logo");c.innerHTML="",a&&a.image_url?c.innerHTML=`<img src="${a.image_url}" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null; this.parentElement.innerHTML = '${defaultSvgHtml.replace(/'/g,"\\'")}' + '${logoUploadOverlayHTML.replace(/'/g,"\\'")}'; lucide.createIcons(); attachLogoInputListener();">${logoUploadOverlayHTML}`:c.innerHTML=defaultSvgHtml+logoUploadOverlayHTML,attachLogoInputListener(),isAdmin?logoContainer.classList.add("admin-active"):logoContainer.classList.remove("admin-active"),lucide.createIcons()}catch(e){console.error("Error al cargar logo:",e);const f=document.getElementById("current-logo");f&&(f.innerHTML=defaultSvgHtml+logoUploadOverlayHTML,attachLogoInputListener(),lucide.createIcons())}}
+        
+        // ==================================================
+        // CORRECCIÓN loadLogo: onError string corregido
+        // ==================================================
+        async function loadLogo() {
+            if (!supabase) return;
+            try {
+                const { data: a, error: b } = await supabase.from("services").select("image_url").eq("id", "logo").maybeSingle(); if (b && "PGRST116" !== b.code) throw b;
+                const c = document.getElementById("current-logo"); c.innerHTML = ""; // Limpiar siempre
+                if (a && a.image_url) {
+                    // CORRECCIÓN: Quitados los ">" y asegurando comillas correctas en onerror
+                    c.innerHTML = `<img src="${a.image_url}" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null; this.parentElement.innerHTML = '${defaultSvgHtml.replace(/'/g, "\\'")}' + '${logoUploadOverlayHTML.replace(/'/g, "\\'")}'; lucide.createIcons(); attachLogoInputListener();">${logoUploadOverlayHTML}`; // <-- Listener en onerror
+                } else {
+                     c.innerHTML = defaultSvgHtml + logoUploadOverlayHTML;
+                }
+                
+                attachLogoInputListener(); // <-- Re-adjuntar listener después de cambiar innerHTML
+                isAdmin ? logoContainer.classList.add("admin-active") : logoContainer.classList.remove("admin-active");
+                lucide.createIcons() // Asegurar iconos
+            } catch (e) { 
+                console.error("Error al cargar logo:", e); 
+                const f = document.getElementById("current-logo"); 
+                f && (f.innerHTML = defaultSvgHtml + logoUploadOverlayHTML, attachLogoInputListener(), lucide.createIcons()) // <-- Listener en fallback
+            }
+        }
+
 
         // --- INVENTARIO (Lógica adaptada a grid) ---
         function loadInventoryData(){if(!supabase)return;inventoryGridContainer.innerHTML="",inventoryLoadingMsg.classList.remove("hidden"),inventoryEmptyMsg.classList.add("hidden"),supabase.from("inventory").select("*").order("name",{ascending:!0}).then(({data:a,error:b})=>{inventoryLoadingMsg.classList.add("hidden"),(()=>{if(b)throw b})(),renderInventory(a||[])}).catch(c=>{inventoryLoadingMsg.classList.add("hidden"),console.error("Error al cargar inventario:",c),inventoryGridContainer.innerHTML='<p class="text-center text-red-400 italic sm:col-span-2 lg:col-span-3 xl:col-span-4 py-4">Error al cargar inventario.</p>',c.message.includes('column "category" does not exist')?handleGlobalError("La columna 'category' no existe en la tabla 'inventory'. Revise las instrucciones."):c.message.includes("does not exist")?handleGlobalError("La tabla 'inventory' no existe en Supabase."):c.message.includes("permission denied")&&handleGlobalError("Permisos incorrectos para leer 'inventory'. Revisa las Políticas RLS.")})}
@@ -187,21 +202,10 @@
         window.deleteSaleItem=async function(a){if(!isAdmin||!confirm("¿Eliminar esta venta del registro?"))return;const{error:b}=await supabase.from("sales").delete().eq("id",a);b?(console.error("Error al eliminar venta:",b),displayMessage(`Error: ${b.message}`,salesAuthMessage)):loadSalesData()}
 
         // --- MODALES Y EVENT LISTENERS ---
-        function openModal(a){a.classList.remove("hidden"),a.classList.add("flex")} function closeModal(a){a.classList.add("hidden"),a.classList.remove("flex")} 
-        // CAMBIO: No aplicar closeModal en click fuera del inventory-modal ya que no es un modal
-        document.querySelectorAll('.fixed.inset-0:not(#inventory-modal)').forEach(a=>{a.addEventListener("click",b=>{b.target===a&&closeModal(a)})}); 
-        document.getElementById("open-auth-modal-btn").onclick=()=>openModal(authModal); 
-        document.getElementById("close-auth-modal").onclick=()=>closeModal(authModal); 
-        logoutBtn.onclick=handleLogout; 
-        toggleAuthModeBtn.onclick=()=>{const a="Iniciar Sesión"===authTitle.textContent;authTitle.textContent=a?"Registrarse":"Iniciar Sesión",authButtonText.textContent=a?"Registrarse":"Iniciar Sesión",toggleAuthModeBtn.textContent=a?"¿Ya tienes cuenta? Inicia Sesión":"¿No tienes cuenta? Regístrate"}; 
-        loginForm.onsubmit=handleAuthSubmit; 
-        // CAMBIO: El botón open-inventory-modal-btn ya no existe
-        // document.getElementById("close-inventory-modal").onclick=()=>closeModal(inventoryModal); // Ya no es necesario cerrar
+        function openModal(a){a.classList.remove("hidden"),a.classList.add("flex")} function closeModal(a){a.classList.add("hidden"),a.classList.remove("flex")} document.querySelectorAll(".fixed.inset-0").forEach(a=>{a.addEventListener("click",b=>{b.target===a&&closeModal(a)})}); document.getElementById("open-auth-modal-btn").onclick=()=>openModal(authModal); document.getElementById("close-auth-modal").onclick=()=>closeModal(authModal); logoutBtn.onclick=handleLogout; toggleAuthModeBtn.onclick=()=>{const a="Iniciar Sesión"===authTitle.textContent;authTitle.textContent=a?"Registrarse":"Iniciar Sesión",authButtonText.textContent=a?"Registrarse":"Iniciar Sesión",toggleAuthModeBtn.textContent=a?"¿Ya tienes cuenta? Inicia Sesión":"¿No tienes cuenta? Regístrate"}; loginForm.onsubmit=handleAuthSubmit; 
+        // Eliminado listener para botón de inventario y cierre de modal inventario
         inventoryAddBtn.onclick=addInventoryItem; 
-        openSalesModalBtn.onclick=()=>{userId?(salesAuthMessage.classList.add("hidden"),salesContent.classList.remove("hidden"),openModal(salesModal)):(salesAuthMessage.textContent="Debes iniciar sesión para acceder a las ventas.",salesAuthMessage.classList.remove("hidden"),salesContent.classList.add("hidden"),openModal(salesModal))}; 
-        document.getElementById("close-sales-modal").onclick=()=>closeModal(salesModal); 
-        addSaleBtn.onclick=addSaleItem; 
-        openThemeDropdownBtn&&(openThemeDropdownBtn.onclick=a=>{a.stopPropagation(),themeDropdownMenu.classList.toggle("hidden")}),window.addEventListener("click",a=>{themeDropdownWrapper&&!themeDropdownWrapper.contains(a.target)&&closeThemeDropdown()});
+        openSalesModalBtn.onclick=()=>{userId?(salesAuthMessage.classList.add("hidden"),salesContent.classList.remove("hidden"),openModal(salesModal)):(salesAuthMessage.textContent="Debes iniciar sesión para acceder a las ventas.",salesAuthMessage.classList.remove("hidden"),salesContent.classList.add("hidden"),openModal(salesModal))}; document.getElementById("close-sales-modal").onclick=()=>closeModal(salesModal); addSaleBtn.onclick=addSaleItem; openThemeDropdownBtn&&(openThemeDropdownBtn.onclick=a=>{a.stopPropagation(),themeDropdownMenu.classList.toggle("hidden")}),window.addEventListener("click",a=>{themeDropdownWrapper&&!themeDropdownWrapper.contains(a.target)&&closeThemeDropdown()});
 
         // --- INICIALIZACIÓN ---
         async function initSupabaseAndSession() {
