@@ -137,7 +137,7 @@
         themeBtnDark=document.getElementById('theme-btn-dark'), themeBtnInfernal=document.getElementById('theme-btn-infernal'), themeBtnGold=document.getElementById('theme-btn-gold'), openThemeDropdownBtn=document.getElementById('open-theme-dropdown-btn'), themeDropdownMenu=document.getElementById('theme-dropdown-menu'), themeDropdownWrapper=document.getElementById('theme-dropdown-wrapper');
 
         // --- UTILIDADES ---
-        function attachLogoInputListener(){const a=document.getElementById("logo-file-input");a?a.onchange=handleLogoUpload:console.log("Logo input not found.")} // Log simplificado
+        function attachLogoInputListener(){const a=document.getElementById("logo-file-input");a?a.onchange=handleLogoUpload:console.log("Logo input not found.")} 
         function initLogoTemplates(){const a=document.getElementById("logo-upload-overlay"),b=document.getElementById("default-logo-svg");a&&(logoUploadOverlayHTML=a.outerHTML,a.parentNode&&a.remove()),b&&(defaultSvgHtml=b.outerHTML);const c=document.getElementById("current-logo");c&&!c.querySelector("img")&&defaultSvgHtml&&(c.innerHTML=defaultSvgHtml+(logoUploadOverlayHTML||""),logoUploadOverlayHTML&&(lucide.createIcons(),attachLogoInputListener()))}
         function handleGlobalError(a){appErrorDisplay.textContent=`Error crítico: ${a}`,appErrorDisplay.classList.remove("hidden")}
         function displayMessage(a,b,c="error"){b.textContent=a,b.className="success"===c?"text-center text-sm text-green-400":"text-center text-sm text-red-400",setTimeout(()=>{b.textContent=""},5e3)}
@@ -160,27 +160,35 @@
         async function handleLogoUpload(a){if(!isAdmin)return;const b=a.target.files[0];if(!b)return;const c=document.getElementById("current-logo"),d=new FileReader;d.onload=b=>{let d=c.querySelector("img");d||(c.innerHTML="",d=document.createElement("img"),d.className="w-full h-full object-cover rounded-full",c.appendChild(d)),d.src=b.target.result,logoUploadOverlayHTML&&!c.querySelector("#logo-upload-overlay")&&(c.insertAdjacentHTML("beforeend",logoUploadOverlayHTML),lucide.createIcons(),attachLogoInputListener())},d.readAsDataURL(b);c.insertAdjacentHTML("beforeend",'<div class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full"><div class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div></div>');try{if(!userId)throw Error("Admin debe iniciar sesión.");const f=await uploadFile(b,`logo/${userId}/${Date.now()}_${b.name}`),g=getPublicUrl(f),{error:h}=await supabase.from("services").upsert({id:"logo",image_url:g,image_path:f,user_id:userId},{onConflict:"id"});if(h)throw h;displayMessage("Logo actualizado.",authMessage,"success")}catch(i){console.error("Error al subir logo:",i),displayMessage(`Error al subir logo: ${i.message}`,authMessage,"error"),loadLogo()}finally{const j=c.querySelector(".animate-spin");j&&j.parentElement.remove(),logoUploadOverlayHTML&&!c.querySelector("#logo-upload-overlay")&&(c.insertAdjacentHTML("beforeend",logoUploadOverlayHTML),lucide.createIcons(),attachLogoInputListener()),a.target.value=null}}
         
         // ==================================================
-        // CORRECCIÓN loadLogo: onError string corregido
+        // CORRECCIÓN loadLogo: onError string corregido FINAL
         // ==================================================
         async function loadLogo() {
             if (!supabase) return;
             try {
-                const { data: a, error: b } = await supabase.from("services").select("image_url").eq("id", "logo").maybeSingle(); if (b && "PGRST116" !== b.code) throw b;
-                const c = document.getElementById("current-logo"); c.innerHTML = ""; // Limpiar siempre
+                const { data: a, error: b } = await supabase.from("services").select("image_url").eq("id", "logo").maybeSingle(); 
+                if (b && "PGRST116" !== b.code) throw b;
+                const c = document.getElementById("current-logo"); 
+                c.innerHTML = ""; // Limpiar siempre
+                
+                // Definir el contenido del onerror de forma segura
+                const onErrorContent = `this.onerror=null; this.parentElement.innerHTML = '${defaultSvgHtml.replace(/'/g, "\\'")}' + '${logoUploadOverlayHTML.replace(/'/g, "\\'")}'; lucide.createIcons(); attachLogoInputListener();`;
+
                 if (a && a.image_url) {
-                    // CORRECCIÓN: Quitados los ">" y asegurando comillas correctas en onerror
-                    c.innerHTML = `<img src="${a.image_url}" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null; this.parentElement.innerHTML = '${defaultSvgHtml.replace(/'/g, "\\'")}' + '${logoUploadOverlayHTML.replace(/'/g, "\\'")}'; lucide.createIcons(); attachLogoInputListener();">${logoUploadOverlayHTML}`; // <-- Listener en onerror
+                    // Cargar imagen de Supabase
+                    c.innerHTML = `<img src="${a.image_url}" class="w-full h-full object-cover rounded-full" onerror="${onErrorContent.replace(/"/g, '&quot;')}">${logoUploadOverlayHTML}`; // Reemplazar comillas dobles en onerror
                 } else {
-                     c.innerHTML = defaultSvgHtml + logoUploadOverlayHTML;
+                     // Mostrar SVG por defecto + overlay
+                    c.innerHTML = defaultSvgHtml + logoUploadOverlayHTML;
                 }
                 
-                attachLogoInputListener(); // <-- Re-adjuntar listener después de cambiar innerHTML
+                attachLogoInputListener(); // Adjuntar listener después de cambiar innerHTML
                 isAdmin ? logoContainer.classList.add("admin-active") : logoContainer.classList.remove("admin-active");
                 lucide.createIcons() // Asegurar iconos
             } catch (e) { 
                 console.error("Error al cargar logo:", e); 
                 const f = document.getElementById("current-logo"); 
-                f && (f.innerHTML = defaultSvgHtml + logoUploadOverlayHTML, attachLogoInputListener(), lucide.createIcons()) // <-- Listener en fallback
+                // Asegurarse de que el fallback también adjunte el listener
+                f && (f.innerHTML = defaultSvgHtml + logoUploadOverlayHTML, attachLogoInputListener(), lucide.createIcons()) 
             }
         }
 
@@ -193,7 +201,7 @@
         async function updateInventoryItem(a,b,c,d){if(!isAdmin)return;const{error:e}=await supabase.from("inventory").update({name:b,price:c,category:d,user_id:userId}).eq("id",a);e&&(console.error("Error al actualizar inventario:",e),displayMessage("Error al actualizar.",inventoryMessage)),loadInventoryData()}
         window.deleteInventoryItem = async function(a,b){if(!isAdmin||!confirm("¿Eliminar este producto del inventario?"))return;try{await deleteFile(b);const{error:c}=await supabase.from("inventory").delete().eq("id",a);if(c)throw c;displayMessage("Producto eliminado.",inventoryMessage,"success"),loadInventoryData()}catch(d){console.error("Error al eliminar inventario:",d),displayMessage(`Error: ${d.message}`,inventoryMessage)}}
         
-        // --- VENTAS --- (Sin cambios)
+        // --- VENTAS ---
         function loadSalesData(){if(!supabase||!userId)return void renderSales([]);supabase.from("sales").select("*").order("created_at",{ascending:!1}).then(({data:a,error:b})=>{if(b)throw b;renderSales(a||[])}).catch(c=>{console.error("Error al cargar ventas:",c.message),salesList.innerHTML='<tr><td colspan="5" class="text-center py-4 text-red-400">Error al cargar ventas.</td></tr>',c.message.includes('column "category" does not exist')?handleGlobalError("La columna 'category' no existe en la tabla 'sales'. Revise las instrucciones."):c.message.includes("does not exist")?handleGlobalError("La tabla 'sales' no existe en Supabase."):c.message.includes("permission denied")&&handleGlobalError("Permisos incorrectos para leer 'sales'. Revisa las Políticas RLS.")})}
         function renderSales(a){salesList.innerHTML="";let b=0;if(0===a.length)return salesList.innerHTML='<tr><td colspan="5" class="text-center py-4 text-gray-500 italic">No hay ventas registradas.</td></tr>',void(salesTotal.textContent="$0.00");a.forEach(c=>{b+=Number(c.price||0);const d=document.createElement("tr");d.className="hover:bg-gray-700 transition duration-150";const e=isAdmin?`<button onclick="toggleSaleEdit(event, '${c.id}', '${(c.clientName||"").replace(/'/g,"\\'")}', '${c.name.replace(/'/g,"\\'")}', ${c.price}, '${(c.category||"").replace(/'/g,"\\'")}')" class="edit-btn text-yellow-400 hover:text-yellow-300 p-2 rounded-full transition duration-150" data-editing="false"><i data-lucide="pencil" class="w-4 h-4"></i></button><button onclick="deleteSaleItem('${c.id}')" class="text-red-500 hover:text-red-400 p-2 rounded-full transition duration-150"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`:"";d.innerHTML=`<td class="px-4 py-3 font-medium text-gray-300"><span id="client-name-${c.id}">${c.clientName||"N/A"}</span></td><td class="px-4 py-3 font-medium text-white"><span id="sale-name-${c.id}">${c.name}</span></td><td class="px-4 py-3 align-top text-gray-300"><span id="sale-category-${c.id}">${c.category||"N/A"}</span></td><td class="px-4 py-3 text-white"><span id="sale-price-${c.id}">$${Number(c.price||0).toFixed(2)}</span></td><td class="px-4 py-3 text-right space-x-2">${e}</td>`,salesList.appendChild(d)}),salesTotal.textContent=`$${b.toFixed(2)}`,lucide.createIcons()}
         async function addSaleItem(){if(!isAdmin||!userId)return salesAuthMessage.textContent="Solo el admin puede registrar ventas.",void salesAuthMessage.classList.remove("hidden");const a=clientNameInput.value.trim()||"Venta General",b=productNameInput.value.trim(),c=parseFloat(productPriceInput.value.trim()),d=saleCategorySelect.value;if(!b||isNaN(c)||0>=c||!d)return void displayMessage("Nombre, precio válido y categoría requeridos.",salesAuthMessage);addSaleBtn.disabled=!0,addSaleBtn.innerHTML='<i data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin"></i> Añadiendo...',lucide.createIcons();try{const{error:e}=await supabase.from("sales").insert([{clientName:a,name:b,price:c,category:d,user_id:userId,created_at:(new Date).toISOString()}]);if(e)throw e;productNameInput.value="",productPriceInput.value="",saleCategorySelect.value="",clientNameInput.value="",loadSalesData()}catch(f){console.error("Error al agregar venta:",f),displayMessage(`Error: ${f.message}`,salesAuthMessage)}finally{addSaleBtn.disabled=!1,addSaleBtn.innerHTML='<i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir a Venta',lucide.createIcons()}}
@@ -203,7 +211,6 @@
 
         // --- MODALES Y EVENT LISTENERS ---
         function openModal(a){a.classList.remove("hidden"),a.classList.add("flex")} function closeModal(a){a.classList.add("hidden"),a.classList.remove("flex")} document.querySelectorAll(".fixed.inset-0").forEach(a=>{a.addEventListener("click",b=>{b.target===a&&closeModal(a)})}); document.getElementById("open-auth-modal-btn").onclick=()=>openModal(authModal); document.getElementById("close-auth-modal").onclick=()=>closeModal(authModal); logoutBtn.onclick=handleLogout; toggleAuthModeBtn.onclick=()=>{const a="Iniciar Sesión"===authTitle.textContent;authTitle.textContent=a?"Registrarse":"Iniciar Sesión",authButtonText.textContent=a?"Registrarse":"Iniciar Sesión",toggleAuthModeBtn.textContent=a?"¿Ya tienes cuenta? Inicia Sesión":"¿No tienes cuenta? Regístrate"}; loginForm.onsubmit=handleAuthSubmit; 
-        // Eliminado listener para botón de inventario y cierre de modal inventario
         inventoryAddBtn.onclick=addInventoryItem; 
         openSalesModalBtn.onclick=()=>{userId?(salesAuthMessage.classList.add("hidden"),salesContent.classList.remove("hidden"),openModal(salesModal)):(salesAuthMessage.textContent="Debes iniciar sesión para acceder a las ventas.",salesAuthMessage.classList.remove("hidden"),salesContent.classList.add("hidden"),openModal(salesModal))}; document.getElementById("close-sales-modal").onclick=()=>closeModal(salesModal); addSaleBtn.onclick=addSaleItem; openThemeDropdownBtn&&(openThemeDropdownBtn.onclick=a=>{a.stopPropagation(),themeDropdownMenu.classList.toggle("hidden")}),window.addEventListener("click",a=>{themeDropdownWrapper&&!themeDropdownWrapper.contains(a.target)&&closeThemeDropdown()});
 
