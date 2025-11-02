@@ -140,6 +140,8 @@
         // --- CONFIGURACIÓN Y VARIABLES GLOBALES ---
         const SUPABASE_URL = 'https://pavonviwyyjmdwwhxrzm.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhdm9udml3eXlqbWR3d2h4cnptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2MTA2MzcsImV4cCI6MjA3NzE4NjYzN30.dWGKn3MWuVHvOivh608-ZIdfVGsekdpfLu7quc42HBk';
+        // URL de la Edge Function para subir archivos a R2
+        const R2_UPLOAD_EDGE_FUNCTION_URL = 'https://pavonviwyyjmdwwhxrzm.supabase.co/functions/v1/upload-to-r2'; // <--- CORREGIDO
         const ADMIN_EMAIL_REAL = 'unicell2025@gmail.com';
         const ASSETS_BUCKET = 'public_assets';
         const CATEGORY_OPTIONS_HTML = `<option value="Placas de Carga">Placas de Carga</option><option value="Placas">Placas</option><option value="Botones">Botones</option><option value="Jacks">Jacks</option><option value="Vidrios">Vidrios</option><option value="Cargadores">Cargadores</option><option value="Privados">Privados</option><option value="Hidrogel">Hidrogel</option><option value="Otro">Otro</option>`;
@@ -171,19 +173,120 @@
         function applyTheme(a){document.body.classList.remove("theme-dark","theme-infernal","theme-gold");const b={dark:themeBtnDark,infernal:themeBtnInfernal,gold:themeBtnGold};Object.values(b).forEach(c=>c&&c.classList.remove("active")),"infernal"===a?(document.body.classList.add("theme-infernal"),themeBtnInfernal&&themeBtnInfernal.classList.add("active")):"gold"===a?(document.body.classList.add("theme-gold"),themeBtnGold&&themeBtnGold.classList.add("active")):(document.body.classList.add("theme-dark"),themeBtnDark&&themeBtnDark.classList.add("active")),localStorage.setItem("unicell-theme",a)}
         function loadSavedTheme(){const a=localStorage.getItem("unicell-theme")||"dark";applyTheme(a),themeBtnDark&&(themeBtnDark.onclick=()=>{applyTheme("dark"),closeThemeDropdown()}),themeBtnInfernal&&(themeBtnInfernal.onclick=()=>{applyTheme("infernal"),closeThemeDropdown()}),themeBtnGold&&(themeBtnGold.onclick=()=>{applyTheme("gold"),closeThemeDropdown()})}
 
-        // --- STORAGE ---
-        async function uploadFile(a,b){const{data:c,error:d}=await supabase.storage.from(ASSETS_BUCKET).upload(b,a,{cacheControl:"3600",upsert:!0});if(d)throw console.error("Error al subir archivo a Storage:",d),Error(`Error al subir archivo: ${d.message}`);return c.path}
-        function getPublicUrl(a){const{data:b}=supabase.storage.from(ASSETS_BUCKET).getPublicUrl(a);return`${b.publicUrl}?v=${Date.now()}`}
-        async function deleteFile(a){if(!a||"null"===a)return;const{error:b}=await supabase.storage.from(ASSETS_BUCKET).remove([a]);b&&console.error("Error al eliminar archivo de Storage:",b)}
-        async function handleLogoUpload(a){if(!isAdmin)return;const b=a.target.files[0];if(!b)return;const c=document.getElementById("current-logo"),d=new FileReader;d.onload=b=>{let d=c.querySelector("img");d||(c.innerHTML="",d=document.createElement("img"),d.className="w-full h-full object-cover rounded-full",c.appendChild(d)),d.src=b.target.result,logoUploadOverlayHTML&&!c.querySelector("#logo-upload-overlay")&&(c.insertAdjacentHTML("beforeend",logoUploadOverlayHTML),lucide.createIcons(),attachLogoInputListener())},d.readAsDataURL(b);c.insertAdjacentHTML("beforeend",'<div class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full"><div class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div></div>');try{if(!userId)throw Error("Admin debe iniciar sesión.");const f=await uploadFile(b,`logo/${userId}/${Date.now()}_${b.name}`),g=getPublicUrl(f),{error:h}=await supabase.from("services").upsert({id:"logo",image_url:g,image_path:f,user_id:userId},{onConflict:"id"});if(h)throw h;displayMessage("Logo actualizado.",authMessage,"success")}catch(i){console.error("Error al subir logo:",i),displayMessage(`Error al subir logo: ${i.message}`,authMessage,"error"),loadLogo()}finally{const j=c.querySelector(".animate-spin");j&&j.parentElement.remove(),logoUploadOverlayHTML&&!c.querySelector("#logo-upload-overlay")&&(c.insertAdjacentHTML("beforeend",logoUploadOverlayHTML),lucide.createIcons(),attachLogoInputListener()),a.target.value=null}}
+        // --- STORAGE (MODIFICADO PARA USAR EDGE FUNCTION) ---
+        async function uploadFile(file) {
+            const formData = new FormData();
+            // 'file' es el nombre que espera la Edge Function
+            formData.append('file', file); 
+
+            const response = await fetch(R2_UPLOAD_EDGE_FUNCTION_URL, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                let errorData = {};
+                try { errorData = await response.json(); } catch(e) {}
+                
+                console.error('Error en Edge Function (R2):', errorData);
+                throw new Error(errorData.error || 'Fallo la subida a R2 a través de la Edge Function.');
+            }
+
+            const data = await response.json();
+            // Retorna path (fileName) y la url pública de R2
+            return { path: data.fileName, publicUrl: data.url };
+        }
+
+        function getPublicUrl(pathOrUrl){
+            return pathOrUrl; 
+        }
+
+        async function deleteFile(filePath){
+            if(!filePath||"null"===filePath)return;
+            // Eliminación de R2 no implementada, solo logueamos
+            console.log(`Eliminación de R2 no implementada para: ${filePath}`);
+        }
+        
+        async function handleLogoUpload(a){
+            if(!isAdmin)return;
+            const b=a.target.files[0];
+            if(!b)return;
+            
+            // UI: Muestra el spinner de carga
+            const c=document.getElementById("current-logo"),
+                d=new FileReader;
+            d.onload=b=>{
+                let d=c.querySelector("img");
+                d||(c.innerHTML="",d=document.createElement("img"),d.className="w-full h-full object-cover rounded-full",c.appendChild(d)),
+                d.src=b.target.result,
+                logoUploadOverlayHTML&&!c.querySelector("#logo-upload-overlay")&&(c.insertAdjacentHTML("beforeend",logoUploadOverlayHTML),lucide.createIcons(),attachLogoInputListener())
+            },
+            d.readAsDataURL(b);
+            c.insertAdjacentHTML("beforeend",'<div class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full"><div class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div></div>');
+            
+            let f=null,g=null; // f = path/fileName, g = publicUrl
+
+            try{
+                if(!userId)throw Error("Admin debe iniciar sesión.");
+                
+                // CAMBIO CLAVE: Usamos la función uploadFile (que llama a la Edge Function de R2)
+                const uploadResult = await uploadFile(b);
+                f = uploadResult.path; 
+                g = uploadResult.publicUrl; 
+
+                // Guardamos la URL de R2 en la tabla 'services'
+                const{error:h}=await supabase.from("services").upsert({id:"logo",image_url:g,image_path:f,user_id:userId},{onConflict:"id"});
+                if(h)throw h;
+
+                displayMessage("Logo actualizado.",authMessage,"success")
+            }catch(i){
+                console.error("Error al subir logo:",i),
+                displayMessage(`Error al subir logo: ${i.message}`,authMessage,"error"),
+                loadLogo() // Si falla, volvemos a cargar el logo anterior
+            }finally{
+                // UI: Quita el spinner y limpia el input
+                const j=c.querySelector(".animate-spin");
+                j&&j.parentElement.remove(),
+                logoUploadOverlayHTML&&!c.querySelector("#logo-upload-overlay")&&(c.insertAdjacentHTML("beforeend",logoUploadOverlayHTML),lucide.createIcons(),attachLogoInputListener()),
+                a.target.value=null
+            }
+        }
         async function loadLogo(){if(!supabase)return;try{const{data:a,error:b}=await supabase.from("services").select("image_url").eq("id","logo").maybeSingle();if(b&&"PGRST116"!==b.code)throw b;const c=document.getElementById("current-logo");c.innerHTML="";const d=`this.onerror=null; this.parentElement.innerHTML = '${defaultSvgHtml.replace(/'/g,"\\'")}' + '${logoUploadOverlayHTML.replace(/'/g,"\\'")}'; lucide.createIcons(); attachLogoInputListener();`;a&&a.image_url?c.innerHTML=`<img src="${a.image_url}" class="w-full h-full object-cover rounded-full" onerror="${d.replace(/"/g,"&quot;")}">${logoUploadOverlayHTML}`:c.innerHTML=defaultSvgHtml+logoUploadOverlayHTML,attachLogoInputListener(),isAdmin?logoContainer.classList.add("admin-active"):logoContainer.classList.remove("admin-active"),lucide.createIcons()}catch(e){console.error("Error al cargar logo:",e);const f=document.getElementById("current-logo");f&&(f.innerHTML=defaultSvgHtml+logoUploadOverlayHTML,attachLogoInputListener(),lucide.createIcons())}}
 
         // --- INVENTARIO ---
         function loadInventoryData(){if(!supabase)return;inventoryGridContainer.innerHTML="",inventoryLoadingMsg.classList.remove("hidden"),inventoryEmptyMsg.classList.add("hidden"),supabase.from("inventory").select("*").order("name",{ascending:!0}).then(({data:a,error:b})=>{inventoryLoadingMsg.classList.add("hidden"),(()=>{if(b)throw b})(),renderInventory(a||[])}).catch(c=>{inventoryLoadingMsg.classList.add("hidden"),console.error("Error al cargar inventario:",c),inventoryGridContainer.innerHTML='<p class="text-center text-red-400 italic sm:col-span-2 lg:col-span-3 xl:col-span-4 py-4">Error al cargar inventario.</p>',c.message.includes('column "quantity" does not exist')?handleGlobalError("La columna 'quantity' no existe en la tabla 'inventory'. ¡Debes añadirla en Supabase!"):c.message.includes("does not exist")?handleGlobalError("La tabla 'inventory' no existe en Supabase."):c.message.includes("permission denied")&&handleGlobalError("Permisos incorrectos para leer 'inventory'. Revisa las Políticas RLS.")})}
         // CAMBIO: renderInventory muestra la cantidad y la pasa a toggleInventoryEdit
         function renderInventory(a){inventoryGridContainer.innerHTML="",0===a.length?(inventoryEmptyMsg.classList.remove("hidden"),1):inventoryEmptyMsg.classList.add("hidden"),a.forEach(b=>{const c=document.createElement("div");c.className="product-card",c.id=`inv-item-${b.id}`;const itemQuantity = b.quantity ?? 0; const d=isAdmin?`<button onclick="toggleInventoryEdit(event, '${b.id}', '${b.name.replace(/'/g,"\\'")}', ${b.price}, '${(b.category||"").replace(/'/g,"\\'")}', ${itemQuantity})" class="edit-btn text-yellow-400 hover:text-yellow-300 p-1 rounded-full transition duration-150" data-editing="false"><i data-lucide="pencil" class="w-4 h-4"></i></button><button onclick="deleteInventoryItem('${b.id}', '${b.image_path}')" class="text-red-500 hover:text-red-400 p-1 rounded-full transition duration-150"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`:"";c.innerHTML=`${b.image_url?`<img src="${b.image_url}" alt="${b.name}" class="inventory-image-preview">`:`<div class="w-full h-[200px] bg-gray-700 flex items-center justify-center text-xs text-gray-400 border-b border-gray-600">Sin Foto</div>`}<div class="product-card-content"><h3 class="font-semibold text-base mb-1" id="inv-name-${b.id}">${b.name}</h3><p class="text-sm text-gray-400 mb-2" id="inv-category-${b.id}">${b.category||"Sin Categoría"}</p><div class="flex justify-between items-center"><p class="font-bold text-lg accent-text" id="inv-price-${b.id}">$${Number(b.price||0).toFixed(2)}</p><p class="text-sm text-gray-300" id="inv-quantity-display-${b.id}">📦 Cant.: ${itemQuantity}</p></div></div>${isAdmin?`<div class="product-card-actions">${d}</div>`:""}`,inventoryGridContainer.appendChild(c)}),lucide.createIcons()}
-        // CAMBIO: addInventoryItem guarda la cantidad
-        async function addInventoryItem(){if(!isAdmin||!userId)return void displayMessage("Acción no permitida.",inventoryMessage);const a=inventoryNameInput.value.trim(),b=parseFloat(inventoryPriceInput.value.trim()),c=inventoryCategorySelect.value,d=parseInt(inventoryQuantityInput.value.trim()),e=inventoryImageFile.files[0];if(!a||isNaN(b)||0>=b||!c||isNaN(d)||0>d)return void displayMessage("Nombre, precio, categoría y cantidad válida son requeridos.",inventoryMessage);inventoryAddBtn.disabled=!0,inventoryAddBtn.innerHTML='<i data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin"></i> Guardando...',lucide.createIcons();let f=null,g=null;try{e&&(f=await uploadFile(e,`inventory/${userId}/${Date.now()}_${e.name}`),g=getPublicUrl(f));const{error:h}=await supabase.from("inventory").insert([{name:a,price:b,category:c,quantity:d,image_url:g,image_path:f,user_id:userId}]);if(h)throw h;inventoryNameInput.value="",inventoryPriceInput.value="",inventoryCategorySelect.value="",inventoryQuantityInput.value="0",inventoryImageFile.value="",displayMessage("Producto añadido.",inventoryMessage,"success"),loadInventoryData()}catch(i){console.error("Error al agregar inventario:",i),displayMessage(`Error: ${i.message}`,inventoryMessage),f&&deleteFile(f)}finally{inventoryAddBtn.innerHTML='<i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir',inventoryAddBtn.disabled=!1,lucide.createIcons()}}
+        // CAMBIO: addInventoryItem usa la Edge Function
+        async function addInventoryItem(){
+            if(!isAdmin||!userId)return void displayMessage("Acción no permitida.",inventoryMessage);
+            const a=inventoryNameInput.value.trim(),b=parseFloat(inventoryPriceInput.value.trim()),c=inventoryCategorySelect.value,d=parseInt(inventoryQuantityInput.value.trim()),e=inventoryImageFile.files[0];
+            if(!a||isNaN(b)||0>=b||!c||isNaN(d)||0>d)return void displayMessage("Nombre, precio, categoría y cantidad válida son requeridos.",inventoryMessage);
+            
+            inventoryAddBtn.disabled=!0,inventoryAddBtn.innerHTML='<i data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin"></i> Guardando...',lucide.createIcons();
+            
+            let f=null,g=null; // f = path/fileName (en R2), g = publicUrl (de R2)
+            
+            try{
+                if(e) {
+                    const uploadResult = await uploadFile(e); // Llama a la Edge Function
+                    f = uploadResult.path; 
+                    g = uploadResult.publicUrl; 
+                }
+                
+                const{error:h}=await supabase.from("inventory").insert([{name:a,price:b,category:c,quantity:d,image_url:g,image_path:f,user_id:userId}]);
+                if(h)throw h;
+                
+                inventoryNameInput.value="",inventoryPriceInput.value="",inventoryCategorySelect.value="",inventoryQuantityInput.value="0",inventoryImageFile.value="",
+                displayMessage("Producto añadido.",inventoryMessage,"success"),
+                loadInventoryData()
+            }catch(i){
+                console.error("Error al agregar inventario o subir archivo:",i),
+                displayMessage(`Error: ${i.message}`,inventoryMessage);
+            }finally{
+                inventoryAddBtn.innerHTML='<i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir',inventoryAddBtn.disabled=!1,lucide.createIcons()
+            }
+        }
         // CAMBIO: toggleInventoryEdit maneja el input de cantidad
         window.toggleInventoryEdit = function(a,b,c,d,e,f){if(!isAdmin)return;const g=document.getElementById(`inv-item-${b}`);if(!g)return;const h=g.querySelector(".product-card-content"),j=a.currentTarget,k="true"===j.getAttribute("data-editing");k?(()=>{const a=document.getElementById(`input-inv-name-${b}`).value.trim(),c=parseFloat(document.getElementById(`input-inv-price-${b}`).value.trim()),d=document.getElementById(`input-inv-category-${b}`).value,e=parseInt(document.getElementById(`input-inv-quantity-${b}`).value.trim());return!a||isNaN(c)||0>=c||!d||isNaN(e)||0>e?void displayMessage("Nombre, precio, categoría y cantidad válidos.",inventoryMessage):void updateInventoryItem(b,a,c,d,e)})():(h.innerHTML=`<input type="text" id="input-inv-name-${b}" value="${c}" class="w-full bg-gray-600 rounded-md p-1 mb-1 input-dark text-base font-semibold" placeholder="Nombre"/><select id="input-inv-category-${b}" class="w-full bg-gray-600 rounded-md p-1 mb-2 input-dark text-sm">${CATEGORY_OPTIONS_HTML}</select><div class="flex justify-between gap-2"><input type="number" id="input-inv-price-${b}" value="${Number(d).toFixed(2)}" class="w-1/2 bg-gray-600 rounded-md p-1 input-dark font-bold text-lg accent-text" step="0.01" placeholder="Precio"/><input type="number" id="input-inv-quantity-${b}" value="${f}" min="0" class="w-1/2 bg-gray-600 rounded-md p-1 input-dark text-sm" placeholder="Cant."/></div>`,document.getElementById(`input-inv-category-${b}`).value=e,j.innerHTML='<i data-lucide="save" class="w-4 h-4"></i>',j.classList.remove("text-yellow-400","hover:text-yellow-300"),j.classList.add("text-green-500","hover:text-green-400"),j.setAttribute("data-editing","true"),lucide.createIcons())}
         // CAMBIO: updateInventoryItem guarda la cantidad
