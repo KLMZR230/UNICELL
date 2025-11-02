@@ -67,7 +67,7 @@
         .shadow-green-700\/50 { box-shadow: 0 10px 15px -3px rgba(21, 128, 61, 0.5), 0 4px 6px -2px rgba(21, 128, 61, 0.5) !important; }
         .bg-red-600 { background-color: #dc2626 !important; } .hover\:bg-red-700:hover { background-color: #b91c1c !important; }
         .text-red-500 { color: #ef4444 !important; } .text-red-400 { color: #f87171 !important; }
-        .text-yellow-400 { color: #facc15 !important; } .hover\:text-yellow-300:hover { color: #fde047 !important; }
+        .text-yellow-400 { color: #facc15 !important; } .hover\:text-yellow-300:hover { color: #fde047 !imporant; }
         .text-green-500 { color: #22c55e !important; }
         .status-badge { padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-align: center; display: inline-block; min-width: 80px; }
         .status-Pagado { background-color: #16a34a !important; color: #ffffff !important; border: 1px solid #15803d !important; }
@@ -125,17 +125,15 @@
     <a href="https://wa.me/50377191068" 
        target="_blank" 
        rel="noopener noreferrer" 
-       class="fixed bottom-6 right-6 z-40 flex items-center p-2 bg-green-500 rounded-full shadow-lg transition-transform hover:scale-105 duration-200 group">
-        
+       class="fixed bottom-6 right-6 z-40 flex items-center p-2 bg-green-500 rounded-full shadow-lg transition-transform hover:scale-105 duration-200">
         <img src="https://pub-0c024c9a5a7a439aa0319b5140a52857.r2.dev/6c784972cbf5806215d46fbda8b0c46a.jpg" 
              alt="WhatsApp" 
              class="w-10 h-10 rounded-full">
         
-        <span class="ml-3 text-white font-semibold text-sm opacity-0 w-0 overflow-hidden group-hover:w-auto group-hover:opacity-100 group-hover:pr-2 transition-all duration-300 ease-in-out">
+        <span class="ml-3 text-white font-semibold text-sm pr-2">
             Escríbenos al WhatsApp, Será Un Placer Atenderte
         </span>
     </a>
-
     <script> lucide.createIcons(); </script>
 
     <script type="module">
@@ -151,7 +149,6 @@
         // --- REFERENCIAS DOM ---
         const adminStatusDisplay=document.getElementById('admin-status'), appErrorDisplay=document.getElementById('app-error-display'), logoContainer=document.getElementById('logo-container'), authModal=document.getElementById('auth-modal'), authContainer=document.getElementById('auth-container'), logoutContainer=document.getElementById('logout-container'), authTitle=document.getElementById('auth-title'), authButtonText=document.getElementById('auth-button-text'), authSubmitBtn=document.getElementById('auth-submit-btn'), toggleAuthModeBtn=document.getElementById('toggle-auth-mode'), loginForm=document.getElementById('login-form'), authEmailInput=document.getElementById('auth-email'), authPasswordInput=document.getElementById('auth-password'), authMessage=document.getElementById('auth-message'), currentUserUidDisplay=document.getElementById('current-user-uid'), logoutBtn=document.getElementById('logout-btn'), openSalesModalBtn=document.getElementById('open-sales-modal-btn'), salesModal=document.getElementById('sales-modal'), salesContent=document.getElementById('sales-content'), salesAuthMessage=document.getElementById('sales-auth-message'), salesAddFormAdmin=document.getElementById('sales-add-form-admin'), salesList=document.getElementById('sales-list'), salesTodaySold = document.getElementById('sales-today-sold'), salesTodayPaid = document.getElementById('sales-today-paid'), salesGrandTotalSold = document.getElementById('sales-grand-total-sold'), salesGrandTotalPaid = document.getElementById('sales-grand-total-paid'), clientNameInput=document.getElementById('client-name'), productNameInput=document.getElementById('product-name'), productPriceInput=document.getElementById('product-price'), saleCategorySelect=document.getElementById('sale-category'), saleInitialStatusSelect = document.getElementById('sale-initial-status'), addSaleBtn=document.getElementById('add-btn'), salesHeaderActions=document.getElementById('sales-header-actions'), 
         inventoryContentAdmin = document.getElementById('inventory-content-admin'), inventoryGridContainer = document.getElementById('inventory-grid'), inventoryLoadingMsg = document.getElementById('inventory-loading-msg'), inventoryEmptyMsg = document.getElementById('inventory-empty-msg'), inventoryNameInput=document.getElementById('inventory-name'), inventoryPriceInput=document.getElementById('inventory-price'), inventoryCategorySelect=document.getElementById('inventory-category'), 
-        // CAMBIO: Nueva referencia
         inventoryQuantityInput = document.getElementById('inventory-quantity'),
         inventoryImageFile=document.getElementById('inventory-image-file'), inventoryAddBtn=document.getElementById('inventory-add-btn'), inventoryMessage=document.getElementById('inventory-message'), 
         themeBtnDark=document.getElementById('theme-btn-dark'), themeBtnInfernal=document.getElementById('theme-btn-infernal'), themeBtnGold=document.getElementById('theme-btn-gold'), openThemeDropdownBtn=document.getElementById('open-theme-dropdown-btn'), themeDropdownMenu=document.getElementById('theme-dropdown-menu'), themeDropdownWrapper=document.getElementById('theme-dropdown-wrapper');
