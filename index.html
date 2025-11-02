@@ -175,6 +175,15 @@
 
         // --- STORAGE (MODIFICADO PARA USAR EDGE FUNCTION) ---
         async function uploadFile(file) {
+            // 1. OBTENER EL TOKEN JWT DEL USUARIO LOGUEADO
+            const session = await supabase.auth.getSession();
+            const token = session?.data?.session?.access_token;
+        
+            if (!token) {
+                // Generamos un error claro si el admin no está logueado
+                throw new Error('Admin no autenticado. Inicie sesión para subir archivos.');
+            }
+            
             const formData = new FormData();
             formData.append('file', file); 
 
@@ -185,12 +194,12 @@
                 const response = await fetch(R2_UPLOAD_EDGE_FUNCTION_URL, {
                     method: 'POST',
                     body: formData,
-                    // Añadimos 'no-cors' si el preflight está fallando de forma silenciosa. 
-                    // Nota: Quitar esto si el CORS en Supabase y R2 está bien, ya que 'no-cors' no nos permite ver la respuesta.
-                    // mode: 'no-cors' 
+                    // 2. AÑADIR EL TOKEN JWT A LAS CABECERAS PARA PASAR EL 401
+                    headers: {
+                        'Authorization': `Bearer ${token}` 
+                    }
                 });
                 
-                // Si la respuesta es opaca (modo 'no-cors') o el status es 500/403
                 if (!response.ok) {
                     let errorData = {};
                     let errorText = await response.text();
@@ -198,13 +207,13 @@
                     try { 
                         errorData = JSON.parse(errorText);
                     } catch(e) {
-                        // Si no es JSON, es un error de infraestructura (500/502/504) o CORS fallando.
                         console.error('Error no JSON de Edge Function:', response.status, errorText);
                         throw new Error(`Edge Function falló. Código: ${response.status}. Revisa logs de Supabase.`);
                     }
                     
                     console.error('Error de Edge Function (R2):', errorData);
-                    throw new Error(errorData.error || 'Fallo la subida a R2 a través de la Edge Function.');
+                    // Devolvemos el mensaje de error de la función si está disponible
+                    throw new Error(errorData.error || `Fallo la subida a R2 a través de la Edge Function. Código 401: ${errorData.message}`);
                 }
 
                 const data = await response.json();
@@ -258,8 +267,8 @@
 
                 displayMessage("Logo actualizado.",authMessage,"success")
             }catch(i){
-                console.error("Error al subir logo:",i),
-                displayMessage(`Error al subir logo: ${i.message}`,authMessage,"error"),
+                console.error("Error al subir logo:", i),
+                displayMessage(`Error al subir logo: ${i.message}`, authMessage, "error"),
                 loadLogo() // Si falla, volvemos a cargar el logo anterior
             }finally{
                 // UI: Quita el spinner y limpia el input
