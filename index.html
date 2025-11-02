@@ -11,112 +11,157 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;600;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Estilos base + Nuevos Temas */
-        body { background-image: radial-gradient(at top left, var(--color-primary-gradient), transparent 50%), radial-gradient(at bottom right, var(--color-secondary-gradient), transparent 50%); min-height: 100vh; padding-top: 5rem; }
-        .accent-text { color: var(--accent-color); }
-        .input-dark { background-color: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); }
-        .focus\:ring-primary:focus { --tw-ring-color: var(--accent-color) !important; }
-        #logo-upload-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.7); opacity: 0; transition: opacity 0.3s; cursor: pointer; border-radius: 9999px; }
-        #logo-container.admin-active:hover #logo-upload-overlay { display: flex; opacity: 1; }
-        #logo-container:not(.admin-active) #logo-upload-overlay { display: none; }
-        .inventory-image-preview { width: 100%; height: 200px; object-fit: cover; border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem; margin-bottom: 0.75rem; }
-        .theme-btn { width: 2rem; height: 2rem; border-radius: 9999px; border: 3px solid #4B5563; cursor: pointer; transition: border-color 0.2s; }
-        .theme-btn.active, .theme-btn:hover { border-color: var(--accent-color); }
-        #theme-btn-dark { background-color: #818cf8; } #theme-btn-infernal { background-color: #ff4500; } #theme-btn-gold { background-color: #D4AF37; }
+        /* Estilos originales y ajustes para el botón de WhatsApp */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1f2937; /* bg-gray-900 */
+            color: #e5e7eb; /* text-gray-100 */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .accent-text { color: #818cf8; /* indigo-400 */ }
+        .input-dark {
+            background-color: #374151; /* bg-gray-700 */
+            border: 1px solid #4b5563; /* border-gray-600 */
+            color: #e5e7eb;
+        }
+        .focus\:ring-primary:focus { --tw-ring-color: #818cf8 !important; }
 
-        /* Estilos Nuevos Temas */
-        html { height: 100%; }
-        body { min-height: 100vh; display: flex; flex-direction: column; transition: background-color 0.5s ease; }
-        .main-content { flex-grow: 1; } 
-        .product-card { background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.5rem; overflow: hidden; transition: transform 0.2s, box-shadow 0.3s; display: flex; flex-direction: column; }
-        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px color-mix(in srgb, var(--accent-color) 20%, transparent), 0 4px 6px -2px color-mix(in srgb, var(--accent-color) 15%, transparent); }
-        .product-card-content { padding: 0 0.75rem 0.75rem; flex-grow: 1; }
-        .product-card-actions { padding: 0.5rem 0.75rem; border-top: 1px solid var(--border-color); background-color: color-mix(in srgb, var(--bg-secondary) 80%, black); display: flex; justify-content: flex-end; gap: 0.5rem; }
-        #logo-upload { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; border: 0; }
+        /* Logo Upload Overlay */
+        #logo-upload-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            transition: opacity 0.3s;
+            cursor: pointer;
+            border-radius: 9999px;
+        }
+        #logo-container.admin-active:hover #logo-upload-overlay {
+            display: flex;
+            opacity: 1;
+        }
+        #logo-container:not(.admin-active) #logo-upload-overlay {
+            display: none;
+        }
+        #logo-upload {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            border: 0;
+        }
+
+        /* Product Card styles */
+        .product-card {
+            background-color: #374151; /* bg-gray-700 */
+            border: 1px solid #4b5563; /* border-gray-600 */
+            border-radius: 0.5rem;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(129, 140, 248, 0.2), 0 4px 6px -2px rgba(129, 140, 248, 0.1);
+        }
+        .product-card-content {
+            padding: 0 0.75rem 0.75rem;
+            flex-grow: 1;
+        }
+        .product-card-actions {
+            padding: 0.5rem 0.75rem;
+            border-top: 1px solid #4b5563;
+            background-color: rgba(55, 65, 81, 0.8); /* Ajustado para un color más oscuro pero transparente */
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+        .inventory-image-preview {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Skeleton Loader */
         .skeleton-card { background-color: transparent; border-radius: 0.5rem; padding: 1rem; display: flex; flex-direction: column; }
-        .skeleton-line { background-color: var(--bg-secondary); opacity: 0.7; border-radius: 0.25rem; animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .skeleton-line { background-color: #374151; opacity: 0.7; border-radius: 0.25rem; animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         @keyframes pulse { 50% { opacity: .4; } }
-        .theme-dark { --bg-primary: #1f2937; --bg-secondary: #374151; --bg-header: rgba(31, 41, 55, 0.8); --text-primary: #e5e7eb; --text-secondary: #d1d5db; --text-muted: #9ca3af; --border-color: #4b5563; --accent-color: #818cf8; --accent-color-dark: #6366f1; --font-main: 'Poppins', sans-serif; --font-headings: 'Poppins', sans-serif; --color-primary-gradient: rgba(129, 140, 248, 0.1); --color-secondary-gradient: rgba(99, 102, 241, 0.1); }
-        .theme-infernal { --bg-primary: #000000; --bg-secondary: #2d1a1a; --bg-header: rgba(17, 7, 0, 0.6); --text-primary: #f9fafb; --text-secondary: #d1d5db; --text-muted: #9ca3af; --border-color: #571e1e; --accent-color: #ff4500; --accent-color-dark: #e63e00; --font-main: 'Roboto', sans-serif; --font-headings: 'Roboto', sans-serif; --color-primary-gradient: rgba(255, 69, 0, 0.1); --color-secondary-gradient: rgba(230, 62, 0, 0.1); }
-        .theme-infernal { background-image: linear-gradient(180deg, #1a0000 0%, #000000 100%); }
-        .theme-infernal .product-card:hover { box-shadow: 0 0 25px rgba(255, 69, 0, 0.5); border-color: rgba(255, 69, 0, 0.7); }
-        .theme-gold { --bg-primary: #121212; --bg-secondary: #2b2b2b; --bg-header: rgba(18, 18, 18, 0.85); --text-primary: #f1f1f1; --text-secondary: #cccccc; --text-muted: #a0a0a0; --border-color: #444444; --accent-color: #D4AF37; --accent-color-dark: #B8860B; --font-main: 'Poppins', sans-serif; --font-headings: 'Playfair Display', serif; --color-primary-gradient: rgba(212, 175, 55, 0.05); --color-secondary-gradient: rgba(184, 134, 11, 0.05); }
-        .theme-gold { background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%232a2a2a" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
-        .theme-gold .product-card:hover { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); border-color: var(--accent-color); }
-        .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
-        .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
-        body { background-color: var(--bg-primary); color: var(--text-primary); font-family: var(--font-main); }
-        h1, h2, h3, h4, h5, h6 { font-family: var(--font-headings); }
-        header.sticky { background-color: var(--bg-header); border-bottom: 1px solid var(--border-color); backdrop-filter: blur(10px); }
-        .bg-gray-800 { background-color: var(--bg-secondary) !important; } .bg-gray-900 { background-color: var(--bg-primary) !important; }
-        .text-gray-300 { color: var(--text-secondary); } .text-gray-400 { color: var(--text-muted); }
-        .bg-gray-600 { background-color: var(--bg-secondary) !important; } .bg-gray-700 { background-color: color-mix(in srgb, var(--bg-secondary) 70%, var(--bg-primary)) !important; }
-        .border-gray-500, .border-gray-600, .border-gray-700 { border-color: var(--border-color); } .divide-gray-700 > :not([hidden]) ~ :not([hidden]) { border-color: var(--border-color); }
-        .text-indigo-400, .text-indigo-300 { color: var(--accent-color); } .border-indigo-500 { border-color: var(--accent-color); }
-        .bg-indigo-500 { background-color: var(--accent-color-dark); color: var(--text-primary); } .hover\:bg-indigo-600:hover { background-color: var(--accent-color); }
-        .focus\:ring-indigo-500:focus { --tw-ring-color: var(--accent-color); }
-        input:focus, select:focus, textarea:focus { border-color: var(--accent-color) !important; box-shadow: 0 0 0 1px var(--accent-color); outline: none; }
-        .bg-pink-600 { background-color: var(--accent-color-dark) !important; } .hover\:bg-pink-700:hover { background-color: var(--accent-color) !important; }
-        .border-pink-500\/50 { border-color: color-mix(in srgb, var(--accent-color) 50%, transparent) !important; } .text-pink-500 { color: var(--accent-color) !important; }
-        .file\:text-pink-700 { color: var(--accent-color-dark) !important; } .file\:bg-pink-50 { background-color: color-mix(in srgb, var(--accent-color) 10%, transparent) !important; }
-        .hover\:file\:bg-pink-100:hover { background-color: color-mix(in srgb, var(--accent-color) 20%, transparent) !important; }
-        .bg-green-600 { background-color: #16a34a !important; } .hover\:bg-green-700:hover { background-color: #15803d !important; }
-        .shadow-green-700\/50 { box-shadow: 0 10px 15px -3px rgba(21, 128, 61, 0.5), 0 4px 6px -2px rgba(21, 128, 61, 0.5) !important; }
-        .bg-red-600 { background-color: #dc2626 !important; } .hover\:bg-red-700:hover { background-color: #b91c1c !important; }
-        .text-red-500 { color: #ef4444 !important; } .text-red-400 { color: #f87171 !important; }
-        .text-yellow-400 { color: #facc15 !important; } .hover\:text-yellow-300:hover { color: #fde047 !important; }
-        .text-green-500 { color: #22c55e !important; }
+
+        /* Status Badges */
         .status-badge { padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-align: center; display: inline-block; min-width: 80px; }
         .status-Pagado { background-color: #16a34a !important; color: #ffffff !important; border: 1px solid #15803d !important; }
         .status-Pendiente { background-color: #f59e0b !important; color: #1f2937 !important; border: 1px solid #d97706 !important; }
         .status-Devuelto { background-color: #dc2626 !important; color: #ffffff !important; border: 1px solid #b91c1c !important; }
-        .status-select { background-color: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.75rem; padding: 0.1rem 0.3rem; border-radius: 0.25rem; margin-left: 0.5rem; }
-        /* --- NUEVOS ESTILOS PARA EL BOTÓN DE WHATSAPP --- */
-        .whatsapp-float-btn {
-            position: fixed; /* Lo mantiene en pantalla al hacer scroll */
-            bottom: 20px; /* Distancia desde la parte inferior */
-            right: 20px; /* Distancia desde la parte derecha */
-            z-index: 50; /* Lo pone por encima de la mayoría de elementos */
-            background-color: #25D366; /* Color oficial de WhatsApp */
-            border-radius: 50%; /* Lo hace redondo */
-            width: 56px; /* Tamaño del botón */
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-        }
-        .whatsapp-float-btn:hover {
-            transform: scale(1.05); /* Ligeramente más grande al pasar el ratón */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
-        }
-        .whatsapp-icon-svg {
-            width: 30px; /* Tamaño del icono */
-            height: 30px;
-            fill: white; /* Color del icono */
-        }
-        /* --- FIN ESTILOS WHATSAPP --- */
+        .status-select { background-color: #374151; border: 1px solid #4b5563; color: #e5e7eb; font-size: 0.75rem; padding: 0.1rem 0.3rem; border-radius: 0.25rem; margin-left: 0.5rem; }
+
+        /* HEADER */
+        header.sticky {
+            background-color: rgba(31, 41, 55, 0.8); /* bg-gray-900 con transparencia */
+            border-bottom: 1px solid #4b5563; /* border-gray-600 */
+            backdrop-filter: blur(10px);
+        }
+
+        /* --- ESTILOS PARA EL BOTÓN DE WHATSAPP (CON IMAGEN) --- */
+        .whatsapp-float-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 50;
+            width: 56px; /* Tamaño del botón */
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            background-color: transparent; /* El color ya está en la imagen */
+            border-radius: 50%; /* Asegura que la sombra y la interacción se vean bien */
+        }
+        .whatsapp-float-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+        }
+        .whatsapp-float-btn img {
+            width: 100%; /* La imagen ocupa todo el botón */
+            height: 100%;
+            object-fit: contain; /* Asegura que la imagen se vea completa */
+            border-radius: 50%; /* Para que la imagen también sea redonda */
+        }
+        /* --- FIN ESTILOS WHATSAPP --- */
     </style>
 </head>
-<body class="theme-dark">
+<body class="bg-gray-900 text-gray-100 font-sans">
 
     <header class="sticky top-0 z-10 shadow-lg p-4 flex items-center justify-between">
         <div class="flex items-center space-x-4">
-            <div class="relative" id="logo-container"> <div class="relative w-16 h-16 flex items-center justify-center rounded-full border-2 border-indigo-500 shadow-md bg-gray-700" id="current-logo"> <svg id="default-logo-svg" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 accent-text" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M12 20a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" opacity=".2"/> <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" fill="var(--accent-color)"/> <path d="M16 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM10 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/> <path d="M12 14v-2" stroke-width="3"/> </svg> <div id="logo-upload-overlay"> <i data-lucide="upload" class="w-5 h-5 text-white"></i> <input type="file" id="logo-file-input" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*"> </div> </div> </div>
+            <div class="relative" id="logo-container"> <div class="relative w-16 h-16 flex items-center justify-center rounded-full border-2 border-indigo-500 shadow-md bg-gray-700" id="current-logo"> <svg id="default-logo-svg" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 accent-text" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M12 20a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" opacity=".2"/> <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" fill="currentColor"/> <path d="M16 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM10 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/> <path d="M12 14v-2" stroke-width="3"/> </svg> <div id="logo-upload-overlay"> <i data-lucide="upload" class="w-5 h-5 text-white"></i> <input type="file" id="logo-file-input" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*"> </div> </div> </div>
             <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight uppercase accent-text"> UNICELL SERVICIO TÉCNICO </h1>
         </div>
         <div class="flex items-center space-x-3">
             <button id="open-sales-modal-btn" class="bg-transparent text-gray-300 font-medium py-1.5 px-3 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 text-sm hidden flex items-center"> <i data-lucide="receipt-text" class="w-4 h-4 mr-1"></i> Ventas </button>
-            <div class="relative" id="theme-dropdown-wrapper"> <button id="open-theme-dropdown-btn" class="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-full transition duration-300 shadow-md flex items-center"> <i data-lucide="palette" class="w-5 h-5"></i> </button> <div id="theme-dropdown-menu" class="hidden absolute top-full right-0 mt-2 w-max bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-3 z-50"> <div id="theme-selector-container" class="flex space-x-2 items-center"> <button id="theme-btn-dark" class="theme-btn" title="Tema Oscuro"></button> <button id="theme-btn-infernal" class="theme-btn" title="Tema Infernal"></button> <button id="theme-btn-gold" class="theme-btn" title="Tema Dorado"></button> </div> </div> </div>
+            <div class="relative" id="theme-dropdown-wrapper"> <button id="open-theme-dropdown-btn" class="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-full transition duration-300 shadow-md flex items-center"> <i data-lucide="palette" class="w-5 h-5"></i> </button> <div id="theme-dropdown-menu" class="hidden absolute top-full right-0 mt-2 w-max bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-3 z-50"> <div id="theme-selector-container" class="flex space-x-2 items-center"> <button id="theme-btn-dark" class="theme-btn active" title="Tema Oscuro" style="background-color: #818cf8;"></button> </div> </div> </div>
             <button id="open-auth-modal-btn" class="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-full transition duration-300 shadow-md flex items-center"> <i data-lucide="user" class="w-5 h-5"></i> </button>
         </div>
     </header>
 
-    <div class="main-content max-w-6xl mx-auto px-4 py-8"> 
+    <div class="main-content max-w-6xl mx-auto px-4 py-8 flex-grow"> 
         <h2 class="text-3xl font-bold text-center mb-6 text-white flex items-center justify-center"> <i data-lucide="package" class="w-7 h-7 accent-text mr-3"></i> Inventario de Productos </h2>
         <p id="app-error-display" class="my-4 text-red-500 font-bold hidden text-center"></p>
 
@@ -127,8 +172,8 @@
                  <div> <label class="text-gray-400 text-sm">Precio</label> <input id="inventory-price" type="number" placeholder="Precio (Ej: 150.00)" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" step="0.01" /> </div>
                  <div> <label class="text-gray-400 text-sm">Categoría</label> <select id="inventory-category" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 h-[46px]"> <option value="">Seleccionar...</option> <option value="Placas de Carga">Placas de Carga</option> <option value="Placas">Placas</option> <option value="Botones">Botones</option> <option value="Jacks">Jacks</option> <option value="Vidrios">Vidrios</option> <option value="Cargadores">Cargadores</option> <option value="Privados">Privados</option> <option value="Hidrogel">Hidrogel</option> <option value="Otro">Otro</option> </select> </div>
                  <div> <label class="text-gray-400 text-sm">Cantidad</label> <input id="inventory-quantity" type="number" placeholder="0" min="0" value="0" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" /> </div>
-                 <div> <label class="text-gray-400 text-sm">Foto (Opcional)</label> <input type="file" id="inventory-image-file" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100" accept="image/*" /> </div>
-                 <button id="inventory-add-btn" class="sm:col-span-1 bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center disabled:opacity-50"> <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir </button>
+                 <div> <label class="text-gray-400 text-sm">Foto (Opcional)</label> <input type="file" id="inventory-image-file" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" accept="image/*" /> </div>
+                 <button id="inventory-add-btn" class="sm:col-span-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center disabled:opacity-50"> <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir </button>
              </div>
              <p id="inventory-message" class="text-center text-sm mt-3 text-red-400"></p>
         </div>
@@ -145,8 +190,8 @@
         </p>
     </div>
 
-    <div id="auth-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4"> <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-gray-700 max-w-sm w-full p-6 relative"> <button id="close-auth-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"> <i data-lucide="x" class="w-6 h-6"></i> </button> <div id="auth-container"> <h2 class="text-2xl font-bold text-center mb-6 text-white" id="auth-title">Iniciar Sesión</h2> <form id="login-form" class="space-y-4"> <input id="auth-email" type="email" placeholder="Correo Electrónico" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" required /> <input id="auth-password" type="password" placeholder="Contraseña" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" required /> <button type="submit" id="auth-submit-btn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center"> <i data-lucide="log-in" class="w-5 h-5 mr-2"></i> <span id="auth-button-text">Iniciar Sesión</span> </button> <p id="auth-message" class="text-center text-sm text-red-400"></p> </form> <button id="toggle-auth-mode" class="w-full mt-4 text-center text-sm text-gray-400 hover:text-white transition"> ¿No tienes cuenta? Regístrate </button> </div> <div id="logout-container" class="hidden text-center"> <p class="text-lg text-white mb-4">Sesión Iniciada.</p> <p id="current-user-uid" class="text-xs text-gray-500 mb-6 font-mono break-all"></p> <button id="logout-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center"> <i data-lucide="log-out" class="w-5 h-5 mr-2"></i> Cerrar Sesión </button> </div> </div> </div>
-    <div id="sales-modal" class="fixed inset-0 z-40 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4"> <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-pink-500/50 max-w-6xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300"> <button id="close-sales-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"> <i data-lucide="x" class="w-7 h-7"></i> </button> <h2 class="text-3xl font-bold text-center mb-6 text-white flex items-center justify-center"> <i data-lucide="receipt-text" class="w-7 h-7 accent-text mr-3"></i> Registro de Ventas </h2> <p id="sales-auth-message" class="text-center p-4 text-red-400 hidden">Debes iniciar sesión para ver o registrar ventas.</p> <div id="sales-content"> <div id="sales-add-form-admin" class="hidden mb-8 p-4 bg-gray-800 rounded-lg shadow-inner"> <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir Nuevo Artículo</h3> <label class="text-gray-400 text-sm mb-1 block">Destinatario/Cliente</label> <input id="client-name" type="text" placeholder="Nombre del Destinatario" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 mb-4" /> <div class="grid grid-cols-1 sm:grid-cols-5 gap-4"> <input id="product-name" type="text" placeholder="Producto/Servicio" class="col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" /> <select id="sale-category" class="col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 h-[46px]"> <option value="">Categoría...</option> <option value="Placas de Carga">Placas de Carga</option> <option value="Placas">Placas</option> <option value="Botones">Botones</option> <option value="Jacks">Jacks</option> <option value="Vidrios">Vidrios</option> <option value="Cargadores">Cargadores</option> <option value="Privados">Privados</option> <option value="Hidrogel">Hidrogel</option> <option value="Otro">Otro</option> </select> <input id="product-price" type="number" placeholder="Precio" class="col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" step="0.01" /> <select id="sale-initial-status" class="col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 h-[46px]"> <option value="Pendiente" selected>Pendiente</option> <option value="Pagado">Pagado</option> <option value="Devuelto">Devuelto</option> </select> <button id="add-btn" class="col-span-1 bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center disabled:opacity-50"> <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir </button> </div> </div> <div class="overflow-x-auto"> <table class="min-w-full divide-y divide-gray-700 rounded-lg"> <thead class="bg-gray-700"> <tr> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Destinatario</th> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Producto</th> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Categoría</th> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Precio</th> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-28">Fecha</th> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-40">Estado</th> <th id="sales-header-actions" class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider w-20 hidden">Acción</th> </tr> </thead> <tbody id="sales-list" class="bg-gray-800 divide-y divide-gray-700"> <tr><td colspan="7" class="text-center py-4 text-gray-500 italic">Cargando ventas...</td></tr> </tbody> </table> </div> <div class="mt-6 p-4 bg-gray-700 rounded-lg grid grid-cols-2 gap-4 text-sm"> <div class="col-span-1 space-y-1"> <div class="flex justify-between"><span>Total Vendido Hoy:</span> <span id="sales-today-sold" class="font-semibold">$0.00</span></div> <div class="flex justify-between"><span>Total Pagado Hoy:</span> <span id="sales-today-paid" class="font-semibold text-green-400">$0.00</span></div> </div> <div class="col-span-1 space-y-1 border-l border-gray-600 pl-4"> <div class="flex justify-between"><span>Total General Vendido:</span> <span id="sales-grand-total-sold" class="font-semibold">$0.00</span></div> <div class="flex justify-between"><span>Total General Pagado:</span> <span id="sales-grand-total-paid" class="font-semibold text-green-400">$0.00</span></div> </div> </div> </div> </div> </div>
+    <div id="auth-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4"> <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-gray-700 max-w-sm w-full p-6 relative"> <button id="close-auth-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"> <i data-lucide="x" class="w-6 h-6"></i> </button> <div id="auth-container"> <h2 class="text-2xl font-bold text-center mb-6 text-white" id="auth-title">Iniciar Sesión</h2> <form id="login-form" class="space-y-4"> <input id="auth-email" type="email" placeholder="Correo Electrónico" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" required /> <input id="auth-password" type="password" placeholder="Contraseña" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" required /> <button type="submit" id="auth-submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center"> <i data-lucide="log-in" class="w-5 h-5 mr-2"></i> <span id="auth-button-text">Iniciar Sesión</span> </button> <p id="auth-message" class="text-center text-sm text-red-400"></p> </form> <button id="toggle-auth-mode" class="w-full mt-4 text-center text-sm text-gray-400 hover:text-white transition"> ¿No tienes cuenta? Regístrate </button> </div> <div id="logout-container" class="hidden text-center"> <p class="text-lg text-white mb-4">Sesión Iniciada.</p> <p id="current-user-uid" class="text-xs text-gray-500 mb-6 font-mono break-all"></p> <button id="logout-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center"> <i data-lucide="log-out" class="w-5 h-5 mr-2"></i> Cerrar Sesión </button> </div> </div> </div>
+    <div id="sales-modal" class="fixed inset-0 z-40 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4"> <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-indigo-500 max-w-6xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300"> <button id="close-sales-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"> <i data-lucide="x" class="w-7 h-7"></i> </button> <h2 class="text-3xl font-bold text-center mb-6 text-white flex items-center justify-center"> <i data-lucide="receipt-text" class="w-7 h-7 accent-text mr-3"></i> Registro de Ventas </h2> <p id="sales-auth-message" class="text-center p-4 text-red-400 hidden">Debes iniciar sesión para ver o registrar ventas.</p> <div id="sales-content"> <div id="sales-add-form-admin" class="hidden mb-8 p-4 bg-gray-800 rounded-lg shadow-inner"> <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir Nuevo Artículo</h3> <label class="text-gray-400 text-sm mb-1 block">Destinatario/Cliente</label> <input id="client-name" type="text" placeholder="Nombre del Destinatario" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 mb-4" /> <div class="grid grid-cols-1 sm:grid-cols-5 gap-4"> <input id="product-name" type="text" placeholder="Producto/Servicio" class="col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" /> <select id="sale-category" class="col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 h-[46px]"> <option value="">Categoría...</option> <option value="Placas de Carga">Placas de Carga</option> <option value="Placas">Placas</option> <option value="Botones">Botones</option> <option value="Jacks">Jacks</option> <option value="Vidrios">Vidrios</option> <option value="Cargadores">Cargadores</option> <option value="Privados">Privados</option> <option value="Hidrogel">Hidrogel</option> <option value="Otro">Otro</option> </select> <input id="product-price" type="number" placeholder="Precio" class="col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" step="0.01" /> <select id="sale-initial-status" class="col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 h-[46px]"> <option value="Pendiente" selected>Pendiente</option> <option value="Pagado">Pagado</option> <option value="Devuelto">Devuelto</option> </select> <button id="add-btn" class="col-span-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center disabled:opacity-50"> <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir </button> </div> </div> <div class="overflow-x-auto"> <table class="min-w-full divide-y divide-gray-700 rounded-lg"> <thead class="bg-gray-700"> <tr> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Destinatario</th> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Producto</th> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Categoría</th> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Precio</th> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-28">Fecha</th> <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-40">Estado</th> <th id="sales-header-actions" class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider w-20 hidden">Acción</th> </tr> </thead> <tbody id="sales-list" class="bg-gray-800 divide-y divide-gray-700"> <tr><td colspan="7" class="text-center py-4 text-gray-500 italic">Cargando ventas...</td></tr> </tbody> </table> </div> <div class="mt-6 p-4 bg-gray-700 rounded-lg grid grid-cols-2 gap-4 text-sm"> <div class="col-span-1 space-y-1"> <div class="flex justify-between"><span>Total Vendido Hoy:</span> <span id="sales-today-sold" class="font-semibold">$0.00</span></div> <div class="flex justify-between"><span>Total Pagado Hoy:</span> <span id="sales-today-paid" class="font-semibold text-green-400">$0.00</span></div> </div> <div class="col-span-1 space-y-1 border-l border-gray-600 pl-4"> <div class="flex justify-between"><span>Total General Vendido:</span> <span id="sales-grand-total-sold" class="font-semibold">$0.00</span></div> <div class="flex justify-between"><span>Total General Pagado:</span> <span id="sales-grand-total-paid" class="font-semibold text-green-400">$0.00</span></div> </div> </div> </div> </div>
 
     <a 
         href="https://wa.me/50377191068" 
@@ -154,9 +199,7 @@
         class="whatsapp-float-btn"
         title="Chatea con UNICELL"
     >
-        <svg viewBox="0 0 24 24" class="whatsapp-icon-svg">
-            <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm4.336 17.377l-.953-.334c-.37-.129-.638-.179-.906.079l-1.393 1.583c-.114.13-.306.196-.499.196-.062 0-.125-.008-.188-.023-1.897-.47-3.488-1.503-4.945-2.96-.921-.92-1.636-1.928-2.146-3.033-.146-.307-.123-.655.068-.946l.542-.716c.361-.476.353-1.12-.025-1.583l-1.332-1.599c-.381-.458-.947-.565-1.465-.286l-1.002.502c-.374.188-.707.458-1.002.784-.199.219-.387.455-.566.702-.533.743-.956 1.57-1.258 2.474-.355 1.053-.418 2.141-.16 3.203.255 1.052.793 2.038 1.583 2.914 1.393 1.59 3.123 2.768 5.093 3.493 1.077.404 2.215.545 3.332.417 1.155-.13 2.22-.556 3.136-1.233.167-.124.32-.267.458-.426.126-.143.238-.302.333-.474.208-.37.288-.773.234-1.183l-.066-.464z" fill-rule="evenodd"/>
-        </svg>
+        <img src="https://i.ibb.co/L5k6h6f/whatsapp-logo.png" alt="WhatsApp Logo">
     </a>
         <script> lucide.createIcons(); </script>
 
@@ -166,7 +209,7 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhdm9udml3eXlqbWR3d2h4cnptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2MTA2MzcsImV4cCI6MjA3NzE4NjYzN30.dWGKn3MWuVHvOivh608-ZIdfVGsekdpfLu7quc42HBk';
         const ADMIN_EMAIL_REAL = 'unicell2025@gmail.com';
         const ASSETS_BUCKET = 'public_assets';
-        const CATEGORY_OPTIONS_HTML = `<option value="Placas de Carga">Placas de Carga</option><option value="Placas">Placas</option><option value="Botones">Botones</option><option value="Jacks">Jacks</option><option value="Vidrios">Vidrios</option><option value="Cargadores">Cargadores</option><option value="Privados">Privados</option><option value="Hidrogel">Hidrogel</option><option value="Otro">Otro</option>`;
+        const CATEGORY_OPTIONS_HTML = `<option value="">Seleccionar...</option><option value="Placas de Carga">Placas de Carga</option><option value="Placas">Placas</option><option value="Botones">Botones</option><option value="Jacks">Jacks</option><option value="Vidrios">Vidrios</option><option value="Cargadores">Cargadores</option><option value="Privados">Privados</option><option value="Hidrogel">Hidrogel</option><option value="Otro">Otro</option>`;
         let supabase = null, userId = null, userEmail = null, isAdmin = false;
         let logoUploadOverlayHTML = '', defaultSvgHtml = '';
 
@@ -176,7 +219,7 @@
         // CAMBIO: Nueva referencia
         inventoryQuantityInput = document.getElementById('inventory-quantity'),
         inventoryImageFile=document.getElementById('inventory-image-file'), inventoryAddBtn=document.getElementById('inventory-add-btn'), inventoryMessage=document.getElementById('inventory-message'), 
-        themeBtnDark=document.getElementById('theme-btn-dark'), themeBtnInfernal=document.getElementById('theme-btn-infernal'), themeBtnGold=document.getElementById('theme-btn-gold'), openThemeDropdownBtn=document.getElementById('open-theme-dropdown-btn'), themeDropdownMenu=document.getElementById('theme-dropdown-menu'), themeDropdownWrapper=document.getElementById('theme-dropdown-wrapper');
+        themeBtnDark=document.getElementById('theme-btn-dark'), openThemeDropdownBtn=document.getElementById('open-theme-dropdown-btn'), themeDropdownMenu=document.getElementById('theme-dropdown-menu'), themeDropdownWrapper=document.getElementById('theme-dropdown-wrapper');
 
         // --- UTILIDADES ---
         function attachLogoInputListener(){const a=document.getElementById("logo-file-input");a?a.onchange=handleLogoUpload:console.log("Logo input not found.")} 
@@ -192,9 +235,26 @@
         async function handleAuthSubmit(a){a.preventDefault();const b=authEmailInput.value,c=authPasswordInput.value,d="Registrarse"===authTitle.textContent;authSubmitBtn.disabled=!0,authMessage.textContent="Procesando...";let e;try{e=d?await supabase.auth.signUp({email:b,password:c}):await supabase.auth.signInWithPassword({email:b,password:c}),e.error?displayMessage(e.error.message,authMessage,"error"):(displayMessage("Éxito. Cerrando modal...",authMessage,"success"),setTimeout(()=>closeModal(authModal),1e3))}catch(f){displayMessage("Error de conexión.",authMessage,"error"),console.error(f)}finally{authSubmitBtn.disabled=!1}}
         async function handleLogout(){const{error:a}=await supabase.auth.signOut();a&&console.error("Error al cerrar sesión:",a.message),closeModal(authModal)}
 
-        // --- TEMAS ---
-        function applyTheme(a){document.body.classList.remove("theme-dark","theme-infernal","theme-gold");const b={dark:themeBtnDark,infernal:themeBtnInfernal,gold:themeBtnGold};Object.values(b).forEach(c=>c&&c.classList.remove("active")),"infernal"===a?(document.body.classList.add("theme-infernal"),themeBtnInfernal&&themeBtnInfernal.classList.add("active")):"gold"===a?(document.body.classList.add("theme-gold"),themeBtnGold&&themeBtnGold.classList.add("active")):(document.body.classList.add("theme-dark"),themeBtnDark&&themeBtnDark.classList.add("active")),localStorage.setItem("unicell-theme",a)}
-        function loadSavedTheme(){const a=localStorage.getItem("unicell-theme")||"dark";applyTheme(a),themeBtnDark&&(themeBtnDark.onclick=()=>{applyTheme("dark"),closeThemeDropdown()}),themeBtnInfernal&&(themeBtnInfernal.onclick=()=>{applyTheme("infernal"),closeThemeDropdown()}),themeBtnGold&&(themeBtnGold.onclick=()=>{applyTheme("gold"),closeThemeDropdown()})}
+        // --- TEMAS (simplificado a un solo tema) ---
+        function applyTheme(a){
+            document.body.className = ''; // Limpiar todas las clases de tema
+            // Solo se usa el tema "dark" por defecto, eliminando opciones de otros temas
+            document.body.classList.add("bg-gray-900", "text-gray-100", "font-sans");
+            themeBtnDark.classList.add("active"); // Asegura que el botón dark esté activo
+            localStorage.setItem("unicell-theme", "dark");
+        }
+        function loadSavedTheme(){
+            // Forzamos el tema "dark"
+            applyTheme("dark");
+            if (themeBtnDark) {
+                themeBtnDark.onclick = () => { applyTheme("dark"); closeThemeDropdown(); };
+            }
+            // Desactivar/eliminar botones de otros temas si existieran para evitar confusión
+            const themeSelectorContainer = document.getElementById('theme-selector-container');
+            if (themeSelectorContainer) {
+                themeSelectorContainer.innerHTML = `<button id="theme-btn-dark" class="theme-btn active" title="Tema Oscuro" style="background-color: #818cf8;"></button>`;
+            }
+        }
 
         // --- STORAGE ---
         async function uploadFile(a,b){const{data:c,error:d}=await supabase.storage.from(ASSETS_BUCKET).upload(b,a,{cacheControl:"3600",upsert:!0});if(d)throw console.error("Error al subir archivo a Storage:",d),Error(`Error al subir archivo: ${d.message}`);return c.path}
