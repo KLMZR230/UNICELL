@@ -140,8 +140,8 @@
         // --- CONFIGURACIÓN Y VARIABLES GLOBALES ---
         const SUPABASE_URL = 'https://pavonviwyyjmdwwhxrzm.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhdm9udml3eXlqbWR3d2h4cnptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2MTA2MzcsImV4cCI6MjA3NzE4NjYzN30.dWGKn3MWuVHvOivh608-ZIdfVGsekdpfLu7quc42HBk';
-        // URL de la Edge Function para subir archivos a R2
-        const R2_UPLOAD_EDGE_FUNCTION_URL = 'https://pavonviwyyjmdwwhxrzm.supabase.co/functions/v1/upload-to-r2'; // <--- CORREGIDO
+        // URL de la Edge Function para subir archivos a R2 (CONFIRMADA)
+        const R2_UPLOAD_EDGE_FUNCTION_URL = 'https://pavonviwyyjmdwwhxrzm.supabase.co/functions/v1/upload-to-r2'; 
         const ADMIN_EMAIL_REAL = 'unicell2025@gmail.com';
         const ASSETS_BUCKET = 'public_assets';
         const CATEGORY_OPTIONS_HTML = `<option value="Placas de Carga">Placas de Carga</option><option value="Placas">Placas</option><option value="Botones">Botones</option><option value="Jacks">Jacks</option><option value="Vidrios">Vidrios</option><option value="Cargadores">Cargadores</option><option value="Privados">Privados</option><option value="Hidrogel">Hidrogel</option><option value="Otro">Otro</option>`;
@@ -176,25 +176,44 @@
         // --- STORAGE (MODIFICADO PARA USAR EDGE FUNCTION) ---
         async function uploadFile(file) {
             const formData = new FormData();
-            // 'file' es el nombre que espera la Edge Function
             formData.append('file', file); 
 
-            const response = await fetch(R2_UPLOAD_EDGE_FUNCTION_URL, {
-                method: 'POST',
-                body: formData,
-            });
+            // LOG DE DIAGNÓSTICO
+            console.log("Intentando fetch a Edge Function:", R2_UPLOAD_EDGE_FUNCTION_URL);
 
-            if (!response.ok) {
-                let errorData = {};
-                try { errorData = await response.json(); } catch(e) {}
+            try {
+                const response = await fetch(R2_UPLOAD_EDGE_FUNCTION_URL, {
+                    method: 'POST',
+                    body: formData,
+                    // Añadimos 'no-cors' si el preflight está fallando de forma silenciosa. 
+                    // Nota: Quitar esto si el CORS en Supabase y R2 está bien, ya que 'no-cors' no nos permite ver la respuesta.
+                    // mode: 'no-cors' 
+                });
                 
-                console.error('Error en Edge Function (R2):', errorData);
-                throw new Error(errorData.error || 'Fallo la subida a R2 a través de la Edge Function.');
-            }
+                // Si la respuesta es opaca (modo 'no-cors') o el status es 500/403
+                if (!response.ok) {
+                    let errorData = {};
+                    let errorText = await response.text();
+                    
+                    try { 
+                        errorData = JSON.parse(errorText);
+                    } catch(e) {
+                        // Si no es JSON, es un error de infraestructura (500/502/504) o CORS fallando.
+                        console.error('Error no JSON de Edge Function:', response.status, errorText);
+                        throw new Error(`Edge Function falló. Código: ${response.status}. Revisa logs de Supabase.`);
+                    }
+                    
+                    console.error('Error de Edge Function (R2):', errorData);
+                    throw new Error(errorData.error || 'Fallo la subida a R2 a través de la Edge Function.');
+                }
 
-            const data = await response.json();
-            // Retorna path (fileName) y la url pública de R2
-            return { path: data.fileName, publicUrl: data.url };
+                const data = await response.json();
+                console.log("Subida exitosa:", data.url);
+                return { path: data.fileName, publicUrl: data.url };
+            } catch (error) {
+                console.error("Error crítico durante el fetch:", error);
+                throw error;
+            }
         }
 
         function getPublicUrl(pathOrUrl){
@@ -229,8 +248,7 @@
             try{
                 if(!userId)throw Error("Admin debe iniciar sesión.");
                 
-                // CAMBIO CLAVE: Usamos la función uploadFile (que llama a la Edge Function de R2)
-                const uploadResult = await uploadFile(b);
+                const uploadResult = await uploadFile(b); // Llama a la Edge Function
                 f = uploadResult.path; 
                 g = uploadResult.publicUrl; 
 
@@ -309,7 +327,9 @@
         async function initSupabaseAndSession() {
             if (!SUPABASE_URL || !SUPABASE_ANON_KEY) { handleGlobalError('¡ERROR: Faltan la URL o la Clave de Supabase!'); return; }
             try {
+                // Aseguramos que Supabase se inicialice antes de cualquier otra llamada
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
                 const { data: { session }, error: sessionError } = await supabase.auth.getSession();
                 if (sessionError) { console.error("Error al obtener la sesión inicial:", sessionError.message); handleAuthChange(null); } 
                 else { handleAuthChange(session); }
