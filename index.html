@@ -120,89 +120,100 @@
     </div>
 
     <div id="auth-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4"> <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-gray-700 max-w-sm w-full p-6 relative"> <button id="close-auth-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"> <i data-lucide="x" class="w-6 h-6"></i> </button> <div id="auth-container"> <h2 class="text-2xl font-bold text-center mb-6 text-white" id="auth-title">Iniciar Sesión</h2> <form id="login-form" class="space-y-4"> <input id="auth-email" type="email" placeholder="Correo Electrónico" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" required /> <input id="auth-password" type="password" placeholder="Contraseña" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" required /> <button type="submit" id="auth-submit-btn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center"> <i data-lucide="log-in" class="w-5 h-5 mr-2"></i> <span id="auth-button-text">Iniciar Sesión</span> </button> <p id="auth-message" class="text-center text-sm text-red-400"></p> </form> <button id="toggle-auth-mode" class="w-full mt-4 text-center text-sm text-gray-400 hover:text-white transition"> ¿No tienes cuenta? Regístrate </button> </div> <div id="logout-container" class="hidden text-center"> <p class="text-lg text-white mb-4">Sesión Iniciada.</p> <p id="current-user-uid" class="text-xs text-gray-500 mb-6 font-mono break-all"></p> <button id="logout-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center"> <i data-lucide="log-out" class="w-5 h-5 mr-2"></i> Cerrar Sesión </button> </div> </div> </div>
-    <div id="sales-modal" class="fixed inset-0 z-40 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4"> <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-pink-500/50 max-w-6xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300"> <button id="close-sales-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"> <i data-lucide="x" class="w-7 h-7"></i> </button> <h2 class="text-3xl font-bold text-center mb-6 text-white flex items-center justify-center"> <i data-lucide="receipt-text" class="w-7 h-7 accent-text mr-3"></i> Registro de Ventas </h2> <p id="sales-auth-message" class="text-center p-4 text-red-400 hidden">Debes iniciar sesión para ver o registrar ventas.</p> <div id="sales-content"> <div id="sales-add-form-admin" class="hidden mb-8 p-4 bg-gray-800 rounded-lg shadow-inner"> <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir Nuevo Artículo</h3> 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-                 <div>
-                     <label class="text-gray-400 text-sm mb-1 block">Destinatario/Cliente</label> 
-                     <input id="client-name" type="text" placeholder="Nombre del Destinatario" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" />
-                 </div>
-                 <div>
-                     <label class="text-gray-400 text-sm mb-1 block">Teléfono (Opcional)</label> 
-                     <input id="client-phone" type="text" placeholder="Teléfono" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" />
-                 </div>
-                 <div>
-                     <label class="text-gray-400 text-sm mb-1 block">Núm. Documento (Opcional)</label> 
-                     <input id="client-doc-number" type="text" placeholder="DUI/NIT/Otro" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" />
-                 </div>
-             </div>
-             <div class="grid grid-cols-1 sm:grid-cols-5 gap-4"> 
-                 <input id="product-name" type="text" placeholder="Producto/Servicio" class="col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" /> 
-                 <select id="sale-category" class="col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 h-[46px]"> 
-                     <option value="">Categoría...</option> 
-                     <option value="Placas de Carga">Placas de Carga</option> 
-                     <option value="Placas">Placas</option> 
-                     <option value="Botones">Botones</option> 
-                     <option value="Jacks">Jacks</option> 
-                     <option value="Vidrios">Vidrios</option> 
-                     <option value="Cargadores">Cargadores</option> 
-                     <option value="Privados">Privados</option> 
-                     <option value="Hidrogel">Hidrogel</option> 
-                     <option value="Otro">Otro</option> 
-                 </select> 
-                 <input id="product-price" type="number" placeholder="Precio" class="col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" step="0.01" /> 
-                 <select id="sale-initial-status" class="col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 h-[46px]"> 
-                     <option value="Pendiente" selected>Pendiente</option> 
-                     <option value="Pagado">Pagado</option> 
-                     <option value="Devuelto">Devuelto</option> 
-                 </select> 
-                 <button id="add-btn" class="col-span-1 bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center disabled:opacity-50"> 
-                     <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir 
-                 </button> 
-             </div> 
-         </div> 
-         <div class="overflow-x-auto"> 
-             <table class="min-w-full divide-y divide-gray-700 rounded-lg"> 
-                 <thead class="bg-gray-700"> 
-                     <tr> 
-                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Destinatario</th> 
-                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Teléfono</th>
-                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Documento</th>
-                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Producto</th> 
-                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Categoría</th> 
-                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Precio</th> 
-                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-28">Fecha</th> 
-                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-40">Estado</th> 
-                         <th id="sales-header-actions" class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider w-20 hidden">Acción</th> 
-                     </tr> 
-                 </thead> 
-                 <tbody id="sales-list" class="bg-gray-800 divide-y divide-gray-700"> 
-                     <tr><td colspan="9" class="text-center py-4 text-gray-500 italic">Cargando ventas...</td></tr> 
-                 </tbody> 
-             </table> 
-         </div> 
-         <div class="mt-6 p-4 bg-gray-700 rounded-lg grid grid-cols-2 gap-4 text-sm"> 
-             <div class="col-span-1 space-y-1"> 
-                 <div class="flex justify-between"><span>Total Vendido Hoy:</span> <span id="sales-today-sold" class="font-semibold">$0.00</span></div> 
-                 <div class="flex justify-between"><span>Total Pagado Hoy:</span> <span id="sales-today-paid" class="font-semibold text-green-400">$0.00</span></div> 
-             </div> 
-             <div class="col-span-1 space-y-1 border-l border-gray-600 pl-4"> 
-                 <div class="flex justify-between"><span>Total General Vendido:</span> <span id="sales-grand-total-sold" class="font-semibold">$0.00</span></div> 
-                 <div class="flex justify-between"><span>Total General Pagado:</span> <span id="sales-grand-total-paid" class="font-semibold text-green-400">$0.00</span></div> 
-             </div> 
-         </div> 
-     </div> 
-     </div> 
+    
+    <div id="sales-modal" class="fixed inset-0 z-40 hidden bg-black bg-opacity-80 backdrop-blur-sm items-center justify-center p-4">
+        <div class="bg-gray-900 rounded-xl shadow-2xl border-2 border-pink-500/50 max-w-6xl w-full max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300">
+            <button id="close-sales-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"> <i data-lucide="x" class="w-7 h-7"></i> </button>
+            <h2 class="text-3xl font-bold text-center mb-6 text-white flex items-center justify-center"> <i data-lucide="receipt-text" class="w-7 h-7 accent-text mr-3"></i> Registro de Ventas </h2>
+            <p id="sales-auth-message" class="text-center p-4 text-red-400 hidden">Debes iniciar sesión para ver o registrar ventas.</p>
+            <div id="sales-content">
+                <div id="sales-add-form-admin" class="hidden mb-8 p-4 bg-gray-800 rounded-lg shadow-inner">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-200">Añadir Nuevo Artículo</h3> 
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                         <div>
+                             <label class="text-gray-400 text-sm mb-1 block">Destinatario/Cliente</label> 
+                             <input id="client-name" type="text" placeholder="Nombre del Destinatario" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" />
+                         </div>
+                         <div>
+                             <label class="text-gray-400 text-sm mb-1 block">Teléfono (Opcional)</label> 
+                             <input id="client-phone" type="text" placeholder="Teléfono" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" />
+                         </div>
+                         <div>
+                             <label class="text-gray-400 text-sm mb-1 block">Núm. Documento (Opcional)</label> 
+                             <input id="client-doc-number" type="text" placeholder="DUI/NIT/Otro" class="w-full p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" />
+                         </div>
+                     </div>
+                     <div class="grid grid-cols-1 sm:grid-cols-5 gap-4"> 
+                         <input id="product-name" type="text" placeholder="Producto/Servicio" class="col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" /> 
+                         <select id="sale-category" class="col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 h-[46px]"> 
+                             <option value="">Categoría...</option> 
+                             <option value="Placas de Carga">Placas de Carga</option> 
+                             <option value="Placas">Placas</option> 
+                             <option value="Botones">Botones</option> 
+                             <option value="Jacks">Jacks</option> 
+                             <option value="Vidrios">Vidrios</option> 
+                             <option value="Cargadores">Cargadores</option> 
+                             <option value="Privados">Privados</option> 
+                             <option value="Hidrogel">Hidrogel</option> 
+                             <option value="Otro">Otro</option> 
+                         </select> 
+                         <input id="product-price" type="number" placeholder="Precio" class="col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500" step="0.01" /> 
+                         <select id="sale-initial-status" class="col-span-1 p-3 rounded-lg input-dark focus:ring-1 focus:ring-indigo-500 h-[46px]"> 
+                             <option value="Pendiente" selected>Pendiente</option> 
+                             <option value="Pagado">Pagado</option> 
+                             <option value="Devuelto">Devuelto</option> 
+                         </select> 
+                         <button id="add-btn" class="col-span-1 bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition duration-300 flex items-center justify-center disabled:opacity-50"> 
+                             <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Añadir 
+                         </button> 
+                     </div> 
+                 </div> 
+                 <div class="overflow-x-auto"> 
+                     <table class="min-w-full divide-y divide-gray-700 rounded-lg"> 
+                         <thead class="bg-gray-700"> 
+                             <tr> 
+                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Destinatario</th> 
+                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Teléfono</th>
+                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Documento</th>
+                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Producto</th> 
+                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Categoría</th> 
+                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-32">Precio</th> 
+                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-28">Fecha</th> 
+                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-40">Estado</th> 
+                                 <th id="sales-header-actions" class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider w-20 hidden">Acción</th> 
+                             </tr> 
+                         </thead> 
+                         <tbody id="sales-list" class="bg-gray-800 divide-y divide-gray-700"> 
+                             <tr><td colspan="9" class="text-center py-4 text-gray-500 italic">Cargando ventas...</td></tr> 
+                         </tbody> 
+                     </table> 
+                 </div> 
+                 <div class="mt-6 p-4 bg-gray-700 rounded-lg grid grid-cols-2 gap-4 text-sm"> 
+                     <div class="col-span-1 space-y-1"> 
+                         <div class="flex justify-between"><span>Total Vendido Hoy:</span> <span id="sales-today-sold" class="font-semibold">$0.00</span></div> 
+                         <div class="flex justify-between"><span>Total Pagado Hoy:</span> <span id="sales-today-paid" class="font-semibold text-green-400">$0.00</span></div> 
+                     </div> 
+                     <div class="col-span-1 space-y-1 border-l border-gray-600 pl-4"> 
+                         <div class="flex justify-between"><span>Total General Vendido:</span> <span id="sales-grand-total-sold" class="font-semibold">$0.00</span></div> 
+                         <div class="flex justify-between"><span>Total General Pagado:</span> <span id="sales-grand-total-paid" class="font-semibold text-green-400">$0.00</span></div> 
+                     </div> 
+                 </div> 
+            </div> 
+        </div> 
+    </div>
 
+    <!-- BOTÓN DE WHATSAPP: Movido aquí, FUERA de todos los modales -->
     <a href="https://wa.me/50377191068" 
        target="_blank" 
        rel="noopener noreferrer" 
-       class="fixed bottom-6 right-6 z-40 group">
-        
+       class="fixed bottom-6 right-6 z-50 group">
+       
         <img src="https://pub-0c024c9a5a7a439aa0319b5140a52857.r2.dev/6c784972cbf5806215d46fbda8b0c46a.jpg" 
              alt="WhatsApp" 
              class="w-14 h-14 rounded-full shadow-lg transition-transform group-hover:scale-110 duration-200">
-        
-        </a>
+       
+    </a>
+
     <script> lucide.createIcons(); </script>
 
     <script type="module">
@@ -250,7 +261,7 @@
             // 1. OBTENER EL TOKEN JWT DEL USUARIO LOGUEADO
             const session = await supabase.auth.getSession();
             const token = session?.data?.session?.access_token;
-        
+            
             if (!token) {
                 // Generamos un error claro si el admin no está logueado
                 throw new Error('Admin no autenticado. Inicie sesión para subir archivos.');
